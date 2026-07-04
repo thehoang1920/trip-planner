@@ -442,7 +442,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <div class="wl-link"><a href="https://www.google.com/maps/search/Spectra+Light+and+Water+Show+Marina+Bay+Sands" target="_blank">Xem trên Google Maps</a></div>
       </div>
     </div>
-    <div class="wl-card" data-address="Supertree Grove, Gardens by the Bay, 18 Marina Gardens Dr, Singapore 018953" data-dist="~4 km from hotel · ~7 min drive" data-gmaps="https://www.google.com/maps/search/Supertree+Grove+Gardens+by+the+Bay+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Evening_light_show_in_Supertree_Grove_of_Gardens_by_the_Bay_in_Singapore.jpg/500px-Evening_light_show_in_Supertree_Grove_of_Gardens_by_the_Bay_in_Singapore.jpg" data-caption="Supertree Grove — Gardens by the Bay">
+    <div class="wl-card" data-address="Supertree Grove, Gardens by the Bay, 18 Marina Gardens Dr, Singapore 018953" data-dist="~4 km from hotel · ~7 min drive" data-gmaps="https://www.google.com/maps/search/Supertree+Grove+Gardens+by+the+Bay+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/8/8c/Supertree_Grove%2C_Gardens_by_the_Bay%2C_light_show_19_August.webm" data-caption="Supertree Grove — Gardens by the Bay">
       <span class="wl-emoji">🌳</span>
       <div class="wl-info">
         <div class="wl-name">Supertree Grove @ Gardens by the Bay</div>
@@ -565,6 +565,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
   <div class="preview-panel" id="previewPanel">
     <div class="preview-placeholder" id="previewPlaceholder">Di chuột vào điểm dừng để xem ảnh</div>
     <img class="preview-img" id="previewImg" style="display:none;">
+    <video class="preview-img" id="previewVideo" muted loop playsinline style="display:none;"></video>
     <div class="preview-info" id="previewInfo" style="display:none;">
       <div class="preview-name" id="previewName"></div>
       <div class="preview-addr" id="previewAddr"></div>
@@ -671,6 +672,7 @@ dayHeaders.forEach(header => {
 
 // Hover preview panel
 const previewImg = document.getElementById('previewImg');
+const previewVideo = document.getElementById('previewVideo');
 const previewPlaceholder = document.getElementById('previewPlaceholder');
 const previewInfo = document.getElementById('previewInfo');
 const previewName = document.getElementById('previewName');
@@ -682,10 +684,20 @@ const previewGmaps = document.getElementById('previewGmaps');
 let pinnedEl = null;
 
 function showPreview(el) {
-  const img = el.dataset.img;
-  if (!img) return;
-  previewImg.src = img;
-  previewImg.style.display = 'block';
+  const src = el.dataset.img;
+  if (!src) return;
+  const isVideo = /\.(webm|mp4|mov)(\?|$)/i.test(src);
+  previewImg.style.display = 'none';
+  previewVideo.style.display = 'none';
+  previewVideo.pause();
+  if (isVideo) {
+    previewVideo.src = src;
+    previewVideo.style.display = 'block';
+    previewVideo.play().catch(function(){});
+  } else {
+    previewImg.src = src;
+    previewImg.style.display = 'block';
+  }
   previewPlaceholder.style.display = 'none';
   previewName.textContent = el.dataset.caption || '';
   previewAddr.textContent = el.dataset.address || '';
@@ -701,6 +713,8 @@ function hidePreview() {
     return;
   }
   previewImg.style.display = 'none';
+  previewVideo.style.display = 'none';
+  previewVideo.pause();
   previewPlaceholder.style.display = 'flex';
   previewInfo.style.display = 'none';
 }
