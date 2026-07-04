@@ -354,7 +354,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
   <h2>Danh sách yêu thích — Cần sắp xếp</h2>
   <p class="wl-sub">Những nơi muốn đến, kéo vào ngày bất kỳ khi sẵn sàng</p>
   <div class="wishlist-grid">
-    <div class="wl-card" data-address="30 Sentosa Gateway, Singapore 098140" data-dist="~10.8 km from hotel · ~16 min drive" data-time="Daily 10am-9pm (holiday season)" data-gmaps="https://www.google.com/maps/search/Universal+Studios+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Universal_Globe_Singapore.jpg/500px-Universal_Globe_Singapore.jpg" data-caption="Universal Studios Singapore — Sentosa Island">
+    <div class="wl-card" data-address="30 Sentosa Gateway, Singapore 098140" data-dist="~10.8 km from hotel · ~16 min drive" data-time="Daily 10am-9pm (holiday season)" data-gmaps="https://www.google.com/maps/search/Universal+Studios+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Universal_Globe_Singapore.jpg/500px-Universal_Globe_Singapore.jpg" data-video="https://www.youtube.com/watch?v=gbPTiTx4xDE" data-caption="Universal Studios Singapore — Sentosa Island">
       <span class="wl-emoji">🎢</span>
       <div class="wl-info">
         <div class="wl-name">Universal Studios Singapore</div>
@@ -431,7 +431,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <div class="wl-link"><a href="https://www.google.com/maps/search/Dopamine+Land+Resorts+World+Sentosa" target="_blank">Xem trên Google Maps</a></div>
       </div>
     </div>
-    <div class="wl-card" data-address="Event Plaza, Marina Bay Sands, 10 Bayfront Ave, Singapore 018956" data-dist="~4.5 km from hotel · ~8 min drive" data-time="Nightly 8pm & 9pm · Free" data-gmaps="https://www.google.com/maps/search/Spectra+Light+and+Water+Show+Marina+Bay+Sands" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Singapore_%28SG%29%2C_Spectra_--_2019_--_4711.jpg/500px-Singapore_(SG),_Spectra_--_2019_--_4711.jpg" data-caption="Spectra — Light &amp; Water Show at Marina Bay Sands">
+    <div class="wl-card" data-address="Event Plaza, Marina Bay Sands, 10 Bayfront Ave, Singapore 018956" data-dist="~4.5 km from hotel · ~8 min drive" data-time="Nightly 8pm & 9pm · Free" data-gmaps="https://www.google.com/maps/search/Spectra+Light+and+Water+Show+Marina+Bay+Sands" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Singapore_%28SG%29%2C_Spectra_--_2019_--_4711.jpg/500px-Singapore_(SG),_Spectra_--_2019_--_4711.jpg" data-video="https://www.youtube.com/watch?v=Kk8oGH55Lk0" data-caption="Spectra — Light &amp; Water Show at Marina Bay Sands">
       <span class="wl-emoji">🌊</span>
       <div class="wl-info">
         <div class="wl-name">Spectra — Light &amp; Water Show</div>
@@ -566,6 +566,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
     <div class="preview-placeholder" id="previewPlaceholder">Di chuột vào điểm dừng để xem ảnh</div>
     <img class="preview-img" id="previewImg" style="display:none;">
     <video class="preview-img" id="previewVideo" muted loop playsinline style="display:none;"></video>
+    <iframe class="preview-img" id="previewYoutube" style="display:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>
     <div class="preview-info" id="previewInfo" style="display:none;">
       <div class="preview-name" id="previewName"></div>
       <div class="preview-addr" id="previewAddr"></div>
@@ -673,6 +674,7 @@ dayHeaders.forEach(header => {
 // Hover preview panel
 const previewImg = document.getElementById('previewImg');
 const previewVideo = document.getElementById('previewVideo');
+const previewYoutube = document.getElementById('previewYoutube');
 const previewPlaceholder = document.getElementById('previewPlaceholder');
 const previewInfo = document.getElementById('previewInfo');
 const previewName = document.getElementById('previewName');
@@ -684,17 +686,31 @@ const previewGmaps = document.getElementById('previewGmaps');
 let pinnedEl = null;
 let pinnedMode = 'image';
 
+function getYoutubeId(url) {
+  const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
 function showPreview(el, type) {
   const src = el.dataset.img;
   if (!src) return;
-  const useVideo = type === 'video' && el.dataset.video;
+  const videoUrl = el.dataset.video;
+  const useVideo = type === 'video' && videoUrl;
   previewImg.style.display = 'none';
   previewVideo.style.display = 'none';
   previewVideo.pause();
+  previewYoutube.style.display = 'none';
+  previewYoutube.src = '';
   if (useVideo) {
-    previewVideo.src = el.dataset.video;
-    previewVideo.style.display = 'block';
-    previewVideo.play().catch(function(){});
+    const ytId = getYoutubeId(videoUrl);
+    if (ytId) {
+      previewYoutube.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0';
+      previewYoutube.style.display = 'block';
+    } else {
+      previewVideo.src = videoUrl;
+      previewVideo.style.display = 'block';
+      previewVideo.play().catch(function(){});
+    }
   } else {
     previewImg.src = src;
     previewImg.style.display = 'block';
@@ -716,6 +732,8 @@ function hidePreview() {
   previewImg.style.display = 'none';
   previewVideo.style.display = 'none';
   previewVideo.pause();
+  previewYoutube.style.display = 'none';
+  previewYoutube.src = '';
   previewPlaceholder.style.display = 'flex';
   previewInfo.style.display = 'none';
 }
