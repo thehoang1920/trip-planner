@@ -145,6 +145,10 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 .food-card .food-link a { color: #60a5fa; text-decoration: none; }
 .food-card .food-link a:hover { text-decoration: underline; }
 
+/* Video indicator */
+.wl-card[data-video] .wl-name::after,
+.food-card[data-video] .food-name::after { content: " ▶"; color: #ef4444; font-size: 0.7rem; vertical-align: middle; }
+
 /* Footer */
 .wl-toggle-btn { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; transition: all .2s; }
 .wl-toggle-btn:hover { background: #334155; color: #f1f5f9; }
@@ -365,7 +369,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <div class="wl-link"><a href="https://www.google.com/maps/search/Universal+Studios+Singapore" target="_blank">Xem trên Google Maps</a></div>
       </div>
     </div>
-    <div class="wl-card" data-address="24 Sentosa Gateway, Singapore 098137" data-dist="~10.8 km from hotel · ~16 min drive" data-time="Daily 10am-5pm" data-gmaps="https://www.google.com/maps/search/S.E.A.+Aquarium+Sentosa" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/S.E.A._Aquarium%2C_Marine_Life_Park%2C_Resorts_World_Sentosa%2C_Singapore_-_20130105-05.JPG/500px-S.E.A._Aquarium%2C_Marine_Life_Park%2C_Resorts_World_Sentosa%2C_Singapore_-_20130105-05.JPG" data-caption="S.E.A. Aquarium — Resorts World Sentosa">
+    <div class="wl-card" data-address="24 Sentosa Gateway, Singapore 098137" data-dist="~10.8 km from hotel · ~16 min drive" data-time="Daily 10am-5pm" data-gmaps="https://www.google.com/maps/search/S.E.A.+Aquarium+Sentosa" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/S.E.A._Aquarium%2C_Marine_Life_Park%2C_Resorts_World_Sentosa%2C_Singapore_-_20130105-05.JPG/500px-S.E.A._Aquarium%2C_Marine_Life_Park%2C_Resorts_World_Sentosa%2C_Singapore_-_20130105-05.JPG" data-video="https://www.youtube.com/watch?v=nQiPO63IxSo" data-caption="S.E.A. Aquarium — Resorts World Sentosa">
       <span class="wl-emoji">🐠</span>
       <div class="wl-info">
         <div class="wl-name">S.E.A. Aquarium (Oceanarium)</div>
@@ -376,7 +380,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <div class="wl-link"><a href="https://www.google.com/maps/search/S.E.A.+Aquarium+Sentosa" target="_blank">Xem trên Google Maps</a></div>
       </div>
     </div>
-    <div class="wl-card" data-address="WEAVE B1, Resorts World Sentosa, 8 Sentosa Gateway, Singapore 098269" data-dist="~10.6 km from hotel · ~18 min drive" data-time="Daily 11am-10pm (last entry 8pm)" data-gmaps="https://www.google.com/maps/search/Harry+Potter+Visions+of+Magic+Singapore" data-img="https://dejiki.com/wp-content/uploads/2024/11/Harry-Potter-Visions-of-Magic-Singapore-The-Knight-Bus2.jpg" data-caption="Harry Potter: Visions of Magic — Resorts World Sentosa">
+    <div class="wl-card" data-address="WEAVE B1, Resorts World Sentosa, 8 Sentosa Gateway, Singapore 098269" data-dist="~10.6 km from hotel · ~18 min drive" data-time="Daily 11am-10pm (last entry 8pm)" data-gmaps="https://www.google.com/maps/search/Harry+Potter+Visions+of+Magic+Singapore" data-img="https://dejiki.com/wp-content/uploads/2024/11/Harry-Potter-Visions-of-Magic-Singapore-The-Knight-Bus2.jpg" data-video="https://www.youtube.com/watch?v=Ru-_h3VDjm4" data-caption="Harry Potter: Visions of Magic — Resorts World Sentosa">
       <span class="wl-emoji">⚡</span>
       <div class="wl-info">
         <div class="wl-name">Harry Potter: Visions of Magic</div>
@@ -398,7 +402,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <div class="wl-link"><a href="https://www.google.com/maps/search/Merlion+Park+Singapore" target="_blank">Xem trên Google Maps</a></div>
       </div>
     </div>
-    <div class="wl-card" data-address="18 Marina Gardens Dr, Singapore 018953" data-dist="~4 km from hotel · ~7 min drive" data-time="Daily 9am-9pm" data-gmaps="https://www.google.com/maps/search/Disney+Garden+of+Wonder+Gardens+by+the+Bay" data-img="https://dejiki.com/wp-content/uploads/2026/06/Disney-Garden-of-Wonder-Floral-Fantasy-Gardens-by-the-Bay_fb1.jpg" data-caption="Disney Garden of Wonder — Floral Fantasy at Gardens by the Bay">
+    <div class="wl-card" data-address="18 Marina Gardens Dr, Singapore 018953" data-dist="~4 km from hotel · ~7 min drive" data-time="Daily 9am-9pm" data-gmaps="https://www.google.com/maps/search/Disney+Garden+of+Wonder+Gardens+by+the+Bay" data-img="https://dejiki.com/wp-content/uploads/2026/06/Disney-Garden-of-Wonder-Floral-Fantasy-Gardens-by-the-Bay_fb1.jpg" data-video="https://www.youtube.com/watch?v=mlJG58mhF-k" data-caption="Disney Garden of Wonder — Floral Fantasy at Gardens by the Bay">
       <span class="wl-emoji">🏰</span>
       <div class="wl-info">
         <div class="wl-name">Disney Garden of Wonder</div>
@@ -409,7 +413,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <div class="wl-link"><a href="https://www.google.com/maps/search/Disney+Garden+of+Wonder+Gardens+by+the+Bay" target="_blank">Xem trên Google Maps</a></div>
       </div>
     </div>
-    <div class="wl-card" data-address="Fever Exhibition Hall, 25 Scotts Rd, Singapore 228220" data-dist="~5.5 km from hotel · ~10 min drive" data-time="Daily 10am-9pm" data-gmaps="https://www.google.com/maps/search/PORTALS+An+Epic+Journey+Through+Fantasy+and+Sci+Fi+Singapore" data-img="https://applications-media.feverup.com/image/upload/f_auto,ar_15:8,c_fill/fever2/plan/photo/e5efb0e0-5fe6-11f1-859b-be9ef1617519.jpg" data-caption="PORTALS: An Epic Journey Through Fantasy &amp; Sci-Fi — Fever Exhibition Hall">
+    <div class="wl-card" data-address="Fever Exhibition Hall, 25 Scotts Rd, Singapore 228220" data-dist="~5.5 km from hotel · ~10 min drive" data-time="Daily 10am-9pm" data-gmaps="https://www.google.com/maps/search/PORTALS+An+Epic+Journey+Through+Fantasy+and+Sci+Fi+Singapore" data-img="https://applications-media.feverup.com/image/upload/f_auto,ar_15:8,c_fill/fever2/plan/photo/e5efb0e0-5fe6-11f1-859b-be9ef1617519.jpg" data-video="https://www.youtube.com/watch?v=OxbA7oFzL-E" data-caption="PORTALS: An Epic Journey Through Fantasy &amp; Sci-Fi — Fever Exhibition Hall">
       <span class="wl-emoji">🌀</span>
       <div class="wl-info">
         <div class="wl-name">PORTALS: An Epic Journey Through Fantasy &amp; Sci-Fi</div>
@@ -420,7 +424,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <div class="wl-link"><a href="https://www.google.com/maps/search/PORTALS+An+Epic+Journey+Through+Fantasy+and+Sci+Fi+Singapore" target="_blank">Xem trên Google Maps</a></div>
       </div>
     </div>
-    <div class="wl-card" data-address="Level 2, WEAVE @ Resorts World Sentosa, 26 Sentosa Gateway, #02-204-205, Singapore 098269" data-dist="~10 km from hotel · ~15 min drive" data-time="Mon, Wed-Sun 11am-9pm · Closed Tue · From $14" data-gmaps="https://www.google.com/maps/search/Dopamine+Land+Resorts+World+Sentosa" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Resorts_World_Sentosa.jpg/500px-Resorts_World_Sentosa.jpg" data-caption="Dopamine Land — Interactive Sensory Museum @ Resorts World Sentosa">
+    <div class="wl-card" data-address="Level 2, WEAVE @ Resorts World Sentosa, 26 Sentosa Gateway, #02-204-205, Singapore 098269" data-dist="~10 km from hotel · ~15 min drive" data-time="Mon, Wed-Sun 11am-9pm · Closed Tue · From $14" data-gmaps="https://www.google.com/maps/search/Dopamine+Land+Resorts+World+Sentosa" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Resorts_World_Sentosa.jpg/500px-Resorts_World_Sentosa.jpg" data-video="https://www.youtube.com/watch?v=uzixrDIkHno" data-caption="Dopamine Land — Interactive Sensory Museum @ Resorts World Sentosa">
       <span class="wl-emoji">🧠</span>
       <div class="wl-info">
         <div class="wl-name">Dopamine Land @ Resorts World Sentosa</div>
@@ -454,7 +458,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <div class="wl-link"><a href="https://www.google.com/maps/search/Supertree+Grove+Gardens+by+the+Bay+Singapore" target="_blank">Xem trên Google Maps</a></div>
       </div>
     </div>
-    <div class="wl-card" data-address="Suntec Convention Hall 405, 1 Raffles Blvd, Singapore 039593" data-dist="~4.5 km from hotel · ~8 min drive" data-time="Dec 25-26 · 12:30pm-8pm · $21.90" data-gmaps="https://www.google.com/maps/search/EOY+Music+Comics+Arts+Festival+Suntec+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Singapore_Suntec-Singapore-01.jpg/500px-Singapore_Suntec-Singapore-01.jpg" data-caption="EOY Music, Comics &amp; Arts Festival — Suntec Convention Centre">
+    <div class="wl-card" data-address="Suntec Convention Hall 405, 1 Raffles Blvd, Singapore 039593" data-dist="~4.5 km from hotel · ~8 min drive" data-time="Dec 25-26 · 12:30pm-8pm · $21.90" data-gmaps="https://www.google.com/maps/search/EOY+Music+Comics+Arts+Festival+Suntec+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Singapore_Suntec-Singapore-01.jpg/500px-Singapore_Suntec-Singapore-01.jpg" data-video="https://www.youtube.com/watch?v=2oSlbo-Xvsw" data-caption="EOY Music, Comics &amp; Arts Festival — Suntec Convention Centre">
       <span class="wl-emoji">🎌</span>
       <div class="wl-info">
         <div class="wl-name">EOY Music, Comics &amp; Arts Festival</div>
@@ -465,7 +469,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <div class="wl-link"><a href="https://www.google.com/maps/search/EOY+Music+Comics+Arts+Festival+Suntec+Singapore" target="_blank">Xem trên Google Maps</a></div>
       </div>
     </div>
-    <div class="wl-card" data-address="8 Sentosa Gateway, Universal Studios Singapore, Singapore 098269" data-dist="~10.8 km from hotel · ~16 min drive" data-time="Dec 19–29 · Nightly ~9pm · Free w/ ticket" data-gmaps="https://www.google.com/maps/search/Universal+Studios+Singapore+Lake+Hollywood" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/1_singapore_national_day_parade_2011_fireworks.jpg/500px-1_singapore_national_day_parade_2011_fireworks.jpg" data-caption="Lake Hollywood Christmas Fireworks — USS">
+    <div class="wl-card" data-address="8 Sentosa Gateway, Universal Studios Singapore, Singapore 098269" data-dist="~10.8 km from hotel · ~16 min drive" data-time="Dec 19–29 · Nightly ~9pm · Free w/ ticket" data-gmaps="https://www.google.com/maps/search/Universal+Studios+Singapore+Lake+Hollywood" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/1_singapore_national_day_parade_2011_fireworks.jpg/500px-1_singapore_national_day_parade_2011_fireworks.jpg" data-video="https://www.youtube.com/watch?v=IaQkerBFjj0" data-caption="Lake Hollywood Christmas Fireworks — USS">
       <span class="wl-emoji">🎆</span>
       <div class="wl-info">
         <div class="wl-name">Lake Hollywood Christmas Fireworks</div>
