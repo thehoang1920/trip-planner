@@ -579,6 +579,10 @@ function toggleSub(el) {
 document.querySelectorAll('.stop[data-img], .wl-card[data-img], .food-card[data-img]').forEach(el => {
   el.addEventListener('mouseenter', () => showPreview(el));
   el.addEventListener('mouseleave', hidePreview);
+  el.addEventListener('click', function() {
+    pinnedEl = pinnedEl === el ? null : el;
+    if (pinnedEl) showPreview(el); else hidePreview();
+  });
 });
 </script>
 </body>
