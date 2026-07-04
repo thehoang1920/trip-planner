@@ -748,6 +748,7 @@ function showPreview(el, type) {
   previewTime.textContent = el.dataset.time || '';
   previewGmaps.innerHTML = el.dataset.gmaps ? '<a href="' + el.dataset.gmaps + '" target="_blank">Xem trên Google Maps</a>' : '';
   previewVideoBtn.style.display = videoUrl && type !== 'video' ? 'block' : 'none';
+  if (videoUrl) previewVideoBtn.setAttribute('data-video-url', videoUrl);
   previewInfo.style.display = 'block';
 }
 
@@ -766,15 +767,30 @@ function hidePreview() {
 }
 
 previewVideoBtn.addEventListener('click', function() {
-  const el = currentPreviewEl;
-  if (!el || !el.dataset.video) return;
-  pinnedEl = pinnedEl === el ? null : el;
-  pinnedMode = 'video';
-  if (pinnedEl) {
-    showPreview(el, 'video');
-  } else {
+  const url = this.getAttribute('data-video-url');
+  if (!url) return;
+  const ytId = getYoutubeId(url);
+  if (!ytId) return;
+  if (pinnedEl === currentPreviewEl && pinnedMode === 'video') {
+    pinnedEl = null;
     hidePreview();
+    return;
   }
+  pinnedEl = currentPreviewEl;
+  pinnedMode = 'video';
+  previewImg.style.display = 'none';
+  previewVideo.style.display = 'none';
+  previewVideo.pause();
+  if (previewYoutube) { previewYoutube.src = ''; previewYoutube.remove(); previewYoutube = null; }
+  previewYoutubeContainer.style.display = 'none';
+  previewYoutube = document.createElement('iframe');
+  previewYoutube.className = 'preview-img';
+  previewYoutube.allow = 'autoplay; encrypted-media; fullscreen';
+  previewYoutube.allowfullscreen = true;
+  previewYoutube.src = 'https://www.youtube-nocookie.com/embed/' + ytId + '?autoplay=1&rel=0&playsinline=1';
+  previewYoutubeContainer.appendChild(previewYoutube);
+  previewYoutubeContainer.style.display = 'block';
+  previewVideoBtn.style.display = 'none';
 });
 
 previewPanel.addEventListener('mouseenter', () => {
