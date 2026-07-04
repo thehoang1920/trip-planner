@@ -430,6 +430,8 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 const map = L.map('minimap', { zoomControl: true, scrollWheelZoom: true, dragging: true }).setView([1.30, 103.88], 12);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>' }).addTo(map);
 
+map.on('click', function() { pinnedEl = null; hidePreview(); });
+
 // Hotel marker (always visible)
 const hotelIcon = L.divIcon({ className: 'hotel-marker', html: '<div class="hotel-pin"><div class="hotel-icon"></div></div>', iconSize: [32, 40], iconAnchor: [16, 40] });
 L.marker([1.31155, 103.88085], { icon: hotelIcon }).addTo(map).bindTooltip('Hotel 81 Star', { direction: 'top' });
@@ -445,6 +447,11 @@ document.querySelectorAll('.food-card[data-food-lat]').forEach(card => {
   const m = L.marker([lat, lng], { icon }).addTo(map).bindTooltip(name, { direction: 'top' });
   m.on('mouseover', () => showPreview(card));
   m.on('mouseout', hidePreview);
+  m.on('click', function(e) {
+    L.DomEvent.stopPropagation(e);
+    pinnedEl = pinnedEl === card ? null : card;
+    if (pinnedEl) showPreview(card); else hidePreview();
+  });
 });
 
 // Per-day route layers
@@ -470,6 +477,11 @@ document.querySelectorAll('.day-card').forEach(card => {
     const m = L.marker([lat, lng], { icon }).bindTooltip(num + '. ' + loc, { direction: 'top' });
     m.on('mouseover', () => showPreview(s));
     m.on('mouseout', hidePreview);
+    m.on('click', function(e) {
+      L.DomEvent.stopPropagation(e);
+      pinnedEl = pinnedEl === s ? null : s;
+      if (pinnedEl) showPreview(s); else hidePreview();
+    });
     markers.push(m);
     layer.addLayer(m);
   });
@@ -526,6 +538,8 @@ const previewAddr = document.getElementById('previewAddr');
 const previewDist = document.getElementById('previewDist');
 const previewGmaps = document.getElementById('previewGmaps');
 
+let pinnedEl = null;
+
 function showPreview(el) {
   const img = el.dataset.img;
   if (!img) return;
@@ -540,6 +554,10 @@ function showPreview(el) {
 }
 
 function hidePreview() {
+  if (pinnedEl) {
+    showPreview(pinnedEl);
+    return;
+  }
   previewImg.style.display = 'none';
   previewPlaceholder.style.display = 'flex';
   previewInfo.style.display = 'none';
