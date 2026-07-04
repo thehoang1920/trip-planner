@@ -381,7 +381,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
   <h2>Food & Drink — To Try</h2>
   <p class="wl-sub">Restaurants and cafes near hotel, pick any day</p>
   <div class="food-grid">
-    <div class="food-card" data-img="https://hungryghost.sg/wp-content/uploads/2023/07/126-Wen-Dao-Shi-Featured-Image-1200x900.jpg" data-caption="126 Dim Sum Wen Dao Shi — Geylang">
+    <div class="food-card" data-img="https://hungryghost.sg/wp-content/uploads/2023/07/126-Wen-Dao-Shi-Featured-Image-1200x900.jpg" data-caption="126 Dim Sum Wen Dao Shi — Geylang" data-food-lat="1.31583" data-food-lng="103.88778">
       <span class="food-emoji">🥟</span>
       <div class="food-info">
         <div class="food-name">126 Dim Sum Wen Dao Shi 揾到食</div>
@@ -413,6 +413,30 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 // Map
 const map = L.map('minimap', { zoomControl: true, scrollWheelZoom: true, dragging: true }).setView([1.30, 103.88], 12);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>' }).addTo(map);
+
+// Food & drink markers (always visible)
+document.querySelectorAll('.food-card[data-food-lat]').forEach(card => {
+  const lat = parseFloat(card.dataset.foodLat);
+  const lng = parseFloat(card.dataset.foodLng);
+  if (isNaN(lat) || isNaN(lng)) return;
+  const name = card.querySelector('.food-name')?.textContent || 'Food';
+  const emoji = card.querySelector('.food-emoji')?.textContent || '🍴';
+  const icon = L.divIcon({ className: '', html: '<div style="font-size:20px;line-height:1;text-align:center;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.5));">' + emoji + '</div>', iconSize: [24,24], iconAnchor: [12,12] });
+  const m = L.marker([lat, lng], { icon }).addTo(map).bindTooltip(name, { direction: 'top' });
+  m.on('mouseover', function() {
+    if (card.dataset.img) {
+      previewImg.src = card.dataset.img;
+      previewImg.style.display = 'block';
+      previewPlaceholder.style.display = 'none';
+      previewCaption.innerHTML = '<span class="cap-name">' + (card.dataset.caption || name) + '</span>';
+    }
+  });
+  m.on('mouseout', function() {
+    previewImg.style.display = 'none';
+    previewPlaceholder.style.display = 'flex';
+    previewCaption.innerHTML = '';
+  });
+});
 
 // Per-day route layers
 const dayRoutes = {};
