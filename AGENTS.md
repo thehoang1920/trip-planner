@@ -336,6 +336,75 @@ if (wasCollapsed) {
 }
 ```
 
+### YouTube Video Preview
+
+Each wishlist/food card can have a YouTube video shown in the preview panel. Add `data-video` attribute with the URL:
+
+```html
+<div class="wl-card" data-video="https://www.youtube.com/watch?v=kkqyRLX2PGk" ...>
+```
+
+The preview panel shows a **▶ Xem video** button when hovering/clicking a card/marker that has `data-video`. Clicking it pins and plays the video in a YouTube iframe:
+
+```js
+previewYoutube = document.createElement('iframe');
+previewYoutube.allow = 'autoplay; encrypted-media; fullscreen';
+previewYoutube.allowfullscreen = true;
+previewYoutube.src = 'https://www.youtube-nocookie.com/embed/' + ytId + '?autoplay=1&rel=0&playsinline=1';
+```
+
+Uses `youtube-nocookie.com` for privacy. The `▶ Xem video` button is a `<span>` with CSS classes `wl-video-btn` / `food-video-btn` (red border badge). Clicking the card itself only shows the image — video is opt-in via the button.
+
+**CSS:**
+```css
+.wl-video-btn, .food-video-btn { display: inline-block; font-size: 0.7rem; color: #ef4444; background: #2d1a1a; border: 1px solid #ef4444; border-radius: 4px; padding: 1px 8px; margin-top: 4px; cursor: pointer; transition: all .15s; text-decoration: none; }
+.wl-video-btn:hover, .food-video-btn:hover { background: #ef4444; color: #fff; }
+```
+
+### Preview Panel — Video Button (in-panel)
+
+A second video button sits inside the preview panel itself (`#previewVideoBtn`), so hovering a map marker also shows the video button:
+
+```html
+<div class="preview-video-btn" id="previewVideoBtn" style="display:none; margin-top:6px;">
+  <span class="wl-video-btn">▶ Xem video</span>
+</div>
+```
+
+In `showPreview()`: `previewVideoBtn.style.display = videoUrl && type !== 'video' ? 'block' : 'none';`
+
+### Pin Logic — Hover Doesn't Interrupt Video
+
+Three state variables control the preview:
+
+| Variable | Purpose |
+|----------|---------|
+| `pinnedEl` | The element whose preview is pinned (clicked to lock) |
+| `pinnedMode` | `'image'` or `'video'` — what to show when re-rendering |
+| `currentPreviewEl` | The element currently being hovered (used by preview video button) |
+
+**Key rule:** When `pinnedEl` is set, all `mouseenter`/`mouseleave`/`mouseover`/`mouseout` handlers return immediately. This prevents hover from interrupting a pinned video:
+
+```js
+el.addEventListener('mouseenter', () => {
+  if (pinnedEl) return;  // Don't override pinned content
+  showPreview(el);
+});
+```
+
+### Marker ↔ Card Sync
+
+Map markers and wishlist/food cards share the same preview panel. Both:
+- Call `showPreview(el)` on hover → shows image + video button (if `data-video`)
+- Call `hidePreview()` on leave
+- Call `showPreview(el, 'video')` on video button click
+
+The preview panel is the sync point — hovering a marker shows the same info and video button as its corresponding wishlist card. Markers use emoji-based `L.divIcon`:
+
+```js
+const icon = L.divIcon({ className: '', html: '<div style="font-size:18px;...">🎢</div>', iconSize: [22,22], iconAnchor: [11,11] });
+```
+
 ### Image Sources (Free, No API Key)
 
 - **Wikimedia Commons:** Best source for landmark/attraction photos
@@ -411,6 +480,7 @@ if (wasCollapsed) {
 7. **Empty days** get `empty-day` class + placeholder text
 8. **Find images** on Wikimedia Commons for each location
 9. **Create wishlist section** — attractions with cards, Google Maps links, hover images
-10. **Create food section** — restaurants with name, rating, notes, Google Maps link
-11. **Add `.nojekyll`** file at repo root if not present
-12. **Commit and push** to deploy to GitHub Pages
+10. **Add YouTube videos** to wishlist cards: add `data-video` attribute + `<div class="wl-video-btn">▶ Xem video</div>` inside card
+11. **Create food section** — restaurants with name, rating, notes, Google Maps link
+12. **Add `.nojekyll`** file at repo root if not present
+13. **Commit and push** to deploy to GitHub Pages
