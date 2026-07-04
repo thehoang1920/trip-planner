@@ -566,7 +566,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
     <div class="preview-placeholder" id="previewPlaceholder">Di chuột vào điểm dừng để xem ảnh</div>
     <img class="preview-img" id="previewImg" style="display:none;">
     <video class="preview-img" id="previewVideo" muted loop playsinline style="display:none;"></video>
-    <iframe class="preview-img" id="previewYoutube" style="display:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    <div id="previewYoutubeContainer" style="display:none; width:100%; height:220px;"></div>
     <div class="preview-info" id="previewInfo" style="display:none;">
       <div class="preview-name" id="previewName"></div>
       <div class="preview-addr" id="previewAddr"></div>
@@ -674,7 +674,8 @@ dayHeaders.forEach(header => {
 // Hover preview panel
 const previewImg = document.getElementById('previewImg');
 const previewVideo = document.getElementById('previewVideo');
-const previewYoutube = document.getElementById('previewYoutube');
+const previewYoutubeContainer = document.getElementById('previewYoutubeContainer');
+let previewYoutube = null;
 const previewPlaceholder = document.getElementById('previewPlaceholder');
 const previewInfo = document.getElementById('previewInfo');
 const previewName = document.getElementById('previewName');
@@ -699,13 +700,18 @@ function showPreview(el, type) {
   previewImg.style.display = 'none';
   previewVideo.style.display = 'none';
   previewVideo.pause();
-  previewYoutube.style.display = 'none';
-  previewYoutube.src = '';
+  if (previewYoutube) { previewYoutube.src = ''; previewYoutube.remove(); previewYoutube = null; }
+  previewYoutubeContainer.style.display = 'none';
   if (useVideo) {
     const ytId = getYoutubeId(videoUrl);
     if (ytId) {
-      previewYoutube.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0';
-      previewYoutube.style.display = 'block';
+      previewYoutube = document.createElement('iframe');
+      previewYoutube.className = 'preview-img';
+      previewYoutube.allow = 'autoplay; encrypted-media';
+      previewYoutube.allowfullscreen = true;
+      previewYoutube.src = 'https://www.youtube-nocookie.com/embed/' + ytId + '?autoplay=1&rel=0&playsinline=1';
+      previewYoutubeContainer.appendChild(previewYoutube);
+      previewYoutubeContainer.style.display = 'block';
     } else {
       previewVideo.src = videoUrl;
       previewVideo.style.display = 'block';
@@ -732,8 +738,8 @@ function hidePreview() {
   previewImg.style.display = 'none';
   previewVideo.style.display = 'none';
   previewVideo.pause();
-  previewYoutube.style.display = 'none';
-  previewYoutube.src = '';
+  if (previewYoutube) { previewYoutube.src = ''; previewYoutube.remove(); previewYoutube = null; }
+  previewYoutubeContainer.style.display = 'none';
   previewPlaceholder.style.display = 'flex';
   previewInfo.style.display = 'none';
 }
