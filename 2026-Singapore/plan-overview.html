@@ -145,6 +145,10 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 .food-card .food-link a:hover { text-decoration: underline; }
 
 /* Footer */
+.wl-toggle-btn { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; transition: all .2s; }
+.wl-toggle-btn:hover { background: #334155; color: #f1f5f9; }
+.wl-toggle-btn.active { background: #3b2f1e; border-color: #fbbf24; color: #fbbf24; }
+
 .footer { text-align: center; color: #475569; font-size: 0.75rem; padding: 20px 0; }
 
 @media (max-width: 900px) {
@@ -196,6 +200,8 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 
 <!-- Mini Map -->
 <div id="minimap"></div>
+<div style="margin-bottom: 8px;"></div>
+<button id="wlToggle" class="wl-toggle-btn">📍 Show Wishlist on Map</button>
 <div style="margin-bottom: 20px;"></div>
 
 <!-- Timeline -->
@@ -658,6 +664,45 @@ document.querySelectorAll('.stop[data-img], .wl-card[data-img], .food-card[data-
     pinnedEl = pinnedEl === el ? null : el;
     if (pinnedEl) showPreview(el); else hidePreview();
   });
+});
+
+// Wishlist marker layer (toggle on/off)
+const wlLayer = L.layerGroup();
+let wlVisible = false;
+
+document.querySelectorAll('.wl-card').forEach(card => {
+  const coordEl = card.querySelector('.wl-coord');
+  if (!coordEl) return;
+  const parts = coordEl.textContent.trim().split(',');
+  if (parts.length !== 2) return;
+  const lat = parseFloat(parts[0]);
+  const lng = parseFloat(parts[1]);
+  if (isNaN(lat) || isNaN(lng)) return;
+  const name = card.querySelector('.wl-name')?.textContent || 'Wishlist';
+  const emoji = card.querySelector('.wl-emoji')?.textContent || '⭐';
+  const icon = L.divIcon({ className: '', html: '<div style="font-size:18px;line-height:1;text-align:center;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.5));">' + emoji + '</div>', iconSize: [22,22], iconAnchor: [11,11] });
+  const m = L.marker([lat, lng], { icon }).bindTooltip(name, { direction: 'top' });
+  m.on('mouseover', () => showPreview(card));
+  m.on('mouseout', hidePreview);
+  m.on('click', function() {
+    ignoreMapClick = true;
+    pinnedEl = pinnedEl === card ? null : card;
+    if (pinnedEl) showPreview(card); else hidePreview();
+  });
+  wlLayer.addLayer(m);
+});
+
+document.getElementById('wlToggle').addEventListener('click', function() {
+  wlVisible = !wlVisible;
+  this.classList.toggle('active');
+  this.textContent = wlVisible ? '📍 Hide Wishlist' : '📍 Show Wishlist on Map';
+  if (wlVisible) {
+    map.addLayer(wlLayer);
+  } else {
+    map.removeLayer(wlLayer);
+    pinnedEl = null;
+    hidePreview();
+  }
 });
 </script>
 </body>
