@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A personal trip planning workspace using free OpenStreetMap APIs + Leaflet.js for interactive maps. No API keys needed.
+A personal trip planning workspace using OpenStreetMap APIs (free, no key) + Geoapify (free key) + Leaflet.js for interactive maps.
 
 **Live URL:** https://thehoang1920.github.io/trip-planner/2026-Singapore/plan-overview.html
 **Repo:** https://github.com/thehoang1920/trip-planner (public — GitHub Pages requires public repo on free tier)
@@ -13,38 +13,70 @@ git add -A && git commit -m "..." && git push
 ```
 The live GitHub Pages site must reflect local changes at all times. The user accesses the planner remotely via the live URL, so never leave local changes unpushed.
 
-- **Core tool:** `osm_tools.py` — Python CLI wrapping Nominatim (geocoding), OSRM (routing), Overpass (POIs)
+- **Core tool:** `osm_tools.py` — Python CLI. Supports two providers:
+  - `osm` (default): Nominatim (geocoding), OSRM (routing), Overpass (POIs). No API key needed.
+  - `geoapify`: Geoapify API. Requires `GEOAPIFY_KEY` env var (or hardcoded default fallback).
 - **Trip data:** `<year>-<city>/` folders with itinerary, hotel info, README
 - **Skill reference:** `osm-planner` skill loaded via OpenCode for API patterns and Leaflet map templates
 
 ## Commands
 
 ```powershell
-# Geocode address to coordinates
+# ── Geocoding (address ↔ coordinates) ──
+#   Use OSM for quick lookups, Geoapify for more precise results
 python osm_tools.py geocode "Marina Bay Sands Singapore"
+python osm_tools.py geocode "Marina Bay Sands" --provider geoapify
+python osm_tools.py reverse 1.2834 103.8607
+python osm_tools.py reverse 1.2834 103.8607 --provider geoapify
 
-# Get route between two points (driving|walking|bike)
+# ── Routing (A→B) ──
+#   OSRM: fast, good for rough estimates.  Geoapify: better turn-by-turn
+#   with road names (including local characters like 薛尔思道)
 python osm_tools.py route 103.8607,1.2834 103.8636,1.2817 --mode walking
+python osm_tools.py route 103.8607,1.2834 103.8636,1.2817 --mode walking --provider geoapify
 
-# Distance/time matrix for multiple stops
+# ── Distance/Time matrix ──
+#   OSRM: unlimited stops.  Geoapify: better accuracy, free tier may limit size
 python osm_tools.py matrix "103.8607,1.2834" "103.8636,1.2817" "103.8303,1.2494" --mode driving
+python osm_tools.py matrix "103.8607,1.2834" "103.8636,1.2817" --mode driving --provider geoapify
 
-# Search POIs in an area
+# ── POI/Places search ──
+#   Overpass: flexible query with tags (tourism, food, etc).  Geoapify: richer
+#   results with address details and categories
 python osm_tools.py poi "Singapore" --type tourism
+python osm_tools.py poi "Singapore" --type food --provider geoapify
 
-# Multi-stop trip plan with turn-by-turn
+# ── Multi-stop trip plan ──
+#   OSRM works well for any number of stops.  Geoapify free tier limited to 2.
 python osm_tools.py plan "103.8607,1.2834" "103.8636,1.2817" "103.8303,1.2494" --mode walking
+python osm_tools.py plan "103.8607,1.2834" "103.8636,1.2817" --mode driving --provider geoapify
 ```
+
+## Provider Recommendations
+
+| Task | Recommended | Why |
+|------|------------|-----|
+| Quick geocode | `osm` (default) | No key, fast enough for most cases |
+| Precise geocode | `geoapify` | Better address parsing, more details |
+| Reverse geocode | `geoapify` | Returns formatted address, city, postcode |
+| Walking route | `geoapify` | Road names, turn-by-turn with local characters |
+| Driving route | Either | Both work well; Geoapify has better instructions |
+| Distance matrix | `osm` (default) | Unlimited stops; Geoapify free tier limited |
+| POI search | `geoapify` | Richer data (address, categories, photos) |
+| Multi-stop plan | `osm` (default) | Unlimited waypoints; Geoapify free = 2 only |
 
 ## Coordinate Format
 
-OSM APIs use `lng,lat` order (NOT `lat,lng`). Example: `103.8607,1.2834` = Marina Bay Sands.
+All coordinates on the CLI use `lng,lat` order regardless of provider.
+`osm_tools.py` auto-converts to `lat,lng` when calling Geoapify internally.
+Example: `103.8607,1.2834` = Marina Bay Sands.
 
 ## Rate Limits
 
-- **Nominatim:** 1 req/sec max. Always set `User-Agent` header.
-- **OSRM:** ~10k req/hr. Max ~100 coordinate pairs per request.
-- **Overpass:** Rate-limited. Use `out 30;` to cap results.
+- **Nominatim (OSM):** 1 req/sec max. Always set `User-Agent` header.
+- **OSRM (OSM):** ~10k req/hr. Max ~100 coordinate pairs per request.
+- **Overpass (OSM):** Rate-limited. Use `out 30;` to cap results.
+- **Geoapify:** Free tier = 3,000 requests/day across all endpoints.
 
 ## Trip Folder Structure
 
