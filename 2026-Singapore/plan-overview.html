@@ -725,7 +725,7 @@ function showPreview(el, type) {
     if (ytId) {
       previewYoutube = document.createElement('iframe');
       previewYoutube.className = 'preview-img';
-      previewYoutube.allow = 'autoplay; encrypted-media';
+      previewYoutube.allow = 'autoplay; encrypted-media; fullscreen';
       previewYoutube.allowfullscreen = true;
       previewYoutube.src = 'https://www.youtube-nocookie.com/embed/' + ytId + '?autoplay=1&rel=0&playsinline=1';
       previewYoutubeContainer.appendChild(previewYoutube);
