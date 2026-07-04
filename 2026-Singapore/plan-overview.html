@@ -198,7 +198,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
       <span class="name">SGN → SIN (Singapore Airlines) · T2/T3</span>
       <span class="time">12:15–15:20</span>
     </div>
-    <div class="stop parent expanded" onclick="toggleSub(this)" data-lat="1.3644" data-lng="103.9915">
+    <div class="stop parent expanded" onclick="toggleSub(this)" data-lat="1.3644" data-lng="103.9915" data-location="Changi Airport">
       <span class="expand-icon">▶</span>
       <span class="emoji">🛫</span>
       <span class="name">Explore Changi Airport<span class="sub-count">4 activities</span></span>
@@ -226,7 +226,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <span class="time">Jewel L5 / T3 L1</span>
       </div>
     </div>
-    <div class="stop" data-lat="1.31155" data-lng="103.88085">
+    <div class="stop" data-lat="1.31155" data-lng="103.88085" data-location="Hotel 81 Star">
       <span class="emoji">🏨</span>
       <span class="name">Move to Hotel 81 Star, check in</span>
       <span class="time">~17:00</span>
@@ -246,12 +246,12 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
       <span class="day-date">Sun, Dec 27</span>
     </div>
     <div class="day-label">Sentosa Island · Universal Studios</div>
-    <div class="stop" data-lat="1.31155" data-lng="103.88085">
+    <div class="stop" data-lat="1.31155" data-lng="103.88085" data-location="Hotel 81 Star">
       <span class="emoji">🍳</span>
       <span class="name">Breakfast near hotel</span>
       <span class="time">08:00–09:00</span>
     </div>
-    <div class="stop" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Universal_Globe_Singapore.jpg/960px-Universal_Globe_Singapore.jpg" data-caption="Universal Studios Singapore — Sentosa Island" data-lat="1.2542" data-lng="103.8227">
+    <div class="stop" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Universal_Globe_Singapore.jpg/960px-Universal_Globe_Singapore.jpg" data-caption="Universal Studios Singapore — Sentosa Island" data-lat="1.2542" data-lng="103.8227" data-location="Universal Studios Singapore">
       <span class="emoji">🎢</span>
       <span class="name">Universal Studios Singapore</span>
       <span class="time">09:00–18:00</span>
@@ -296,12 +296,12 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
       <span class="day-date">Thu, Dec 31</span>
     </div>
     <div class="day-label">Departure</div>
-    <div class="stop" data-lat="1.31155" data-lng="103.88085">
+    <div class="stop" data-lat="1.31155" data-lng="103.88085" data-location="Hotel 81 Star">
       <span class="emoji">🏨</span>
       <span class="name">Check out · Hotel 81 Star</span>
       <span class="time">~12:00</span>
     </div>
-    <div class="stop" data-lat="1.3644" data-lng="103.9915">
+    <div class="stop" data-lat="1.3644" data-lng="103.9915" data-location="Changi Airport">
       <span class="emoji">🚕</span>
       <span class="name">Taxi/Grab to Changi Airport</span>
       <span class="time">~20 min</span>
@@ -398,17 +398,6 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 const map = L.map('minimap', { zoomControl: true, scrollWheelZoom: true, dragging: true }).setView([1.30, 103.88], 12);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>' }).addTo(map);
 
-// Static helper markers (always visible)
-L.marker([1.31155, 103.88085], { icon: L.divIcon({ className: '', html: '<div style="background:#3b82f6;width:14px;height:14px;border-radius:50%;border:2px solid #fff;"></div>', iconSize: [14,14], iconAnchor: [7,7] }) }).addTo(map).bindTooltip('Hotel 81 Star', { direction: 'top' });
-L.marker([1.3644, 103.9915]).addTo(map).bindTooltip('Changi Airport', { direction: 'top' });
-L.marker([1.3162, 103.8823], { icon: L.divIcon({ className: '', html: '<div style="background:#009645;width:12px;height:12px;border-radius:50%;border:2px solid #fff;"></div>', iconSize: [12,12], iconAnchor: [6,6] }) }).addTo(map).bindTooltip('Aljunied MRT', { direction: 'top' });
-L.marker([1.2542, 103.8227], { icon: L.divIcon({ className: '', html: '<div style="font-size:18px;line-height:1;text-align:center;">🎢</div>', iconSize: [20,20], iconAnchor: [10,10] }) }).addTo(map).bindTooltip('Universal Studios', { direction: 'top' });
-L.marker([1.2584, 103.8205], { icon: L.divIcon({ className: '', html: '<div style="font-size:18px;line-height:1;text-align:center;">🐠</div>', iconSize: [20,20], iconAnchor: [10,10] }) }).addTo(map).bindTooltip('S.E.A. Aquarium', { direction: 'top' });
-L.marker([1.2557, 103.8212], { icon: L.divIcon({ className: '', html: '<div style="font-size:18px;line-height:1;text-align:center;">⚡</div>', iconSize: [20,20], iconAnchor: [10,10] }) }).addTo(map).bindTooltip('HP: Visions of Magic', { direction: 'top' });
-L.marker([1.2857, 103.8542], { icon: L.divIcon({ className: '', html: '<div style="font-size:18px;line-height:1;text-align:center;">🦁</div>', iconSize: [20,20], iconAnchor: [10,10] }) }).addTo(map).bindTooltip('Merlion Park', { direction: 'top' });
-L.polyline([[1.31155, 103.88085], [1.3644, 103.9915]], { color: '#60a5fa', weight: 2, dashArray: '4, 6', opacity: 0.5 }).addTo(map);
-L.polyline([[1.3116,103.8823],[1.3110,103.8857],[1.3104,103.8898],[1.3127,103.8954],[1.3141,103.8954]], { color: '#009645', weight: 3, opacity: 0.3 }).addTo(map);
-
 // Per-day route layers
 const dayRoutes = {};
 let activeDay = null;
@@ -426,11 +415,23 @@ document.querySelectorAll('.day-card').forEach(card => {
     const lng = parseFloat(s.dataset.lng);
     if (isNaN(lat) || isNaN(lng)) return;
     coords.push([lat, lng]);
-    const name = s.querySelector('.name')?.textContent || '';
-    const emoji = s.querySelector('.emoji')?.textContent || '';
+    const loc = s.dataset.location || 'Stop';
     const num = i + 1;
     const icon = L.divIcon({ className: 'num-marker', html: '' + num, iconSize: [26, 26], iconAnchor: [13, 13] });
-    const m = L.marker([lat, lng], { icon }).bindTooltip(num + '. ' + emoji + ' ' + name, { direction: 'top' });
+    const m = L.marker([lat, lng], { icon }).bindTooltip(num + '. ' + loc, { direction: 'top' });
+    m.on('mouseover', function() {
+      if (s.dataset.img) {
+        previewImg.src = s.dataset.img;
+        previewImg.style.display = 'block';
+        previewPlaceholder.style.display = 'none';
+        previewCaption.innerHTML = '<span class="cap-name">' + (s.dataset.caption || loc) + '</span>';
+      }
+    });
+    m.on('mouseout', function() {
+      previewImg.style.display = 'none';
+      previewPlaceholder.style.display = 'flex';
+      previewCaption.innerHTML = '';
+    });
     markers.push(m);
     layer.addLayer(m);
   });
