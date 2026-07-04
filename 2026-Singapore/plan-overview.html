@@ -91,6 +91,10 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 .day-card.active { border-color: #60a5fa; box-shadow: 0 0 0 1px #60a5fa; }
 .day-card.active .day-num { color: #fbbf24; }
 .day-card .day-header { cursor: pointer; }
+.day-card .collapse-icon { font-size: 0.7rem; color: #64748b; margin-left: 8px; transition: transform .2s; }
+.day-card .day-body { overflow: hidden; transition: max-height .3s ease, opacity .2s; max-height: 2000px; opacity: 1; }
+.day-card.collapsed .day-body { max-height: 0; opacity: 0; }
+.day-card.collapsed .collapse-icon { transform: rotate(-90deg); }
 
 /* Wishlist */
 .wishlist, .food-wl { background: #1e293b; border-radius: 12px; border: 1px dashed #334155; padding: 20px; margin-top: 20px; }
@@ -190,7 +194,9 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
     <div class="day-header">
       <span class="day-num">Day 1</span>
       <span class="day-date">Sat, Dec 26</span>
+      <span class="collapse-icon">▼</span>
     </div>
+    <div class="day-body">
     <div class="day-label">Arrival · Airport exploration with wife</div>
 
     <div class="stop">
@@ -236,6 +242,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
       <span class="name">Evening: explore Geylang food</span>
       <span class="time">free</span>
     </div>
+    </div><!-- /day-body -->
   </div>
 
   <!-- Day 2 -->
@@ -244,7 +251,9 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
     <div class="day-header">
       <span class="day-num">Day 2</span>
       <span class="day-date">Sun, Dec 27</span>
+      <span class="collapse-icon">▼</span>
     </div>
+    <div class="day-body">
     <div class="day-label">Sentosa Island · Universal Studios</div>
     <div class="stop" data-lat="1.31155" data-lng="103.88085" data-location="Hotel 81 Star" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Hotel_81_Palace%2C_Geylang%2C_Singapore.JPG/500px-Hotel_81_Palace%2C_Geylang%2C_Singapore.JPG" data-caption="Hotel 81 Palace (sister hotel) — Geylang">
       <span class="emoji">🍳</span>
@@ -256,6 +265,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
       <span class="name">Universal Studios Singapore</span>
       <span class="time">09:00–18:00</span>
     </div>
+    </div><!-- /day-body -->
   </div>
 
   <!-- Day 3 -->
@@ -264,8 +274,9 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
     <div class="day-header">
       <span class="day-num">Day 3</span>
       <span class="day-date">Mon, Dec 28</span>
+      <span class="collapse-icon">▼</span>
     </div>
-    <div class="placeholder-text">• to be planned</div>
+    <div class="day-body"><div class="placeholder-text">• to be planned</div></div><!-- /day-body -->
   </div>
 
   <!-- Day 4 -->
@@ -274,8 +285,9 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
     <div class="day-header">
       <span class="day-num">Day 4</span>
       <span class="day-date">Tue, Dec 29</span>
+      <span class="collapse-icon">▼</span>
     </div>
-    <div class="placeholder-text">• to be planned</div>
+    <div class="day-body"><div class="placeholder-text">• to be planned</div></div><!-- /day-body -->
   </div>
 
   <!-- Day 5 -->
@@ -284,8 +296,9 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
     <div class="day-header">
       <span class="day-num">Day 5</span>
       <span class="day-date">Wed, Dec 30</span>
+      <span class="collapse-icon">▼</span>
     </div>
-    <div class="placeholder-text">• to be planned</div>
+    <div class="day-body"><div class="placeholder-text">• to be planned</div></div><!-- /day-body -->
   </div>
 
   <!-- Day 6 -->
@@ -294,7 +307,9 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
     <div class="day-header">
       <span class="day-num">Day 6</span>
       <span class="day-date">Thu, Dec 31</span>
+      <span class="collapse-icon">▼</span>
     </div>
+    <div class="day-body">
     <div class="day-label">Departure</div>
     <div class="stop" data-lat="1.31155" data-lng="103.88085" data-location="Hotel 81 Star" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Hotel_81_Palace%2C_Geylang%2C_Singapore.JPG/500px-Hotel_81_Palace%2C_Geylang%2C_Singapore.JPG" data-caption="Hotel 81 Palace (sister hotel) — Geylang">
       <span class="emoji">🏨</span>
@@ -311,6 +326,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
       <span class="name">SIN → SGN (Singapore Airlines)</span>
       <span class="time">13:50–15:00</span>
     </div>
+    </div><!-- /day-body -->
   </div>
 </div><!-- /timeline -->
 
@@ -446,33 +462,36 @@ document.querySelectorAll('.day-card').forEach(card => {
   map.removeLayer(layer);
 });
 
-// Day click handler
+// Day click handler — collapse/expand + map route
 const dayHeaders = document.querySelectorAll('.day-card .day-header');
 dayHeaders.forEach(header => {
   header.addEventListener('click', function() {
     const card = this.closest('.day-card');
     const dayNum = card.querySelector('.day-num')?.textContent || '0';
+    const wasCollapsed = card.classList.contains('collapsed');
 
-    // Toggle off if same day
-    if (activeDay === dayNum) {
+    // Toggle collapse
+    card.classList.toggle('collapsed');
+
+    if (wasCollapsed) {
+      // Expanding: show this day's route, hide others
       document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active'));
-      if (dayRoutes[dayNum]) map.removeLayer(dayRoutes[dayNum].layer);
-      activeDay = null;
-      return;
+      if (activeDay && dayRoutes[activeDay]) map.removeLayer(dayRoutes[activeDay].layer);
+      if (dayRoutes[dayNum]) {
+        map.addLayer(dayRoutes[dayNum].layer);
+        const c = dayRoutes[dayNum].coords;
+        if (c.length) map.fitBounds(c, { padding: [30, 30], maxZoom: 14 });
+      }
+      card.classList.add('active');
+      activeDay = dayNum;
+    } else {
+      // Collapsing: hide route if this day was active
+      if (activeDay === dayNum) {
+        document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active'));
+        if (dayRoutes[dayNum]) map.removeLayer(dayRoutes[dayNum].layer);
+        activeDay = null;
+      }
     }
-
-    // Remove previous day's route
-    document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active'));
-    if (activeDay && dayRoutes[activeDay]) map.removeLayer(dayRoutes[activeDay].layer);
-
-    // Show this day's route
-    if (dayRoutes[dayNum]) {
-      map.addLayer(dayRoutes[dayNum].layer);
-      const c = dayRoutes[dayNum].coords;
-      if (c.length) map.fitBounds(c, { padding: [30, 30], maxZoom: 14 });
-    }
-    card.classList.add('active');
-    activeDay = dayNum;
   });
 });
 
