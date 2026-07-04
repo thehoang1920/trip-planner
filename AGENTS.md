@@ -7,7 +7,11 @@ A personal trip planning workspace using free OpenStreetMap APIs + Leaflet.js fo
 **Live URL:** https://thehoang1920.github.io/trip-planner/2026-Singapore/plan-overview.html
 **Repo:** https://github.com/thehoang1920/trip-planner (public — GitHub Pages requires public repo on free tier)
 
-**IMPORTANT — Git Sync Rule:** Every time you modify any files in this repo, immediately `git add -A && git commit -m "..." && git push` so the online Pages site stays in sync. The user accesses the planner remotely via the live URL.
+**IMPORTANT — Git Sync Rule (STRICT):** Every time you modify any files in this repo — especially `plan-overview.html` — immediately run:
+```powershell
+git add -A && git commit -m "..." && git push
+```
+The live GitHub Pages site must reflect local changes at all times. The user accesses the planner remotely via the live URL, so never leave local changes unpushed.
 
 - **Core tool:** `osm_tools.py` — Python CLI wrapping Nominatim (geocoding), OSRM (routing), Overpass (POIs)
 - **Trip data:** `<year>-<city>/` folders with itinerary, hotel info, README
