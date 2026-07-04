@@ -602,24 +602,6 @@ map.on('click', function() {
 const hotelIcon = L.divIcon({ className: 'hotel-marker', html: '<div class="hotel-pin"><div class="hotel-icon"></div></div>', iconSize: [32, 40], iconAnchor: [16, 40] });
 L.marker([1.31155, 103.88085], { icon: hotelIcon }).addTo(map).bindTooltip('Hotel 81 Star', { direction: 'top' });
 
-// Food & drink markers (always visible)
-document.querySelectorAll('.food-card[data-food-lat]').forEach(card => {
-  const lat = parseFloat(card.dataset.foodLat);
-  const lng = parseFloat(card.dataset.foodLng);
-  if (isNaN(lat) || isNaN(lng)) return;
-  const name = card.querySelector('.food-name')?.textContent || 'Food';
-  const emoji = card.querySelector('.food-emoji')?.textContent || '🍴';
-  const icon = L.divIcon({ className: '', html: '<div style="font-size:20px;line-height:1;text-align:center;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.5));">' + emoji + '</div>', iconSize: [24,24], iconAnchor: [12,12] });
-  const m = L.marker([lat, lng], { icon }).addTo(map).bindTooltip(name, { direction: 'top' });
-  m.on('mouseover', () => showPreview(card));
-  m.on('mouseout', hidePreview);
-  m.on('click', function() {
-    ignoreMapClick = true;
-    pinnedEl = pinnedEl === card ? null : card;
-    if (pinnedEl) showPreview(card); else hidePreview();
-  });
-});
-
 // Per-day route layers
 const dayRoutes = {};
 let activeDay = null;
