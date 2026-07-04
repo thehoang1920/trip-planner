@@ -777,11 +777,25 @@ document.querySelectorAll('.stop[data-img], .wl-card[data-img], .food-card[data-
     if (pinnedEl) return;
     hidePreview();
   });
-  el.addEventListener('click', function() {
+  el.addEventListener('click', function(e) {
+    if (e.target.closest('.wl-video-btn, .food-video-btn')) return;
     pinnedEl = pinnedEl === el ? null : el;
+    pinnedMode = 'image';
     if (pinnedEl) {
-      pinnedMode = el.dataset.video ? 'video' : 'image';
-      showPreview(el, pinnedMode);
+      showPreview(el, 'image');
+    } else {
+      hidePreview();
+    }
+  });
+});
+document.querySelectorAll('.wl-video-btn, .food-video-btn').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const card = this.closest('[data-img]');
+    pinnedEl = pinnedEl === card ? null : card;
+    pinnedMode = 'video';
+    if (pinnedEl) {
+      showPreview(card, 'video');
     } else {
       hidePreview();
     }
