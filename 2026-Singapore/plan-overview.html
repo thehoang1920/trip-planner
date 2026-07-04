@@ -399,8 +399,13 @@ const map = L.map('minimap', { zoomControl: true, scrollWheelZoom: true, draggin
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>' }).addTo(map);
 
 // Static helper markers (always visible)
+L.marker([1.31155, 103.88085], { icon: L.divIcon({ className: '', html: '<div style="background:#3b82f6;width:14px;height:14px;border-radius:50%;border:2px solid #fff;"></div>', iconSize: [14,14], iconAnchor: [7,7] }) }).addTo(map).bindTooltip('Hotel 81 Star', { direction: 'top' });
 L.marker([1.3644, 103.9915]).addTo(map).bindTooltip('Changi Airport', { direction: 'top' });
 L.marker([1.3162, 103.8823], { icon: L.divIcon({ className: '', html: '<div style="background:#009645;width:12px;height:12px;border-radius:50%;border:2px solid #fff;"></div>', iconSize: [12,12], iconAnchor: [6,6] }) }).addTo(map).bindTooltip('Aljunied MRT', { direction: 'top' });
+L.marker([1.2542, 103.8227], { icon: L.divIcon({ className: '', html: '<div style="font-size:18px;line-height:1;text-align:center;">🎢</div>', iconSize: [20,20], iconAnchor: [10,10] }) }).addTo(map).bindTooltip('Universal Studios', { direction: 'top' });
+L.marker([1.2584, 103.8205], { icon: L.divIcon({ className: '', html: '<div style="font-size:18px;line-height:1;text-align:center;">🐠</div>', iconSize: [20,20], iconAnchor: [10,10] }) }).addTo(map).bindTooltip('S.E.A. Aquarium', { direction: 'top' });
+L.marker([1.2557, 103.8212], { icon: L.divIcon({ className: '', html: '<div style="font-size:18px;line-height:1;text-align:center;">⚡</div>', iconSize: [20,20], iconAnchor: [10,10] }) }).addTo(map).bindTooltip('HP: Visions of Magic', { direction: 'top' });
+L.marker([1.2857, 103.8542], { icon: L.divIcon({ className: '', html: '<div style="font-size:18px;line-height:1;text-align:center;">🦁</div>', iconSize: [20,20], iconAnchor: [10,10] }) }).addTo(map).bindTooltip('Merlion Park', { direction: 'top' });
 L.polyline([[1.31155, 103.88085], [1.3644, 103.9915]], { color: '#60a5fa', weight: 2, dashArray: '4, 6', opacity: 0.5 }).addTo(map);
 L.polyline([[1.3116,103.8823],[1.3110,103.8857],[1.3104,103.8898],[1.3127,103.8954],[1.3141,103.8954]], { color: '#009645', weight: 3, opacity: 0.3 }).addTo(map);
 
