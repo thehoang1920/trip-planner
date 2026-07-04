@@ -442,7 +442,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <div class="wl-link"><a href="https://www.google.com/maps/search/Spectra+Light+and+Water+Show+Marina+Bay+Sands" target="_blank">Xem trên Google Maps</a></div>
       </div>
     </div>
-    <div class="wl-card" data-address="Supertree Grove, Gardens by the Bay, 18 Marina Gardens Dr, Singapore 018953" data-dist="~4 km from hotel · ~7 min drive" data-gmaps="https://www.google.com/maps/search/Supertree+Grove+Gardens+by+the+Bay+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/8/8c/Supertree_Grove%2C_Gardens_by_the_Bay%2C_light_show_19_August.webm" data-caption="Supertree Grove — Gardens by the Bay">
+    <div class="wl-card" data-address="Supertree Grove, Gardens by the Bay, 18 Marina Gardens Dr, Singapore 018953" data-dist="~4 km from hotel · ~7 min drive" data-gmaps="https://www.google.com/maps/search/Supertree+Grove+Gardens+by+the+Bay+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Evening_light_show_in_Supertree_Grove_of_Gardens_by_the_Bay_in_Singapore.jpg/500px-Evening_light_show_in_Supertree_Grove_of_Gardens_by_the_Bay_in_Singapore.jpg" data-video="https://upload.wikimedia.org/wikipedia/commons/8/8c/Supertree_Grove%2C_Gardens_by_the_Bay%2C_light_show_19_August.webm" data-caption="Supertree Grove — Gardens by the Bay">
       <span class="wl-emoji">🌳</span>
       <div class="wl-info">
         <div class="wl-name">Supertree Grove @ Gardens by the Bay</div>
@@ -682,16 +682,17 @@ const previewTime = document.getElementById('previewTime');
 const previewGmaps = document.getElementById('previewGmaps');
 
 let pinnedEl = null;
+let pinnedMode = 'image';
 
-function showPreview(el) {
+function showPreview(el, type) {
   const src = el.dataset.img;
   if (!src) return;
-  const isVideo = /\.(webm|mp4|mov)(\?|$)/i.test(src);
+  const useVideo = type === 'video' && el.dataset.video;
   previewImg.style.display = 'none';
   previewVideo.style.display = 'none';
   previewVideo.pause();
-  if (isVideo) {
-    previewVideo.src = src;
+  if (useVideo) {
+    previewVideo.src = el.dataset.video;
     previewVideo.style.display = 'block';
     previewVideo.play().catch(function(){});
   } else {
@@ -709,7 +710,7 @@ function showPreview(el) {
 
 function hidePreview() {
   if (pinnedEl) {
-    showPreview(pinnedEl);
+    showPreview(pinnedEl, pinnedMode);
     return;
   }
   previewImg.style.display = 'none';
@@ -728,11 +729,22 @@ function toggleSub(el) {
 }
 
 document.querySelectorAll('.stop[data-img], .wl-card[data-img], .food-card[data-img]').forEach(el => {
-  el.addEventListener('mouseenter', () => showPreview(el));
-  el.addEventListener('mouseleave', hidePreview);
+  el.addEventListener('mouseenter', () => {
+    if (pinnedEl === el) return;
+    showPreview(el);
+  });
+  el.addEventListener('mouseleave', () => {
+    if (pinnedEl === el) return;
+    hidePreview();
+  });
   el.addEventListener('click', function() {
     pinnedEl = pinnedEl === el ? null : el;
-    if (pinnedEl) showPreview(el); else hidePreview();
+    if (pinnedEl) {
+      pinnedMode = el.dataset.video ? 'video' : 'image';
+      showPreview(el, pinnedMode);
+    } else {
+      hidePreview();
+    }
   });
 });
 
