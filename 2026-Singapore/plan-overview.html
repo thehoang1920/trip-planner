@@ -756,7 +756,6 @@ function hidePreview() {
     showPreview(pinnedEl, pinnedMode);
     return;
   }
-  currentPreviewEl = null;
   previewImg.style.display = 'none';
   previewVideo.style.display = 'none';
   previewVideo.pause();
@@ -768,7 +767,7 @@ function hidePreview() {
 
 previewVideoBtn.addEventListener('click', function() {
   const el = currentPreviewEl;
-  if (!el) return;
+  if (!el || !el.dataset.video) return;
   pinnedEl = pinnedEl === el ? null : el;
   pinnedMode = 'video';
   if (pinnedEl) {
@@ -778,7 +777,10 @@ previewVideoBtn.addEventListener('click', function() {
   }
 });
 
-previewPanel.addEventListener('mouseenter', () => { clearTimeout(hideTimeout); });
+previewPanel.addEventListener('mouseenter', () => {
+  clearTimeout(hideTimeout);
+  if (currentPreviewEl && !pinnedEl) showPreview(currentPreviewEl);
+});
 previewPanel.addEventListener('mouseleave', () => { if (!pinnedEl) hideTimeout = setTimeout(hidePreview, 100); });
 
 function toggleSub(el) {
