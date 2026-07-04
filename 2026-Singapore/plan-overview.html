@@ -307,7 +307,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
   <h2>Wishlist — To Schedule</h2>
   <p class="wl-sub">Places to visit, drag into any day when ready</p>
   <div class="wishlist-grid">
-    <div class="wl-card">
+    <div class="wl-card" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Universal_Globe_Singapore.jpg/960px-Universal_Globe_Singapore.jpg" data-caption="Universal Studios Singapore — Sentosa Island">
       <span class="wl-emoji">🎢</span>
       <div class="wl-info">
         <div class="wl-name">Universal Studios Singapore</div>
@@ -317,7 +317,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <div class="wl-link"><a href="https://www.google.com/maps/search/Universal+Studios+Singapore" target="_blank">View on Google Maps</a></div>
       </div>
     </div>
-    <div class="wl-card">
+    <div class="wl-card" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/S.E.A._Aquarium%2C_Marine_Life_Park%2C_Resorts_World_Sentosa%2C_Singapore_-_20130105-05.JPG/960px-S.E.A._Aquarium%2C_Marine_Life_Park%2C_Resorts_World_Sentosa%2C_Singapore_-_20130105-05.JPG" data-caption="S.E.A. Aquarium — Resorts World Sentosa">
       <span class="wl-emoji">🐠</span>
       <div class="wl-info">
         <div class="wl-name">S.E.A. Aquarium (Oceanarium)</div>
@@ -327,7 +327,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <div class="wl-link"><a href="https://www.google.com/maps/search/S.E.A.+Aquarium+Sentosa" target="_blank">View on Google Maps</a></div>
       </div>
     </div>
-    <div class="wl-card">
+    <div class="wl-card" data-img="https://www.lilithia.net/wp-content/gallery/harry-potter-visions-singapore-2025/Harry-Potter-Visions-of-Magic-02.jpg" data-caption="Harry Potter: Visions of Magic — Resorts World Sentosa">
       <span class="wl-emoji">⚡</span>
       <div class="wl-info">
         <div class="wl-name">Harry Potter: Visions of Magic</div>
@@ -337,7 +337,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <div class="wl-link"><a href="https://www.google.com/maps/search/Harry+Potter+Visions+of+Magic+Singapore" target="_blank">View on Google Maps</a></div>
       </div>
     </div>
-    <div class="wl-card">
+    <div class="wl-card" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Singapore_Mini_Merlion.JPG/500px-Singapore_Mini_Merlion.JPG" data-caption="Merlion Park — Singapore Downtown Core">
       <span class="wl-emoji">🦁</span>
       <div class="wl-info">
         <div class="wl-name">Merlion Park</div>
@@ -400,7 +400,7 @@ function toggleSub(el) {
   }
 }
 
-document.querySelectorAll('.stop[data-img], .food-card[data-img]').forEach(stop => {
+document.querySelectorAll('.stop[data-img], .wl-card[data-img], .food-card[data-img]').forEach(stop => {
   stop.addEventListener('mouseenter', () => {
     previewImg.src = stop.dataset.img;
     previewImg.style.display = 'block';
