@@ -463,28 +463,6 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <div class="wl-link"><a href="https://www.google.com/maps/search/EOY+Music+Comics+Arts+Festival+Suntec+Singapore" target="_blank">Xem trên Google Maps</a></div>
       </div>
     </div>
-    <div class="wl-card" data-address="51 East Coast Road, Singapore 428770" data-dist="~2.5 km from hotel · ~6 min drive" data-time="Daily 9:30am-9:30pm · ~$10" data-gmaps="https://www.google.com/maps/search/328+Katong+Laksa+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Food_KatongLaksa.JPG/500px-Food_KatongLaksa.JPG" data-caption="328 Katong Laksa — Michelin Recommended">
-      <span class="wl-emoji">🍜</span>
-      <div class="wl-info">
-        <div class="wl-name">328 Katong Laksa</div>
-        <div class="wl-loc">51 East Coast Road, Singapore 428770</div>
-        <div class="wl-dist">~2.5 km from hotel · ~6 min drive</div>
-        <div class="wl-time">🕐 Daily 9:30am-9:30pm · ~$10 · Cash only</div>
-        <div class="wl-coord">1.30470, 103.90386</div>
-        <div class="wl-link"><a href="https://www.google.com/maps/search/328+Katong+Laksa+Singapore" target="_blank">Xem trên Google Maps</a></div>
-      </div>
-    </div>
-    <div class="wl-card" data-address="204 East Coast Road, Singapore 428903" data-dist="~2.5 km from hotel · ~6 min drive" data-time="Daily 8am-4pm (last order 3:30pm)" data-gmaps="https://www.google.com/maps/search/Chin+Mee+Chin+Confectionery+Katong" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Chin_Mee_Chin_Confectionery.jpg/500px-Chin_Mee_Chin_Confectionery.jpg" data-caption="Chin Mee Chin Confectionery — 100-year-old kopitiam in Katong">
-      <span class="wl-emoji">🧇</span>
-      <div class="wl-info">
-        <div class="wl-name">Chin Mee Chin Confectionery</div>
-        <div class="wl-loc">204 East Coast Road, Singapore 428903</div>
-        <div class="wl-dist">~2.5 km from hotel · ~6 min drive</div>
-        <div class="wl-time">🕐 Daily 8am-4pm (last order 3:30pm)</div>
-        <div class="wl-coord">1.30724, 103.90714</div>
-        <div class="wl-link"><a href="https://www.google.com/maps/search/Chin+Mee+Chin+Confectionery+Katong" target="_blank">Xem trên Google Maps</a></div>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -733,6 +711,25 @@ document.querySelectorAll('.wl-card').forEach(card => {
   if (isNaN(lat) || isNaN(lng)) return;
   const name = card.querySelector('.wl-name')?.textContent || 'Wishlist';
   const emoji = card.querySelector('.wl-emoji')?.textContent || '⭐';
+  const icon = L.divIcon({ className: '', html: '<div style="font-size:18px;line-height:1;text-align:center;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.5));">' + emoji + '</div>', iconSize: [22,22], iconAnchor: [11,11] });
+  const m = L.marker([lat, lng], { icon }).bindTooltip(name, { direction: 'top' });
+  m.on('mouseover', () => showPreview(card));
+  m.on('mouseout', hidePreview);
+  m.on('click', function() {
+    ignoreMapClick = true;
+    pinnedEl = pinnedEl === card ? null : card;
+    if (pinnedEl) showPreview(card); else hidePreview();
+  });
+  wlLayer.addLayer(m);
+});
+
+// Food card markers (using data-food-lat / data-food-lng)
+document.querySelectorAll('.food-card').forEach(card => {
+  const lat = parseFloat(card.dataset.foodLat);
+  const lng = parseFloat(card.dataset.foodLng);
+  if (isNaN(lat) || isNaN(lng)) return;
+  const name = card.querySelector('.food-name')?.textContent || 'Food';
+  const emoji = card.querySelector('.food-emoji')?.textContent || '🍽️';
   const icon = L.divIcon({ className: '', html: '<div style="font-size:18px;line-height:1;text-align:center;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.5));">' + emoji + '</div>', iconSize: [22,22], iconAnchor: [11,11] });
   const m = L.marker([lat, lng], { icon }).bindTooltip(name, { direction: 'top' });
   m.on('mouseover', () => showPreview(card));
