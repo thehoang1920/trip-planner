@@ -87,7 +87,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 .placeholder-text { color: #64748b; font-size: 0.82rem; font-style: italic; padding: 4px 0; }
 
 /* Mini map */
-#minimap { height: 220px; border-radius: 8px; }
+#minimap { height: 450px; border-radius: 8px; }
 
 /* Numbered map markers */
 .num-marker { background: #fbbf24; color: #0f172a; border-radius: 50%; width: 26px; height: 26px; line-height: 22px; text-align: center; font-weight: 700; font-size: 0.8rem; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
@@ -506,7 +506,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 
 <script>
 // Map
-const map = L.map('minimap', { zoomControl: true, scrollWheelZoom: true, dragging: true }).setView([1.30, 103.88], 12);
+const map = L.map('minimap', { zoomControl: true, scrollWheelZoom: true, dragging: true }).setView([1.32, 103.85], 11);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>' }).addTo(map);
 
 let ignoreMapClick = false;
@@ -698,6 +698,9 @@ document.getElementById('wlToggle').addEventListener('click', function() {
   this.textContent = wlVisible ? '📍 Hide Wishlist' : '📍 Show Wishlist on Map';
   if (wlVisible) {
     map.addLayer(wlLayer);
+    const allCoords = [];
+    wlLayer.eachLayer(l => { if (l.getLatLng) allCoords.push(l.getLatLng()); });
+    if (allCoords.length) map.fitBounds(allCoords, { padding: [40, 40], maxZoom: 13 });
   } else {
     map.removeLayer(wlLayer);
     pinnedEl = null;
