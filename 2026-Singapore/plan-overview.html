@@ -633,8 +633,8 @@ document.querySelectorAll('.day-card').forEach(card => {
     const num = i + 1;
     const icon = L.divIcon({ className: 'num-marker', html: '' + num, iconSize: [26, 26], iconAnchor: [13, 13] });
     const m = L.marker([lat, lng], { icon }).bindTooltip(num + '. ' + loc, { direction: 'top' });
-    m.on('mouseover', () => showPreview(s));
-    m.on('mouseout', hidePreview);
+    m.on('mouseover', () => { if (pinnedEl) return; showPreview(s); });
+    m.on('mouseout', () => { if (pinnedEl) return; hidePreview(); });
     m.on('click', function() {
       ignoreMapClick = true;
       pinnedEl = pinnedEl === s ? null : s;
@@ -770,11 +770,11 @@ function toggleSub(el) {
 
 document.querySelectorAll('.stop[data-img], .wl-card[data-img], .food-card[data-img]').forEach(el => {
   el.addEventListener('mouseenter', () => {
-    if (pinnedEl === el) return;
+    if (pinnedEl) return;
     showPreview(el);
   });
   el.addEventListener('mouseleave', () => {
-    if (pinnedEl === el) return;
+    if (pinnedEl) return;
     hidePreview();
   });
   el.addEventListener('click', function() {
@@ -804,8 +804,8 @@ document.querySelectorAll('.wl-card').forEach(card => {
   const emoji = card.querySelector('.wl-emoji')?.textContent || '⭐';
   const icon = L.divIcon({ className: '', html: '<div style="font-size:18px;line-height:1;text-align:center;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.5));">' + emoji + '</div>', iconSize: [22,22], iconAnchor: [11,11] });
   const m = L.marker([lat, lng], { icon }).bindTooltip(name, { direction: 'top' });
-  m.on('mouseover', () => showPreview(card));
-  m.on('mouseout', hidePreview);
+  m.on('mouseover', () => { if (pinnedEl) return; showPreview(card); });
+  m.on('mouseout', () => { if (pinnedEl) return; hidePreview(); });
   m.on('click', function() {
     ignoreMapClick = true;
     pinnedEl = pinnedEl === card ? null : card;
@@ -823,8 +823,8 @@ document.querySelectorAll('.food-card').forEach(card => {
   const emoji = card.querySelector('.food-emoji')?.textContent || '🍽️';
   const icon = L.divIcon({ className: '', html: '<div style="font-size:18px;line-height:1;text-align:center;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.5));">' + emoji + '</div>', iconSize: [22,22], iconAnchor: [11,11] });
   const m = L.marker([lat, lng], { icon }).bindTooltip(name, { direction: 'top' });
-  m.on('mouseover', () => showPreview(card));
-  m.on('mouseout', hidePreview);
+  m.on('mouseover', () => { if (pinnedEl) return; showPreview(card); });
+  m.on('mouseout', () => { if (pinnedEl) return; hidePreview(); });
   m.on('click', function() {
     ignoreMapClick = true;
     pinnedEl = pinnedEl === card ? null : card;
