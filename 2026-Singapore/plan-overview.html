@@ -58,9 +58,12 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 .day-label { font-size: 0.8rem; color: #64748b; margin-bottom: 10px; }
 
 /* Stop */
+.day-card { counter-reset: stop-order; }
 .stop { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; background: #334155; margin-bottom: 6px; cursor: default; transition: background .15s; }
 .stop:hover { background: #3b4a63; }
 .stop:last-child { margin-bottom: 0; }
+.stop[data-lat] { counter-increment: stop-order; }
+.stop[data-lat] .name::before { content: counter(stop-order) ". "; font-weight: 700; color: #fbbf24; }
 .stop .emoji { font-size: 1rem; width: 24px; text-align: center; }
 .stop .name { font-size: 0.85rem; flex: 1; }
 .stop .time { font-size: 0.75rem; color: #94a3b8; }
@@ -80,6 +83,9 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 
 /* Mini map */
 #minimap { height: 220px; border-radius: 8px; }
+
+/* Numbered map markers */
+.num-marker { background: #fbbf24; color: #0f172a; border-radius: 50%; width: 26px; height: 26px; line-height: 22px; text-align: center; font-weight: 700; font-size: 0.8rem; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
 
 /* Active day card */
 .day-card.active { border-color: #60a5fa; box-shadow: 0 0 0 1px #60a5fa; }
@@ -410,14 +416,16 @@ document.querySelectorAll('.day-card').forEach(card => {
   const coords = [];
   const markers = [];
 
-  stops.forEach(s => {
+  stops.forEach((s, i) => {
     const lat = parseFloat(s.dataset.lat);
     const lng = parseFloat(s.dataset.lng);
     if (isNaN(lat) || isNaN(lng)) return;
     coords.push([lat, lng]);
     const name = s.querySelector('.name')?.textContent || '';
     const emoji = s.querySelector('.emoji')?.textContent || '';
-    const m = L.marker([lat, lng]).bindTooltip(emoji + ' ' + name, { direction: 'top' });
+    const num = i + 1;
+    const icon = L.divIcon({ className: 'num-marker', html: '' + num, iconSize: [26, 26], iconAnchor: [13, 13] });
+    const m = L.marker([lat, lng], { icon }).bindTooltip(num + '. ' + emoji + ' ' + name, { direction: 'top' });
     markers.push(m);
     layer.addLayer(m);
   });
