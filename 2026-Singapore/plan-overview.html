@@ -21,8 +21,13 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 .preview-panel { background: #1e293b; border-radius: 12px; border: 1px solid #334155; overflow: hidden; min-height: 240px; display: flex; flex-direction: column; }
 .preview-panel .preview-img { width: 100%; height: 220px; object-fit: cover; display: block; }
 .preview-panel .preview-placeholder { flex: 1; display: flex; align-items: center; justify-content: center; color: #475569; font-size: 0.85rem; font-style: italic; min-height: 220px; }
-.preview-panel .preview-caption { padding: 12px 16px; font-size: 0.85rem; color: #94a3b8; border-top: 1px solid #334155; min-height: 42px; }
-.preview-panel .preview-caption .cap-name { color: #f1f5f9; font-weight: 600; }
+.preview-panel .preview-info { padding: 12px 16px; border-top: 1px solid #334155; }
+.preview-panel .preview-name { font-size: 0.9rem; font-weight: 600; color: #f1f5f9; margin-bottom: 6px; }
+.preview-panel .preview-addr { font-size: 0.8rem; color: #94a3b8; margin-bottom: 4px; }
+.preview-panel .preview-dist { font-size: 0.8rem; color: #60a5fa; margin-bottom: 4px; }
+.preview-panel .preview-gmaps { margin-top: 6px; }
+.preview-panel .preview-gmaps a { color: #60a5fa; font-size: 0.8rem; text-decoration: none; }
+.preview-panel .preview-gmaps a:hover { text-decoration: underline; }
 
 /* Trip info card */
 .info-card { background: #1e293b; border-radius: 12px; padding: 20px; margin-bottom: 24px; border: 1px solid #334155; }
@@ -210,7 +215,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
       <span class="name">SGN → SIN (Singapore Airlines) · T2/T3</span>
       <span class="time">12:15–15:20</span>
     </div>
-    <div class="stop parent expanded" onclick="toggleSub(this)" data-lat="1.3644" data-lng="103.9915" data-location="Changi Airport" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Jewel_Changi_airport.jpg/500px-Jewel_Changi_airport.jpg" data-caption="Jewel Changi Airport — HSBC Rain Vortex">
+    <div class="stop parent expanded" onclick="toggleSub(this)" data-lat="1.3644" data-lng="103.9915" data-location="Changi Airport" data-address="80 Airport Boulevard, Singapore 819642" data-dist="~10.5 km from hotel · ~15 min drive" data-gmaps="https://www.google.com/maps/search/Changi+Airport+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Jewel_Changi_airport.jpg/500px-Jewel_Changi_airport.jpg" data-caption="Jewel Changi Airport — HSBC Rain Vortex">
       <span class="expand-icon">▶</span>
       <span class="emoji">🛫</span>
       <span class="name">Explore Changi Airport<span class="sub-count">4 activities</span></span>
@@ -238,7 +243,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <span class="time">Jewel L5 / T3 L1</span>
       </div>
     </div>
-    <div class="stop" data-lat="1.31155" data-lng="103.88085" data-location="Hotel 81 Star" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Hotel_81_Palace%2C_Geylang%2C_Singapore.JPG/500px-Hotel_81_Palace%2C_Geylang%2C_Singapore.JPG" data-caption="Hotel 81 Palace (sister hotel) — Geylang">
+    <div class="stop" data-lat="1.31155" data-lng="103.88085" data-location="Hotel 81 Star" data-address="31 Lorong 18 Geylang, Singapore 398820" data-dist="Your hotel" data-gmaps="https://www.google.com/maps/search/Hotel+81+Premier+Star+Geylang" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Hotel_81_Palace%2C_Geylang%2C_Singapore.JPG/500px-Hotel_81_Palace%2C_Geylang%2C_Singapore.JPG" data-caption="Hotel 81 Palace (sister hotel) — Geylang">
       <span class="emoji">🏨</span>
       <span class="name">Move to Hotel 81 Star, check in</span>
       <span class="time">~17:00</span>
@@ -261,12 +266,12 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
     </div>
     <div class="day-body">
     <div class="day-label">Sentosa Island · Universal Studios</div>
-    <div class="stop" data-lat="1.31155" data-lng="103.88085" data-location="Hotel 81 Star" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Hotel_81_Palace%2C_Geylang%2C_Singapore.JPG/500px-Hotel_81_Palace%2C_Geylang%2C_Singapore.JPG" data-caption="Hotel 81 Palace (sister hotel) — Geylang">
+    <div class="stop" data-lat="1.31155" data-lng="103.88085" data-location="Hotel 81 Star" data-address="31 Lorong 18 Geylang, Singapore 398820" data-dist="Your hotel" data-gmaps="https://www.google.com/maps/search/Hotel+81+Premier+Star+Geylang" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Hotel_81_Palace%2C_Geylang%2C_Singapore.JPG/500px-Hotel_81_Palace%2C_Geylang%2C_Singapore.JPG" data-caption="Hotel 81 Palace (sister hotel) — Geylang">
       <span class="emoji">🍳</span>
       <span class="name">Breakfast near hotel</span>
       <span class="time">08:00–09:00</span>
     </div>
-    <div class="stop" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Universal_Globe_Singapore.jpg/500px-Universal_Globe_Singapore.jpg" data-caption="Universal Studios Singapore — Sentosa Island" data-lat="1.2542" data-lng="103.8227" data-location="Universal Studios Singapore">
+    <div class="stop" data-lat="1.2542" data-lng="103.8227" data-location="Universal Studios Singapore" data-address="30 Sentosa Gateway, Singapore 098140" data-dist="~10.8 km from hotel · ~16 min drive" data-gmaps="https://www.google.com/maps/search/Universal+Studios+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Universal_Globe_Singapore.jpg/500px-Universal_Globe_Singapore.jpg" data-caption="Universal Studios Singapore — Sentosa Island">
       <span class="emoji">🎢</span>
       <span class="name">Universal Studios Singapore</span>
       <span class="time">09:00–18:00</span>
@@ -317,12 +322,12 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
     </div>
     <div class="day-body">
     <div class="day-label">Departure</div>
-    <div class="stop" data-lat="1.31155" data-lng="103.88085" data-location="Hotel 81 Star" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Hotel_81_Palace%2C_Geylang%2C_Singapore.JPG/500px-Hotel_81_Palace%2C_Geylang%2C_Singapore.JPG" data-caption="Hotel 81 Palace (sister hotel) — Geylang">
+    <div class="stop" data-lat="1.31155" data-lng="103.88085" data-location="Hotel 81 Star" data-address="31 Lorong 18 Geylang, Singapore 398820" data-dist="Your hotel" data-gmaps="https://www.google.com/maps/search/Hotel+81+Premier+Star+Geylang" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Hotel_81_Palace%2C_Geylang%2C_Singapore.JPG/500px-Hotel_81_Palace%2C_Geylang%2C_Singapore.JPG" data-caption="Hotel 81 Palace (sister hotel) — Geylang">
       <span class="emoji">🏨</span>
       <span class="name">Check out · Hotel 81 Star</span>
       <span class="time">~12:00</span>
     </div>
-    <div class="stop" data-lat="1.3644" data-lng="103.9915" data-location="Changi Airport" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Jewel_Changi_airport.jpg/500px-Jewel_Changi_airport.jpg" data-caption="Jewel Changi Airport — HSBC Rain Vortex">
+    <div class="stop" data-lat="1.3644" data-lng="103.9915" data-location="Changi Airport" data-address="80 Airport Boulevard, Singapore 819642" data-dist="~10.5 km from hotel · ~15 min drive" data-gmaps="https://www.google.com/maps/search/Changi+Airport+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Jewel_Changi_airport.jpg/500px-Jewel_Changi_airport.jpg" data-caption="Jewel Changi Airport — HSBC Rain Vortex">
       <span class="emoji">🚕</span>
       <span class="name">Taxi/Grab to Changi Airport</span>
       <span class="time">~20 min</span>
@@ -340,7 +345,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
   <h2>Wishlist — To Schedule</h2>
   <p class="wl-sub">Places to visit, drag into any day when ready</p>
   <div class="wishlist-grid">
-    <div class="wl-card" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Universal_Globe_Singapore.jpg/500px-Universal_Globe_Singapore.jpg" data-caption="Universal Studios Singapore — Sentosa Island">
+    <div class="wl-card" data-address="30 Sentosa Gateway, Singapore 098140" data-dist="~10.8 km from hotel · ~16 min drive" data-gmaps="https://www.google.com/maps/search/Universal+Studios+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Universal_Globe_Singapore.jpg/500px-Universal_Globe_Singapore.jpg" data-caption="Universal Studios Singapore — Sentosa Island">
       <span class="wl-emoji">🎢</span>
       <div class="wl-info">
         <div class="wl-name">Universal Studios Singapore</div>
@@ -350,7 +355,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <div class="wl-link"><a href="https://www.google.com/maps/search/Universal+Studios+Singapore" target="_blank">View on Google Maps</a></div>
       </div>
     </div>
-    <div class="wl-card" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/S.E.A._Aquarium%2C_Marine_Life_Park%2C_Resorts_World_Sentosa%2C_Singapore_-_20130105-05.JPG/500px-S.E.A._Aquarium%2C_Marine_Life_Park%2C_Resorts_World_Sentosa%2C_Singapore_-_20130105-05.JPG" data-caption="S.E.A. Aquarium — Resorts World Sentosa">
+    <div class="wl-card" data-address="24 Sentosa Gateway, Singapore 098137" data-dist="~10.8 km from hotel · ~16 min drive" data-gmaps="https://www.google.com/maps/search/S.E.A.+Aquarium+Sentosa" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/S.E.A._Aquarium%2C_Marine_Life_Park%2C_Resorts_World_Sentosa%2C_Singapore_-_20130105-05.JPG/500px-S.E.A._Aquarium%2C_Marine_Life_Park%2C_Resorts_World_Sentosa%2C_Singapore_-_20130105-05.JPG" data-caption="S.E.A. Aquarium — Resorts World Sentosa">
       <span class="wl-emoji">🐠</span>
       <div class="wl-info">
         <div class="wl-name">S.E.A. Aquarium (Oceanarium)</div>
@@ -360,7 +365,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <div class="wl-link"><a href="https://www.google.com/maps/search/S.E.A.+Aquarium+Sentosa" target="_blank">View on Google Maps</a></div>
       </div>
     </div>
-    <div class="wl-card" data-img="https://dejiki.com/wp-content/uploads/2024/11/Harry-Potter-Visions-of-Magic-Singapore-The-Knight-Bus2.jpg" data-caption="Harry Potter: Visions of Magic — Resorts World Sentosa">
+    <div class="wl-card" data-address="WEAVE B1, Resorts World Sentosa, 8 Sentosa Gateway, Singapore 098269" data-dist="~10.6 km from hotel · ~18 min drive" data-gmaps="https://www.google.com/maps/search/Harry+Potter+Visions+of+Magic+Singapore" data-img="https://dejiki.com/wp-content/uploads/2024/11/Harry-Potter-Visions-of-Magic-Singapore-The-Knight-Bus2.jpg" data-caption="Harry Potter: Visions of Magic — Resorts World Sentosa">
       <span class="wl-emoji">⚡</span>
       <div class="wl-info">
         <div class="wl-name">Harry Potter: Visions of Magic</div>
@@ -370,7 +375,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <div class="wl-link"><a href="https://www.google.com/maps/search/Harry+Potter+Visions+of+Magic+Singapore" target="_blank">View on Google Maps</a></div>
       </div>
     </div>
-    <div class="wl-card" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Singapore_Mini_Merlion.JPG/500px-Singapore_Mini_Merlion.JPG" data-caption="Merlion Park — Singapore Downtown Core">
+    <div class="wl-card" data-address="Clifford Pier, 1 Fullerton Promenade, Singapore 049215" data-dist="~4.8 km from hotel · ~6 min drive" data-gmaps="https://www.google.com/maps/search/Merlion+Park+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Singapore_Mini_Merlion.JPG/500px-Singapore_Mini_Merlion.JPG" data-caption="Merlion Park — Singapore Downtown Core">
       <span class="wl-emoji">🦁</span>
       <div class="wl-info">
         <div class="wl-name">Merlion Park</div>
@@ -387,7 +392,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
   <h2>Food & Drink — To Try</h2>
   <p class="wl-sub">Restaurants and cafes near hotel, pick any day</p>
   <div class="food-grid">
-    <div class="food-card" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Dim_Sum_Breakfast.jpg/500px-Dim_Sum_Breakfast.jpg" data-caption="126 Dim Sum Wen Dao Shi — Geylang" data-food-lat="1.31583" data-food-lng="103.88778">
+    <div class="food-card" data-address="126 Sims Avenue, Singapore 387449" data-dist="~366m from hotel · ~5 min walk" data-gmaps="https://www.google.com/maps/search/126+Dim+Sum+Wen+Dao+Shi+Geylang" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Dim_Sum_Breakfast.jpg/500px-Dim_Sum_Breakfast.jpg" data-caption="126 Dim Sum Wen Dao Shi — Geylang" data-food-lat="1.31583" data-food-lng="103.88778">
       <span class="food-emoji">🥟</span>
       <div class="food-info">
         <div class="food-name">126 Dim Sum Wen Dao Shi 揾到食</div>
@@ -408,7 +413,12 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
   <div class="preview-panel" id="previewPanel">
     <div class="preview-placeholder" id="previewPlaceholder">Hover a stop to see photo</div>
     <img class="preview-img" id="previewImg" style="display:none;">
-    <div class="preview-caption" id="previewCaption"></div>
+    <div class="preview-info" id="previewInfo" style="display:none;">
+      <div class="preview-name" id="previewName"></div>
+      <div class="preview-addr" id="previewAddr"></div>
+      <div class="preview-dist" id="previewDist"></div>
+      <div class="preview-gmaps" id="previewGmaps"></div>
+    </div>
   </div>
 </div>
 </div><!-- /layout -->
@@ -433,19 +443,8 @@ document.querySelectorAll('.food-card[data-food-lat]').forEach(card => {
   const emoji = card.querySelector('.food-emoji')?.textContent || '🍴';
   const icon = L.divIcon({ className: '', html: '<div style="font-size:20px;line-height:1;text-align:center;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.5));">' + emoji + '</div>', iconSize: [24,24], iconAnchor: [12,12] });
   const m = L.marker([lat, lng], { icon }).addTo(map).bindTooltip(name, { direction: 'top' });
-  m.on('mouseover', function() {
-    if (card.dataset.img) {
-      previewImg.src = card.dataset.img;
-      previewImg.style.display = 'block';
-      previewPlaceholder.style.display = 'none';
-      previewCaption.innerHTML = '<span class="cap-name">' + (card.dataset.caption || name) + '</span>';
-    }
-  });
-  m.on('mouseout', function() {
-    previewImg.style.display = 'none';
-    previewPlaceholder.style.display = 'flex';
-    previewCaption.innerHTML = '';
-  });
+  m.on('mouseover', () => showPreview(card));
+  m.on('mouseout', hidePreview);
 });
 
 // Per-day route layers
@@ -469,19 +468,8 @@ document.querySelectorAll('.day-card').forEach(card => {
     const num = i + 1;
     const icon = L.divIcon({ className: 'num-marker', html: '' + num, iconSize: [26, 26], iconAnchor: [13, 13] });
     const m = L.marker([lat, lng], { icon }).bindTooltip(num + '. ' + loc, { direction: 'top' });
-    m.on('mouseover', function() {
-      if (s.dataset.img) {
-        previewImg.src = s.dataset.img;
-        previewImg.style.display = 'block';
-        previewPlaceholder.style.display = 'none';
-        previewCaption.innerHTML = '<span class="cap-name">' + (s.dataset.caption || loc) + '</span>';
-      }
-    });
-    m.on('mouseout', function() {
-      previewImg.style.display = 'none';
-      previewPlaceholder.style.display = 'flex';
-      previewCaption.innerHTML = '';
-    });
+    m.on('mouseover', () => showPreview(s));
+    m.on('mouseout', hidePreview);
     markers.push(m);
     layer.addLayer(m);
   });
@@ -531,8 +519,31 @@ dayHeaders.forEach(header => {
 
 // Hover preview panel
 const previewImg = document.getElementById('previewImg');
-const previewCaption = document.getElementById('previewCaption');
 const previewPlaceholder = document.getElementById('previewPlaceholder');
+const previewInfo = document.getElementById('previewInfo');
+const previewName = document.getElementById('previewName');
+const previewAddr = document.getElementById('previewAddr');
+const previewDist = document.getElementById('previewDist');
+const previewGmaps = document.getElementById('previewGmaps');
+
+function showPreview(el) {
+  const img = el.dataset.img;
+  if (!img) return;
+  previewImg.src = img;
+  previewImg.style.display = 'block';
+  previewPlaceholder.style.display = 'none';
+  previewName.textContent = el.dataset.caption || '';
+  previewAddr.textContent = el.dataset.address || '';
+  previewDist.textContent = el.dataset.dist || '';
+  previewGmaps.innerHTML = el.dataset.gmaps ? '<a href="' + el.dataset.gmaps + '" target="_blank">View on Google Maps</a>' : '';
+  previewInfo.style.display = 'block';
+}
+
+function hidePreview() {
+  previewImg.style.display = 'none';
+  previewPlaceholder.style.display = 'flex';
+  previewInfo.style.display = 'none';
+}
 
 function toggleSub(el) {
   el.classList.toggle('expanded');
@@ -542,18 +553,9 @@ function toggleSub(el) {
   }
 }
 
-document.querySelectorAll('.stop[data-img], .wl-card[data-img], .food-card[data-img]').forEach(stop => {
-  stop.addEventListener('mouseenter', () => {
-    previewImg.src = stop.dataset.img;
-    previewImg.style.display = 'block';
-    previewPlaceholder.style.display = 'none';
-    previewCaption.innerHTML = '<span class="cap-name">' + stop.dataset.caption + '</span>';
-  });
-  stop.addEventListener('mouseleave', () => {
-    previewImg.style.display = 'none';
-    previewPlaceholder.style.display = 'flex';
-    previewCaption.innerHTML = '';
-  });
+document.querySelectorAll('.stop[data-img], .wl-card[data-img], .food-card[data-img]').forEach(el => {
+  el.addEventListener('mouseenter', () => showPreview(el));
+  el.addEventListener('mouseleave', hidePreview);
 });
 </script>
 </body>
