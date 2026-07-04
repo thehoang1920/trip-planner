@@ -165,21 +165,104 @@ Only stops with coordinates (`data-lat`) receive a sequential number within each
 - Sub-events without `data-lat` are NOT numbered
 - Map markers show the same number as the timeline stop
 
-### Preview Panel (Right Column)
+### Preview Panel (Right Column) — Hover Detail + Pin
 
+The preview panel shows a photo + location info (name, address, distance, Google Maps link) when hovering any item with `data-img`. Clicking locks the preview until clicked again or blank space is clicked.
+
+**HTML structure:**
 ```html
 <div class="col-right">
   <div class="preview-panel" id="previewPanel">
     <div class="preview-placeholder" id="previewPlaceholder">Hover a stop to see photo</div>
     <img class="preview-img" id="previewImg" style="display:none;">
-    <div class="preview-caption" id="previewCaption"></div>
+    <div class="preview-info" id="previewInfo" style="display:none;">
+      <div class="preview-name" id="previewName"></div>
+      <div class="preview-addr" id="previewAddr"></div>
+      <div class="preview-dist" id="previewDist"></div>
+      <div class="preview-gmaps" id="previewGmaps"></div>
+    </div>
   </div>
 </div>
 ```
 
-Triggered by `mouseenter`/`mouseleave` on both:
-- Timeline stops with `data-img` (via `.stop[data-img]` selector)
-- Map markers with `data-img` (via Leaflet `mouseover`/`mouseout` events)
+**Data attributes required on every hoverable element:**
+- `data-img` — image URL for preview
+- `data-caption` — location name shown in preview
+- `data-address` — full address
+- `data-dist` — distance from hotel
+- `data-gmaps` — Google Maps search URL
+
+**CSS:**
+```css
+.preview-panel .preview-info { padding: 12px 16px; border-top: 1px solid #334155; }
+.preview-panel .preview-name { font-size: 0.9rem; font-weight: 600; color: #f1f5f9; margin-bottom: 6px; }
+.preview-panel .preview-addr { font-size: 0.8rem; color: #94a3b8; margin-bottom: 4px; }
+.preview-panel .preview-dist { font-size: 0.8rem; color: #60a5fa; margin-bottom: 4px; }
+.preview-panel .preview-gmaps { margin-top: 6px; }
+.preview-panel .preview-gmaps a { color: #60a5fa; font-size: 0.8rem; text-decoration: none; }
+.preview-panel .preview-gmaps a:hover { text-decoration: underline; }
+```
+
+**JS — helpers + pin logic (copy verbatim):**
+```js
+let pinnedEl = null;
+
+function showPreview(el) {
+  const img = el.dataset.img;
+  if (!img) return;
+  previewImg.src = img;
+  previewImg.style.display = 'block';
+  previewPlaceholder.style.display = 'none';
+  previewName.textContent = el.dataset.caption || '';
+  previewAddr.textContent = el.dataset.address || '';
+  previewDist.textContent = el.dataset.dist || '';
+  previewGmaps.innerHTML = el.dataset.gmaps ? '<a href="' + el.dataset.gmaps + '" target="_blank">View on Google Maps</a>' : '';
+  previewInfo.style.display = 'block';
+}
+
+function hidePreview() {
+  if (pinnedEl) {
+    showPreview(pinnedEl);
+    return;
+  }
+  previewImg.style.display = 'none';
+  previewPlaceholder.style.display = 'flex';
+  previewInfo.style.display = 'none';
+}
+```
+
+**Pin on click — apply to all hoverable elements:**
+```js
+el.addEventListener('click', function() {
+  pinnedEl = pinnedEl === el ? null : el;
+  if (pinnedEl) showPreview(el); else hidePreview();
+});
+```
+
+**Map blank-space unpin — place after tile layer:**
+```js
+let ignoreMapClick = false;
+map.on('click', function() {
+  if (ignoreMapClick) { ignoreMapClick = false; return; }
+  pinnedEl = null;
+  hidePreview();
+});
+```
+
+**Marker click (prevent map click from unpinning):**
+```js
+m.on('click', function() {
+  ignoreMapClick = true;
+  pinnedEl = pinnedEl === s ? null : s;
+  if (pinnedEl) showPreview(s); else hidePreview();
+});
+```
+
+Triggered by `mouseenter`/`mouseleave` on:
+- Timeline stops with `data-img` (`.stop[data-img]`)
+- Wishlist cards with `data-img` (`.wl-card[data-img]`)
+- Food cards with `data-img` (`.food-card[data-img]`)
+- Map markers with `data-img` (via Leaflet `mouseover`/`mouseout`)
 
 ### Map System (Leaflet + CartoDB)
 
@@ -291,7 +374,7 @@ if (wasCollapsed) {
 2. **Copy template structure** from an existing `plan-overview.html`
 3. **Update trip info** (flight, hotel, dates) in info card and subtitle
 4. **Create day cards** — one per day of trip
-5. **For each stop add:** `data-lat`, `data-lng`, `data-location`, `data-img`, `data-caption`
+5. **For each stop add:** `data-lat`, `data-lng`, `data-location`, `data-address`, `data-dist`, `data-gmaps`, `data-img`, `data-caption`
 6. **Set day label** — short description of the day's theme
 7. **Empty days** get `empty-day` class + placeholder text
 8. **Find images** on Wikimedia Commons for each location
