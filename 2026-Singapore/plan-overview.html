@@ -600,10 +600,12 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 const map = L.map('minimap', { zoomControl: true, scrollWheelZoom: true, dragging: true }).setView([1.32, 103.85], 11);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>' }).addTo(map);
 
-let ignoreMapClick = false;
+let pinnedEl = null, pinnedMode = 'image';
+let currentPreviewEl = null, hideTimeout = null;
+
 map.on('click', function() {
-  if (ignoreMapClick) { ignoreMapClick = false; return; }
   pinnedEl = null;
+  pinnedMode = 'image';
   hidePreview();
 });
 
@@ -635,7 +637,6 @@ document.querySelectorAll('.day-card').forEach(card => {
     m.on('mouseover', () => { if (pinnedEl) return; clearTimeout(hideTimeout); showPreview(s); });
     m.on('mouseout', () => { if (pinnedEl) return; hideTimeout = setTimeout(hidePreview, 150); });
     m.on('click', function() {
-      ignoreMapClick = true;
       pinnedEl = pinnedEl === s ? null : s;
       if (pinnedEl) showPreview(s); else hidePreview();
     });
@@ -866,7 +867,6 @@ document.querySelectorAll('.wl-card').forEach(card => {
   m.on('mouseover', () => { if (pinnedEl) return; clearTimeout(hideTimeout); showPreview(card); });
   m.on('mouseout', () => { if (pinnedEl) return; hideTimeout = setTimeout(hidePreview, 150); });
   m.on('click', function() {
-    ignoreMapClick = true;
     pinnedEl = pinnedEl === card ? null : card;
     if (pinnedEl) showPreview(card); else hidePreview();
   });
@@ -885,7 +885,6 @@ document.querySelectorAll('.food-card').forEach(card => {
   m.on('mouseover', () => { if (pinnedEl) return; clearTimeout(hideTimeout); showPreview(card); });
   m.on('mouseout', () => { if (pinnedEl) return; hideTimeout = setTimeout(hidePreview, 150); });
   m.on('click', function() {
-    ignoreMapClick = true;
     pinnedEl = pinnedEl === card ? null : card;
     if (pinnedEl) showPreview(card); else hidePreview();
   });
