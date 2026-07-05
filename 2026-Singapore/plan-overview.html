@@ -610,14 +610,12 @@ let pinnedEl = null, pinnedMode = 'image';
 let currentPreviewEl = null, hideTimeout = null;
 
 map.on('click', function() {
-  console.log('MAP CLICK');
   pinnedEl = null;
   pinnedMode = 'image';
   hidePreview();
 });
 map.on('mousedown', function() {
   if (pinnedEl) {
-    console.log('MAP MOUSEDOWN — unpin');
     pinnedEl = null;
     pinnedMode = 'image';
     hidePreview();
@@ -652,7 +650,6 @@ document.querySelectorAll('.day-card').forEach(card => {
     m.on('mouseover', () => { if (pinnedEl) return; clearTimeout(hideTimeout); showPreview(s); });
     m.on('mouseout', () => { if (pinnedEl) return; hideTimeout = setTimeout(hidePreview, 150); });
     m.on('click', function() {
-      console.log('MARKER CLICK (stop)', { el: s });
       pinnedEl = s;
       pinnedMode = 'image';
       showPreview(s);
@@ -725,9 +722,8 @@ function getYoutubeId(url) {
 }
 
 function showPreview(el, type) {
-  console.log('showPreview', { el, type, src: el?.dataset?.img, pinnedEl, pinnedMode, currentPreviewEl });
   const src = el.dataset.img;
-  if (!src) { console.log('showPreview EARLY RETURN — no src'); return; }
+  if (!src) return;
   currentPreviewEl = el;
   const videoUrl = el.dataset.video;
   const useVideo = type === 'video' && videoUrl;
@@ -767,9 +763,7 @@ function showPreview(el, type) {
 }
 
 function hidePreview() {
-  console.log('hidePreview', { pinnedEl, pinnedMode, currentPreviewEl });
   if (pinnedEl) {
-    console.log('hidePreview → redirect to showPreview', { pinnedEl, pinnedMode });
     showPreview(pinnedEl, pinnedMode);
     return;
   }
@@ -851,31 +845,27 @@ document.querySelectorAll('.stop[data-img], .wl-card[data-img], .food-card[data-
   el.addEventListener('click', function(e) {
     clearTimeout(hideTimeout);
     const videoBtn = e.target.closest('.wl-video-btn, .food-video-btn');
-    console.log('CARD CLICK', { el: this, videoBtn: !!videoBtn, pinnedEl, pinnedMode, target: e.target.className });
     if (videoBtn) {
       const card = this;
       if (pinnedEl === card && pinnedMode === 'video') {
-        console.log('→ toggle off video');
         pinnedEl = null;
         pinnedMode = 'image';
         hidePreview();
       } else {
         if (pinnedEl && pinnedEl !== card) {
-          console.log('→ clear old pin');
           pinnedEl = null;
           pinnedMode = 'image';
         }
         pinnedEl = card;
         pinnedMode = 'video';
-        console.log('→ play video', card);
         showPreview(card, 'video');
       }
     } else {
-      console.log('→ click card body, pin image');
       pinnedEl = this;
       pinnedMode = 'image';
       showPreview(this, 'image');
     }
+  });
   });
 });
 

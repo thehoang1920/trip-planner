@@ -262,7 +262,9 @@ function hidePreview() {
 }
 ```
 
-### Map Click — Unpin
+### Map Click/Unpin — mousedown catches drags
+
+`map.on('click', ...)` does NOT fire when Leaflet detects a drag (mousedown + mousemove). Use `mousedown` to catch all map interactions:
 
 ```js
 map.on('click', function() {
@@ -270,20 +272,61 @@ map.on('click', function() {
   pinnedMode = 'image';
   hidePreview();
 });
+map.on('mousedown', function() {
+  if (pinnedEl) {
+    pinnedEl = null;
+    pinnedMode = 'image';
+    hidePreview();
+  }
+});
 ```
 
-**No `ignoreMapClick` — Leaflet markers don't fire map's click event.**
+- `mousedown` fires immediately on mouse press, before Leaflet's drag detection (catches both clicks and drags)
+- `click` fires only for non-drag clicks (redundant with mousedown but kept for safety)
+- **No `ignoreMapClick`** — Leaflet markers stop propagation, they don't fire map events
 
-### Card/Marker Click — Pin/Unpin
+### Card Click — Consolidated Handler (video button + card body)
+
+Merge video-button and card-body clicks into ONE `addEventListener` per card. Use `e.target.closest()` to distinguish, avoiding `stopPropagation` race conditions:
 
 ```js
 el.addEventListener('click', function(e) {
-  if (e.target.closest('.wl-video-btn, .food-video-btn')) return;
-  pinnedEl = pinnedEl === el ? null : el;
-  pinnedMode = 'image';  // ← CRITICAL: reset to image on non-video click
-  if (pinnedEl) showPreview(el, 'image'); else hidePreview();
+  clearTimeout(hideTimeout);  // ← prevent stale mouseout timer
+  const videoBtn = e.target.closest('.wl-video-btn, .food-video-btn');
+  if (videoBtn) {
+    const card = this;
+    if (pinnedEl === card && pinnedMode === 'video') {
+      pinnedEl = null; pinnedMode = 'image'; hidePreview();
+    } else {
+      if (pinnedEl && pinnedEl !== card) { pinnedEl = null; pinnedMode = 'image'; }
+      pinnedEl = card; pinnedMode = 'video';
+      showPreview(card, 'video');
+    }
+  } else {
+    pinnedEl = this; pinnedMode = 'image';
+    showPreview(this, 'image');
+  }
 });
 ```
+
+This pattern must be applied via one query selector that matches ALL interactive card types:
+```js
+document.querySelectorAll('.stop[data-img], .wl-card[data-img], .food-card[data-img]')
+```
+
+There is NO separate `document.querySelectorAll('.wl-video-btn, .food-video-btn')` — all video button clicks are handled by this consolidated card handler. Adding separate handlers causes race conditions between the two.
+
+### Marker Click — Pin Image
+
+```js
+m.on('click', function() {
+  pinnedEl = card;
+  pinnedMode = 'image';  // ← CRITICAL: reset to image
+  showPreview(card);
+});
+```
+
+`clearTimeout(hideTimeout)` not needed here (marker click has no DOM-level timeout) but `pinnedMode = 'image'` is mandatory.
 
 ### Marker Mouseover/Mouseout
 
@@ -294,20 +337,13 @@ m.on('mouseout', () => { if (pinnedEl) return; hideTimeout = setTimeout(hidePrev
 
 Preview panel cancels timeout on mouseenter, hides on mouseleave (if unpinned).
 
-### Video Button — Card Level
+### Video Button — Card Level (NO separate handler)
+
+Video buttons are handled INSIDE the card's consolidated click handler via `e.target.closest('.wl-video-btn, .food-video-btn')`. Do NOT add separate `document.querySelectorAll('.wl-video-btn, .food-video-btn')` handlers — they create a race condition where the card handler and video handler both run.
 
 ```html
 <div class="wl-video-btn">▶ Xem video</div>
-```
-
-```js
-btn.addEventListener('click', function(e) {
-  e.stopPropagation();
-  const card = this.closest('[data-img]');
-  pinnedEl = pinnedEl === card ? null : card;
-  pinnedMode = 'video';
-  if (pinnedEl) showPreview(card, 'video'); else hidePreview();
-});
+<!-- No JS handler needed — the card's consolidated click handles it -->
 ```
 
 ### Video Button — Preview Panel (`#previewVideoBtn`)
@@ -360,7 +396,9 @@ Uses `currentPreviewEl || this._lastEl` fallback — `_lastEl` is set by `showPr
 | Click different | changed | `'image'` | Pins new image |
 | Click video btn (1st) | set | `'video'` | Plays video |
 | Click video btn (same) | null | `'image'` | Unpins video |
+| Click video btn (diff) | changed | `'video'` | Plays new video |
 | Click blank map | null | `'image'` | Hides everything |
+| Map mousedown (drag) | null | `'image'` | Hides everything |
 
 ### Map Route Toggle
 
@@ -401,7 +439,7 @@ previewYoutube.src = 'https://www.youtube-nocookie.com/embed/' + ytId + '?autopl
 previewYoutubeContainer.appendChild(previewYoutube);
 ```
 
-### Common Bugs
+### Common Bugs — Lessons Learned
 
 1. **Duplicate `let` declarations** — causes SyntaxError, entire script fails.
 2. **`ignoreMapClick` flag** — unnecessary (Leaflet markers don't fire map click), causes first map-click to be silently dropped.
@@ -409,8 +447,12 @@ previewYoutubeContainer.appendChild(previewYoutube);
 4. **Preview panel button class collision** — `<span class="wl-video-btn">` inside `#previewVideoBtn` matches global selector, creates duplicate handler. Use plain text instead.
 5. **`display:none` buttons not clickable** — ensure button is visible (`display:block`) before users can click it.
 6. **Iframe not destroyed** — old video continues audio after unpin. Always do `previewYoutube.src = ''; previewYoutube.remove(); previewYoutube = null;` in both showPreview and hidePreview.
-
-7. **CSS `:hover` on nested span unreliable** — `#previewVideoBtn span:hover` may not work consistently in all environments. Use JS `mouseenter`/`mouseleave` events to toggle inline background/color instead.
+7. **CSS `:hover` on nested span unreliable** — `#previewVideoBtn span:hover` may not work consistently. Use JS `mouseenter`/`mouseleave` events to toggle inline background/color instead.
+8. **Separate video button handlers cause race conditions** — Card-level video buttons (`wl-video-btn`, `food-video-btn`) MUST NOT have their own event listeners. Merge into the card's single click handler via `e.target.closest('.wl-video-btn, .food-video-btn')`. A separate handler with `e.stopPropagation()` fights the card handler and produces intermittent failures.
+9. **`map.on('click', ...)` doesn't fire for drags** — Leaflet suppresses `click` events when mousedown + mousemove is detected (a drag). Add `map.on('mousedown', ...)` which fires before drag detection. This is the correct way to catch ALL map interactions including drags.
+10. **Stale `hideTimeout` fires after click** — A 150ms `setTimeout` from a previous `mouseout` on a card/marker can fire `hidePreview()` milliseconds after a click handler sets new state, showing the placeholder. Fix: `clearTimeout(hideTimeout)` at the top of every click handler.
+11. **Document-level handlers are unnecessary** — Map `mousedown` + map `click` + card/marker click handlers cover all blank-area unpin scenarios. Document-level `click`/`mouseup` handlers add complexity and potential bugs (e.g., excluding `.leaflet-container` prevents map drag detection).
+12. **Console logging for debugging** — When a bug's root cause is unclear, add `console.log` traces at every key decision point (`showPreview`, `hidePreview`, each click handler) to trace the exact code path. This is faster than guessing.
 
 ### Leaflet CDN
 
