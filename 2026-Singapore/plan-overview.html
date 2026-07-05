@@ -643,7 +643,7 @@ document.querySelectorAll('.day-card').forEach(card => {
     m.on('mouseover', () => { if (pinnedEl) return; clearTimeout(hideTimeout); showPreview(s); });
     m.on('mouseout', () => { if (pinnedEl) return; hideTimeout = setTimeout(hidePreview, 150); });
     m.on('click', function() {
-      pinnedEl = pinnedEl === s ? null : s;
+      if (pinnedEl === s && pinnedMode === 'image') { pinnedEl = null; } else { pinnedEl = s; }
       pinnedMode = 'image';
       if (pinnedEl) showPreview(s); else hidePreview();
     });
@@ -837,7 +837,7 @@ document.querySelectorAll('.stop[data-img], .wl-card[data-img], .food-card[data-
   });
   el.addEventListener('click', function(e) {
     if (e.target.closest('.wl-video-btn, .food-video-btn')) return;
-    pinnedEl = pinnedEl === el ? null : el;
+    if (pinnedEl === el && pinnedMode === 'image') { pinnedEl = null; } else { pinnedEl = el; }
     pinnedMode = 'image';
     if (pinnedEl) {
       showPreview(el, 'image');
@@ -879,7 +879,7 @@ document.querySelectorAll('.wl-card').forEach(card => {
   m.on('mouseover', () => { if (pinnedEl) return; clearTimeout(hideTimeout); showPreview(card); });
   m.on('mouseout', () => { if (pinnedEl) return; hideTimeout = setTimeout(hidePreview, 150); });
   m.on('click', function() {
-    pinnedEl = pinnedEl === card ? null : card;
+    if (pinnedEl === card && pinnedMode === 'image') { pinnedEl = null; } else { pinnedEl = card; }
     pinnedMode = 'image';
     if (pinnedEl) showPreview(card); else hidePreview();
   });
@@ -898,7 +898,7 @@ document.querySelectorAll('.food-card').forEach(card => {
   m.on('mouseover', () => { if (pinnedEl) return; clearTimeout(hideTimeout); showPreview(card); });
   m.on('mouseout', () => { if (pinnedEl) return; hideTimeout = setTimeout(hidePreview, 150); });
   m.on('click', function() {
-    pinnedEl = pinnedEl === card ? null : card;
+    if (pinnedEl === card && pinnedMode === 'image') { pinnedEl = null; } else { pinnedEl = card; }
     pinnedMode = 'image';
     if (pinnedEl) showPreview(card); else hidePreview();
   });
