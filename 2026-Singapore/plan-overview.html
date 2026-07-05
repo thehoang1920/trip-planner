@@ -836,22 +836,26 @@ document.querySelectorAll('.stop[data-img], .wl-card[data-img], .food-card[data-
     hidePreview();
   });
   el.addEventListener('click', function(e) {
-    if (e.target.closest('.wl-video-btn, .food-video-btn')) return;
-    pinnedEl = el;
-    pinnedMode = 'image';
-    showPreview(el, 'image');
-  });
-});
-document.querySelectorAll('.wl-video-btn, .food-video-btn').forEach(btn => {
-  btn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    const card = this.closest('[data-img]');
-    pinnedEl = pinnedEl === card ? null : card;
-    pinnedMode = 'video';
-    if (pinnedEl) {
-      showPreview(card, 'video');
+    const videoBtn = e.target.closest('.wl-video-btn, .food-video-btn');
+    if (videoBtn) {
+      const card = this;
+      if (pinnedEl === card && pinnedMode === 'video') {
+        pinnedEl = null;
+        pinnedMode = 'image';
+        hidePreview();
+      } else {
+        if (pinnedEl && pinnedEl !== card) {
+          pinnedEl = null;
+          pinnedMode = 'image';
+        }
+        pinnedEl = card;
+        pinnedMode = 'video';
+        showPreview(card, 'video');
+      }
     } else {
-      hidePreview();
+      pinnedEl = this;
+      pinnedMode = 'image';
+      showPreview(this, 'image');
     }
   });
 });
@@ -913,6 +917,14 @@ document.getElementById('wlToggle').addEventListener('click', function() {
   } else {
     map.removeLayer(wlLayer);
     pinnedEl = null;
+    hidePreview();
+  }
+});
+document.addEventListener('click', function(e) {
+  if (e.target.closest('.stop, .wl-card, .food-card, .day-header, .leaflet-container, .preview-panel, #wlToggle')) return;
+  if (pinnedEl) {
+    pinnedEl = null;
+    pinnedMode = 'image';
     hidePreview();
   }
 });
