@@ -748,7 +748,7 @@ function showPreview(el, type) {
   previewTime.textContent = el.dataset.time || '';
   previewGmaps.innerHTML = el.dataset.gmaps ? '<a href="' + el.dataset.gmaps + '" target="_blank">Xem trên Google Maps</a>' : '';
   previewVideoBtn.style.display = videoUrl && type !== 'video' ? 'block' : 'none';
-  if (videoUrl) previewVideoBtn.setAttribute('data-video-url', videoUrl);
+  previewVideoBtn._lastEl = videoUrl ? el : null;
   previewInfo.style.display = 'block';
 }
 
@@ -767,18 +767,19 @@ function hidePreview() {
 }
 
 previewVideoBtn.addEventListener('click', function() {
-  const url = this.getAttribute('data-video-url');
-  if (!url) return;
-  const ytId = getYoutubeId(url);
+  const el = this._lastEl;
+  if (!el || !el.dataset.video) return;
+  const ytId = getYoutubeId(el.dataset.video);
   if (!ytId) return;
-  if (pinnedEl === currentPreviewEl && pinnedMode === 'video') {
+  if (pinnedEl === el && pinnedMode === 'video') {
     pinnedEl = null;
     hidePreview();
     return;
   }
-  pinnedEl = currentPreviewEl;
+  pinnedEl = el;
   pinnedMode = 'video';
   previewImg.style.display = 'none';
+  previewImg.src = '';
   previewVideo.style.display = 'none';
   previewVideo.pause();
   if (previewYoutube) { previewYoutube.src = ''; previewYoutube.remove(); previewYoutube = null; }
@@ -795,9 +796,8 @@ previewVideoBtn.addEventListener('click', function() {
 
 previewPanel.addEventListener('mouseenter', () => {
   clearTimeout(hideTimeout);
-  if (currentPreviewEl && !pinnedEl) showPreview(currentPreviewEl);
 });
-previewPanel.addEventListener('mouseleave', () => { if (!pinnedEl) hideTimeout = setTimeout(hidePreview, 100); });
+previewPanel.addEventListener('mouseleave', () => { if (!pinnedEl) hidePreview(); });
 
 function toggleSub(el) {
   el.classList.toggle('expanded');
