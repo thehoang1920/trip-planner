@@ -123,8 +123,10 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 .wl-card .wl-link a { color: #60a5fa; text-decoration: none; }
 .wl-card .wl-link a:hover { text-decoration: underline; }
 .wl-card .wl-time { font-size: 0.7rem; color: #a78bfa; margin-top: 2px; }
+.wl-card .wl-price { font-size: 0.7rem; color: #34d399; margin-top: 2px; font-weight: 600; }
 .wl-card .wl-event { font-size: 0.75rem; color: #c4b5fd; margin-top: 3px; padding-left: 4px; border-left: 2px solid #4c1d95; }
 .preview-time { font-size: 0.8rem; color: #a78bfa; margin-top: 2px; }
+.preview-price { font-size: 0.8rem; color: #34d399; margin-top: 2px; font-weight: 600; }
 
 /* Food & Drink wishlist */
 .food-wl { border-color: #7c2d12; }
@@ -141,6 +143,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 .food-card .food-rating .count { color: #64748b; }
 .food-card .food-dist { font-size: 0.7rem; color: #60a5fa; margin-top: 2px; }
 .food-card .food-note { font-size: 0.7rem; color: #94a3b8; margin-top: 4px; font-style: italic; }
+.food-card .food-price { font-size: 0.7rem; color: #34d399; margin-top: 2px; font-weight: 600; }
 .food-card .food-link { font-size: 0.7rem; margin-top: 4px; }
 .food-card .food-link a { color: #60a5fa; text-decoration: none; }
 .food-card .food-link a:hover { text-decoration: underline; }
@@ -358,107 +361,116 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
   <h2>Danh sách yêu thích — Cần sắp xếp</h2>
   <p class="wl-sub">Những nơi muốn đến, kéo vào ngày bất kỳ khi sẵn sàng</p>
   <div class="wishlist-grid">
-    <div class="wl-card" data-address="30 Sentosa Gateway, Singapore 098140" data-dist="~10.8 km from hotel · ~16 min drive" data-time="Daily 10am-9pm (holiday season)" data-gmaps="https://www.google.com/maps/search/Universal+Studios+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Universal_Globe_Singapore.jpg/500px-Universal_Globe_Singapore.jpg" data-video="https://www.youtube.com/watch?v=kkqyRLX2PGk" data-caption="Universal Studios Singapore — Sentosa Island">
+    <div class="wl-card" data-address="30 Sentosa Gateway, Singapore 098140" data-dist="~10.8 km from hotel · ~16 min drive" data-time="Daily 10am-9pm (holiday season)" data-price="💰 ~S$92/người (vé vào cổng)" data-gmaps="https://www.google.com/maps/search/Universal+Studios+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Universal_Globe_Singapore.jpg/500px-Universal_Globe_Singapore.jpg" data-video="https://www.youtube.com/watch?v=kkqyRLX2PGk" data-caption="Universal Studios Singapore — Sentosa Island">
       <span class="wl-emoji">🎢</span>
       <div class="wl-info">
         <div class="wl-name">Universal Studios Singapore</div>
         <div class="wl-loc">30 Sentosa Gateway, Singapore 098140</div>
         <div class="wl-dist">~10.8 km from hotel · ~16 min drive</div>
         <div class="wl-time">🕐 Daily 10am-9pm (holiday season)</div>
+        <div class="wl-price">💰 ~S$92/người (vé vào cổng)</div>
         <div class="wl-coord">1.2542, 103.8227</div>
         <div class="wl-link"><a href="https://www.google.com/maps/search/Universal+Studios+Singapore" target="_blank">Xem trên Google Maps</a></div>
         <div class="wl-video-btn">▶ Xem video</div>
       </div>
     </div>
-    <div class="wl-card" data-address="24 Sentosa Gateway, Singapore 098137" data-dist="~10.8 km from hotel · ~16 min drive" data-time="Daily 10am-5pm" data-gmaps="https://www.google.com/maps/search/S.E.A.+Aquarium+Sentosa" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/S.E.A._Aquarium%2C_Marine_Life_Park%2C_Resorts_World_Sentosa%2C_Singapore_-_20130105-05.JPG/500px-S.E.A._Aquarium%2C_Marine_Life_Park%2C_Resorts_World_Sentosa%2C_Singapore_-_20130105-05.JPG" data-video="https://www.youtube.com/watch?v=nQiPO63IxSo" data-caption="S.E.A. Aquarium — Resorts World Sentosa">
+    <div class="wl-card" data-address="24 Sentosa Gateway, Singapore 098137" data-dist="~10.8 km from hotel · ~16 min drive" data-time="Daily 10am-5pm" data-price="💰 ~S$43/người (vé vào cổng)" data-gmaps="https://www.google.com/maps/search/S.E.A.+Aquarium+Sentosa" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/S.E.A._Aquarium%2C_Marine_Life_Park%2C_Resorts_World_Sentosa%2C_Singapore_-_20130105-05.JPG/500px-S.E.A._Aquarium%2C_Marine_Life_Park%2C_Resorts_World_Sentosa%2C_Singapore_-_20130105-05.JPG" data-video="https://www.youtube.com/watch?v=nQiPO63IxSo" data-caption="S.E.A. Aquarium — Resorts World Sentosa">
       <span class="wl-emoji">🐠</span>
       <div class="wl-info">
         <div class="wl-name">S.E.A. Aquarium (Oceanarium)</div>
         <div class="wl-loc">24 Sentosa Gateway, Singapore 098137</div>
         <div class="wl-dist">~10.8 km from hotel · ~16 min drive</div>
         <div class="wl-time">🕐 Daily 10am-5pm</div>
+        <div class="wl-price">💰 ~S$43/người (vé vào cổng)</div>
         <div class="wl-coord">1.2584, 103.8205</div>
         <div class="wl-link"><a href="https://www.google.com/maps/search/S.E.A.+Aquarium+Sentosa" target="_blank">Xem trên Google Maps</a></div>
         <div class="wl-video-btn">▶ Xem video</div>
       </div>
     </div>
-    <div class="wl-card" data-address="WEAVE B1, Resorts World Sentosa, 8 Sentosa Gateway, Singapore 098269" data-dist="~10.6 km from hotel · ~18 min drive" data-time="Daily 11am-10pm (last entry 8pm)" data-gmaps="https://www.google.com/maps/search/Harry+Potter+Visions+of+Magic+Singapore" data-img="https://dejiki.com/wp-content/uploads/2024/11/Harry-Potter-Visions-of-Magic-Singapore-The-Knight-Bus2.jpg" data-video="https://www.youtube.com/watch?v=Ru-_h3VDjm4" data-caption="Harry Potter: Visions of Magic — Resorts World Sentosa">
+    <div class="wl-card" data-address="WEAVE B1, Resorts World Sentosa, 8 Sentosa Gateway, Singapore 098269" data-dist="~10.6 km from hotel · ~18 min drive" data-time="Daily 11am-10pm (last entry 8pm)" data-price="💰 ~S$36/người (vé vào)" data-gmaps="https://www.google.com/maps/search/Harry+Potter+Visions+of+Magic+Singapore" data-img="https://dejiki.com/wp-content/uploads/2024/11/Harry-Potter-Visions-of-Magic-Singapore-The-Knight-Bus2.jpg" data-video="https://www.youtube.com/watch?v=Ru-_h3VDjm4" data-caption="Harry Potter: Visions of Magic — Resorts World Sentosa">
       <span class="wl-emoji">⚡</span>
       <div class="wl-info">
         <div class="wl-name">Harry Potter: Visions of Magic</div>
         <div class="wl-loc">WEAVE B1, Resorts World Sentosa, 8 Sentosa Gateway, Singapore 098269</div>
         <div class="wl-dist">~10.6 km from hotel · ~18 min drive</div>
         <div class="wl-time">🕐 Daily 11am-10pm (last entry 8pm)</div>
+        <div class="wl-price">💰 ~S$36/người (vé vào)</div>
         <div class="wl-coord">1.2557, 103.8212</div>
         <div class="wl-link"><a href="https://www.google.com/maps/search/Harry+Potter+Visions+of+Magic+Singapore" target="_blank">Xem trên Google Maps</a></div>
         <div class="wl-video-btn">▶ Xem video</div>
       </div>
     </div>
-    <div class="wl-card" data-address="Clifford Pier, 1 Fullerton Promenade, Singapore 049215" data-dist="~4.8 km from hotel · ~6 min drive" data-time="24/7 outdoor public space" data-gmaps="https://www.google.com/maps/search/Merlion+Park+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Singapore_Mini_Merlion.JPG/500px-Singapore_Mini_Merlion.JPG" data-video="https://www.youtube.com/watch?v=qaOnCIZ_1eY" data-caption="Merlion Park — Singapore Downtown Core">
+    <div class="wl-card" data-address="Clifford Pier, 1 Fullerton Promenade, Singapore 049215" data-dist="~4.8 km from hotel · ~6 min drive" data-time="24/7 outdoor public space" data-price="💰 Miễn phí" data-gmaps="https://www.google.com/maps/search/Merlion+Park+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Singapore_Mini_Merlion.JPG/500px-Singapore_Mini_Merlion.JPG" data-video="https://www.youtube.com/watch?v=qaOnCIZ_1eY" data-caption="Merlion Park — Singapore Downtown Core">
       <span class="wl-emoji">🦁</span>
       <div class="wl-info">
         <div class="wl-name">Merlion Park</div>
         <div class="wl-loc">Clifford Pier, 1 Fullerton Promenade, Singapore 049215</div>
         <div class="wl-dist">~4.8 km from hotel · ~6 min drive</div>
         <div class="wl-time">🕐 24/7 outdoor public space</div>
+        <div class="wl-price">💰 Miễn phí</div>
         <div class="wl-coord">1.2870, 103.8545</div>
         <div class="wl-link"><a href="https://www.google.com/maps/search/Merlion+Park+Singapore" target="_blank">Xem trên Google Maps</a></div>
       </div>
     </div>
-    <div class="wl-card" data-address="18 Marina Gardens Dr, Singapore 018953" data-dist="~4 km from hotel · ~7 min drive" data-time="Daily 9am-9pm" data-gmaps="https://www.google.com/maps/search/Disney+Garden+of+Wonder+Gardens+by+the+Bay" data-img="https://dejiki.com/wp-content/uploads/2026/06/Disney-Garden-of-Wonder-Floral-Fantasy-Gardens-by-the-Bay_fb1.jpg" data-video="https://www.youtube.com/watch?v=mlJG58mhF-k" data-caption="Disney Garden of Wonder — Floral Fantasy at Gardens by the Bay">
+    <div class="wl-card" data-address="18 Marina Gardens Dr, Singapore 018953" data-dist="~4 km from hotel · ~7 min drive" data-time="Daily 9am-9pm" data-price="💰 ~S$15/người (vé Floral Fantasy)" data-gmaps="https://www.google.com/maps/search/Disney+Garden+of+Wonder+Gardens+by+the+Bay" data-img="https://dejiki.com/wp-content/uploads/2026/06/Disney-Garden-of-Wonder-Floral-Fantasy-Gardens-by-the-Bay_fb1.jpg" data-video="https://www.youtube.com/watch?v=mlJG58mhF-k" data-caption="Disney Garden of Wonder — Floral Fantasy at Gardens by the Bay">
       <span class="wl-emoji">🏰</span>
       <div class="wl-info">
         <div class="wl-name">Disney Garden of Wonder</div>
         <div class="wl-loc">Floral Fantasy, 18 Marina Gardens Dr, Singapore 018953</div>
         <div class="wl-dist">~4 km from hotel · ~7 min drive</div>
         <div class="wl-time">🕐 Daily 9am-9pm</div>
+        <div class="wl-price">💰 ~S$15/người (vé Floral Fantasy)</div>
         <div class="wl-coord">1.2816, 103.8639</div>
         <div class="wl-link"><a href="https://www.google.com/maps/search/Disney+Garden+of+Wonder+Gardens+by+the+Bay" target="_blank">Xem trên Google Maps</a></div>
         <div class="wl-video-btn">▶ Xem video</div>
       </div>
     </div>
-    <div class="wl-card" data-address="Fever Exhibition Hall, 25 Scotts Rd, Singapore 228220" data-dist="~5.5 km from hotel · ~10 min drive" data-time="Daily 10am-9pm" data-gmaps="https://www.google.com/maps/search/PORTALS+An+Epic+Journey+Through+Fantasy+and+Sci+Fi+Singapore" data-img="https://applications-media.feverup.com/image/upload/f_auto,ar_15:8,c_fill/fever2/plan/photo/e5efb0e0-5fe6-11f1-859b-be9ef1617519.jpg" data-video="https://www.youtube.com/watch?v=OxbA7oFzL-E" data-caption="PORTALS: An Epic Journey Through Fantasy &amp; Sci-Fi — Fever Exhibition Hall">
+    <div class="wl-card" data-address="Fever Exhibition Hall, 25 Scotts Rd, Singapore 228220" data-dist="~5.5 km from hotel · ~10 min drive" data-time="Daily 10am-9pm" data-price="💰 ~S$32/người (vé vào)" data-gmaps="https://www.google.com/maps/search/PORTALS+An+Epic+Journey+Through+Fantasy+and+Sci+Fi+Singapore" data-img="https://applications-media.feverup.com/image/upload/f_auto,ar_15:8,c_fill/fever2/plan/photo/e5efb0e0-5fe6-11f1-859b-be9ef1617519.jpg" data-video="https://www.youtube.com/watch?v=OxbA7oFzL-E" data-caption="PORTALS: An Epic Journey Through Fantasy &amp; Sci-Fi — Fever Exhibition Hall">
       <span class="wl-emoji">🌀</span>
       <div class="wl-info">
         <div class="wl-name">PORTALS: An Epic Journey Through Fantasy &amp; Sci-Fi</div>
         <div class="wl-loc">Fever Exhibition Hall, 25 Scotts Rd, Singapore 228220</div>
         <div class="wl-dist">~5.5 km from hotel · ~10 min drive</div>
         <div class="wl-time">🕐 Daily 10am-9pm</div>
+        <div class="wl-price">💰 ~S$32/người (vé vào)</div>
         <div class="wl-coord">1.3070, 103.8320</div>
         <div class="wl-link"><a href="https://www.google.com/maps/search/PORTALS+An+Epic+Journey+Through+Fantasy+and+Sci+Fi+Singapore" target="_blank">Xem trên Google Maps</a></div>
         <div class="wl-video-btn">▶ Xem video</div>
       </div>
     </div>
-    <div class="wl-card" data-address="Level 2, WEAVE @ Resorts World Sentosa, 26 Sentosa Gateway, #02-204-205, Singapore 098269" data-dist="~10 km from hotel · ~15 min drive" data-time="Mon, Wed-Sun 11am-9pm · Closed Tue · From $14" data-gmaps="https://www.google.com/maps/search/Dopamine+Land+Resorts+World+Sentosa" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Resorts_World_Sentosa.jpg/500px-Resorts_World_Sentosa.jpg" data-video="https://www.youtube.com/watch?v=uzixrDIkHno" data-caption="Dopamine Land — Interactive Sensory Museum @ Resorts World Sentosa">
+    <div class="wl-card" data-address="Level 2, WEAVE @ Resorts World Sentosa, 26 Sentosa Gateway, #02-204-205, Singapore 098269" data-dist="~10 km from hotel · ~15 min drive" data-time="Mon, Wed-Sun 11am-9pm · Closed Tue · From $14" data-price="💰 ~S$14/người (vé vào)" data-gmaps="https://www.google.com/maps/search/Dopamine+Land+Resorts+World+Sentosa" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Resorts_World_Sentosa.jpg/500px-Resorts_World_Sentosa.jpg" data-video="https://www.youtube.com/watch?v=uzixrDIkHno" data-caption="Dopamine Land — Interactive Sensory Museum @ Resorts World Sentosa">
       <span class="wl-emoji">🧠</span>
       <div class="wl-info">
         <div class="wl-name">Dopamine Land @ Resorts World Sentosa</div>
         <div class="wl-loc">Level 2, WEAVE, 26 Sentosa Gateway, Singapore 098269</div>
         <div class="wl-dist">~10 km from hotel · ~15 min drive</div>
         <div class="wl-time">🕐 Mon, Wed-Sun 11am-9pm · From $14</div>
+        <div class="wl-price">💰 ~S$14/người (vé vào)</div>
         <div class="wl-coord">1.2543, 103.8233</div>
         <div class="wl-link"><a href="https://www.google.com/maps/search/Dopamine+Land+Resorts+World+Sentosa" target="_blank">Xem trên Google Maps</a></div>
         <div class="wl-video-btn">▶ Xem video</div>
       </div>
     </div>
-    <div class="wl-card" data-address="Event Plaza, Marina Bay Sands, 10 Bayfront Ave, Singapore 018956" data-dist="~4.5 km from hotel · ~8 min drive" data-time="Nightly 8pm & 9pm · Free" data-gmaps="https://www.google.com/maps/search/Spectra+Light+and+Water+Show+Marina+Bay+Sands" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Singapore_%28SG%29%2C_Spectra_--_2019_--_4711.jpg/500px-Singapore_(SG),_Spectra_--_2019_--_4711.jpg" data-video="https://www.youtube.com/watch?v=si6HVnV078E" data-caption="Spectra — Light &amp; Water Show at Marina Bay Sands">
+    <div class="wl-card" data-address="Event Plaza, Marina Bay Sands, 10 Bayfront Ave, Singapore 018956" data-dist="~4.5 km from hotel · ~8 min drive" data-time="Nightly 8pm & 9pm · Free" data-price="💰 Miễn phí" data-gmaps="https://www.google.com/maps/search/Spectra+Light+and+Water+Show+Marina+Bay+Sands" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Singapore_%28SG%29%2C_Spectra_--_2019_--_4711.jpg/500px-Singapore_(SG),_Spectra_--_2019_--_4711.jpg" data-video="https://www.youtube.com/watch?v=si6HVnV078E" data-caption="Spectra — Light &amp; Water Show at Marina Bay Sands">
       <span class="wl-emoji">🌊</span>
       <div class="wl-info">
         <div class="wl-name">Spectra — Light &amp; Water Show</div>
         <div class="wl-loc">Event Plaza, Marina Bay Sands, 10 Bayfront Ave, Singapore 018956</div>
         <div class="wl-dist">~4.5 km from hotel · ~8 min drive</div>
         <div class="wl-time">🕐 Nightly 8pm & 9pm · Free</div>
+        <div class="wl-price">💰 Miễn phí</div>
         <div class="wl-coord">1.2834, 103.8590</div>
         <div class="wl-link"><a href="https://www.google.com/maps/search/Spectra+Light+and+Water+Show+Marina+Bay+Sands" target="_blank">Xem trên Google Maps</a></div>
         <div class="wl-video-btn">▶ Xem video</div>
       </div>
     </div>
-    <div class="wl-card" data-address="Supertree Grove, Gardens by the Bay, 18 Marina Gardens Dr, Singapore 018953" data-dist="~4 km from hotel · ~7 min drive" data-gmaps="https://www.google.com/maps/search/Supertree+Grove+Gardens+by+the+Bay+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Evening_light_show_in_Supertree_Grove_of_Gardens_by_the_Bay_in_Singapore.jpg/500px-Evening_light_show_in_Supertree_Grove_of_Gardens_by_the_Bay_in_Singapore.jpg" data-video="https://www.youtube.com/watch?v=17-BEhEbefE" data-caption="Supertree Grove — Gardens by the Bay">
+    <div class="wl-card" data-address="Supertree Grove, Gardens by the Bay, 18 Marina Gardens Dr, Singapore 018953" data-dist="~4 km from hotel · ~7 min drive" data-price="💰 Miễn phí (Christas Wonderland ~S$12)" data-gmaps="https://www.google.com/maps/search/Supertree+Grove+Gardens+by+the+Bay+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Evening_light_show_in_Supertree_Grove_of_Gardens_by_the_Bay_in_Singapore.jpg/500px-Evening_light_show_in_Supertree_Grove_of_Gardens_by_the_Bay_in_Singapore.jpg" data-video="https://www.youtube.com/watch?v=17-BEhEbefE" data-caption="Supertree Grove — Gardens by the Bay">
       <span class="wl-emoji">🌳</span>
       <div class="wl-info">
         <div class="wl-name">Supertree Grove @ Gardens by the Bay</div>
         <div class="wl-loc">18 Marina Gardens Dr, Singapore 018953</div>
         <div class="wl-dist">~4 km from hotel · ~7 min drive</div>
+        <div class="wl-price">💰 Miễn phí (Christas Wonderland ~S$12)</div>
         <div class="wl-event">🎄 Christmas Wonderland — Daily ~6:30pm–11pm (until Jan 1, ticketed)</div>
         <div class="wl-event">✨ Garden Rhapsody — Daily 7:45pm & 8:45pm · Free</div>
         <div class="wl-coord">1.2819, 103.8640</div>
@@ -466,38 +478,41 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <div class="wl-video-btn">▶ Xem video</div>
       </div>
     </div>
-    <div class="wl-card" data-address="18 Marina Gardens Dr, #01-21 Bayfront Plaza, Singapore 018953" data-dist="~4 km from hotel · ~7 min drive" data-time="Daily 12pm-2:30pm, 5pm-10pm" data-gmaps="https://www.google.com/maps/search/Hopscotch+Gardens+by+the+Bay+Singapore" data-img="https://www.hopscotch.sg/wp-content/uploads/2023/01/GBTB_InteriorDaylight-10.webp" data-video="https://www.youtube.com/watch?v=fbdGGWROfpQ" data-caption="Hopscotch — Craft Cocktail Bar @ Gardens by the Bay">
+    <div class="wl-card" data-address="18 Marina Gardens Dr, #01-21 Bayfront Plaza, Singapore 018953" data-dist="~4 km from hotel · ~7 min drive" data-time="Daily 12pm-2:30pm, 5pm-10pm" data-price="💰 ~S$24–42/người (ăn + uống)" data-gmaps="https://www.google.com/maps/search/Hopscotch+Gardens+by+the+Bay+Singapore" data-img="https://www.hopscotch.sg/wp-content/uploads/2023/01/GBTB_InteriorDaylight-10.webp" data-video="https://www.youtube.com/watch?v=fbdGGWROfpQ" data-caption="Hopscotch — Craft Cocktail Bar @ Gardens by the Bay">
       <span class="wl-emoji">🍸</span>
       <div class="wl-info">
         <div class="wl-name">Hopscotch @ Gardens by the Bay</div>
         <div class="wl-loc">18 Marina Gardens Dr, #01-21 Bayfront Plaza, Singapore 018953</div>
         <div class="wl-dist">~4 km from hotel · ~7 min drive</div>
         <div class="wl-time">🕐 Daily 12pm-2:30pm (lunch) · 5pm-10pm (dinner)</div>
+        <div class="wl-price">💰 ~S$24–42/người (ăn + uống)</div>
         <div class="wl-event">💑 Cozy date spot — craft cocktails, fusion food, Supertree views</div>
         <div class="wl-coord">1.2819, 103.8646</div>
         <div class="wl-link"><a href="https://www.google.com/maps/search/Hopscotch+Gardens+by+the+Bay+Singapore" target="_blank">Xem trên Google Maps</a></div>
         <div class="wl-video-btn">▶ Xem video</div>
       </div>
     </div>
-    <div class="wl-card" data-address="Suntec Convention Hall 405, 1 Raffles Blvd, Singapore 039593" data-dist="~4.5 km from hotel · ~8 min drive" data-time="Dec 25-26 · 12:30pm-8pm · $21.90" data-gmaps="https://www.google.com/maps/search/EOY+Music+Comics+Arts+Festival+Suntec+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Singapore_Suntec-Singapore-01.jpg/500px-Singapore_Suntec-Singapore-01.jpg" data-video="https://www.youtube.com/watch?v=2oSlbo-Xvsw" data-caption="EOY Music, Comics &amp; Arts Festival — Suntec Convention Centre">
+    <div class="wl-card" data-address="Suntec Convention Hall 405, 1 Raffles Blvd, Singapore 039593" data-dist="~4.5 km from hotel · ~8 min drive" data-time="Dec 25-26 · 12:30pm-8pm · $21.90" data-price="💰 ~S$21.90/người (vé vào)" data-gmaps="https://www.google.com/maps/search/EOY+Music+Comics+Arts+Festival+Suntec+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Singapore_Suntec-Singapore-01.jpg/500px-Singapore_Suntec-Singapore-01.jpg" data-video="https://www.youtube.com/watch?v=2oSlbo-Xvsw" data-caption="EOY Music, Comics &amp; Arts Festival — Suntec Convention Centre">
       <span class="wl-emoji">🎌</span>
       <div class="wl-info">
         <div class="wl-name">EOY Music, Comics &amp; Arts Festival</div>
         <div class="wl-loc">Suntec Convention Hall 405, 1 Raffles Blvd, Singapore 039593</div>
         <div class="wl-dist">~4.5 km from hotel · ~8 min drive</div>
         <div class="wl-time">🕐 Dec 25-26 · 12:30pm-8pm · $21.90</div>
+        <div class="wl-price">💰 ~S$21.90/người (vé vào)</div>
         <div class="wl-coord">1.2935, 103.8570</div>
         <div class="wl-link"><a href="https://www.google.com/maps/search/EOY+Music+Comics+Arts+Festival+Suntec+Singapore" target="_blank">Xem trên Google Maps</a></div>
         <div class="wl-video-btn">▶ Xem video</div>
       </div>
     </div>
-    <div class="wl-card" data-address="8 Sentosa Gateway, Universal Studios Singapore, Singapore 098269" data-dist="~10.8 km from hotel · ~16 min drive" data-time="Dec 19–29 · Nightly ~9pm · Free w/ ticket" data-gmaps="https://www.google.com/maps/search/Universal+Studios+Singapore+Lake+Hollywood" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/1_singapore_national_day_parade_2011_fireworks.jpg/500px-1_singapore_national_day_parade_2011_fireworks.jpg" data-video="https://www.youtube.com/watch?v=IaQkerBFjj0" data-caption="Lake Hollywood Christmas Fireworks — USS">
+    <div class="wl-card" data-address="8 Sentosa Gateway, Universal Studios Singapore, Singapore 098269" data-dist="~10.8 km from hotel · ~16 min drive" data-time="Dec 19–29 · Nightly ~9pm · Free w/ ticket" data-price="💰 Miễn phí (đã bao gồm vé USS)" data-gmaps="https://www.google.com/maps/search/Universal+Studios+Singapore+Lake+Hollywood" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/1_singapore_national_day_parade_2011_fireworks.jpg/500px-1_singapore_national_day_parade_2011_fireworks.jpg" data-video="https://www.youtube.com/watch?v=IaQkerBFjj0" data-caption="Lake Hollywood Christmas Fireworks — USS">
       <span class="wl-emoji">🎆</span>
       <div class="wl-info">
         <div class="wl-name">Lake Hollywood Christmas Fireworks</div>
         <div class="wl-loc">Universal Studios Singapore, 8 Sentosa Gateway</div>
         <div class="wl-dist">~10.8 km from hotel · ~16 min drive</div>
         <div class="wl-time">🕐 Dec 19–29 · Nightly ~9pm · Free w/ park ticket</div>
+        <div class="wl-price">💰 Miễn phí (đã bao gồm vé USS)</div>
         <div class="wl-coord">1.2542, 103.8227</div>
         <div class="wl-link"><a href="https://www.rwsentosa.com/en/play/universal-studios-singapore/shows/lake-hollywood-christmas-fireworks" target="_blank">Xem trên Google Maps</a></div>
         <div class="wl-video-btn">▶ Xem video</div>
@@ -510,7 +525,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
   <h2>Ẩm thực — Cần thử</h2>
   <p class="wl-sub">Nhà hàng và quán cà phê gần khách sạn, chọn ngày bất kỳ</p>
   <div class="food-grid">
-    <div class="food-card" data-address="126 Sims Avenue, Singapore 387449" data-dist="~366m from hotel · ~5 min walk" data-gmaps="https://www.google.com/maps/search/126+Dim+Sum+Wen+Dao+Shi+Geylang" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Dim_Sum_Breakfast.jpg/500px-Dim_Sum_Breakfast.jpg" data-video="https://www.youtube.com/watch?v=pDAupdn86j4" data-caption="126 Dim Sum Wen Dao Shi — Geylang" data-food-lat="1.31583" data-food-lng="103.88778">
+    <div class="food-card" data-address="126 Sims Avenue, Singapore 387449" data-dist="~366m from hotel · ~5 min walk" data-price="💰 ~S$3–8/món" data-gmaps="https://www.google.com/maps/search/126+Dim+Sum+Wen+Dao+Shi+Geylang" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Dim_Sum_Breakfast.jpg/500px-Dim_Sum_Breakfast.jpg" data-video="https://www.youtube.com/watch?v=pDAupdn86j4" data-caption="126 Dim Sum Wen Dao Shi — Geylang" data-food-lat="1.31583" data-food-lng="103.88778">
       <span class="food-emoji">🥟</span>
       <div class="food-info">
         <div class="food-name">126 Dim Sum Wen Dao Shi 揾到食</div>
@@ -518,12 +533,13 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <div class="food-loc">126 Sims Avenue, Singapore 387449</div>
         <div class="food-rating"><span class="stars">⭐ 3.9/5</span> <span class="count">(3,761 đánh giá)</span></div>
         <div class="food-dist">~366m from hotel · ~5 min walk</div>
+        <div class="food-price">💰 ~S$3–8/món</div>
         <div class="food-note">24/7 dim sum từ năm 1985. Hơn 300 món. Phải thử: liu sha bao, bánh củ cải chiên.</div>
         <div class="food-link"><a href="https://www.google.com/maps/search/126+Dim+Sum+Wen+Dao+Shi+Geylang" target="_blank">Xem trên Google Maps</a></div>
         <div class="food-video-btn">▶ Xem video</div>
       </div>
     </div>
-    <div class="food-card" data-address="328 Katong Laksa, 51 East Coast Rd, Singapore 428770" data-dist="~2.5 km from hotel · ~6 min drive" data-gmaps="https://www.google.com/maps/search/328+Katong+Laksa+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Food_KatongLaksa.JPG/500px-Food_KatongLaksa.JPG" data-video="https://www.youtube.com/watch?v=ODnin_MUT4U" data-caption="328 Katong Laksa — East Coast Road" data-food-lat="1.30470" data-food-lng="103.90386">
+    <div class="food-card" data-address="328 Katong Laksa, 51 East Coast Rd, Singapore 428770" data-dist="~2.5 km from hotel · ~6 min drive" data-price="💰 ~S$6–10/người" data-gmaps="https://www.google.com/maps/search/328+Katong+Laksa+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Food_KatongLaksa.JPG/500px-Food_KatongLaksa.JPG" data-video="https://www.youtube.com/watch?v=ODnin_MUT4U" data-caption="328 Katong Laksa — East Coast Road" data-food-lat="1.30470" data-food-lng="103.90386">
       <span class="food-emoji">🍜</span>
       <div class="food-info">
         <div class="food-name">328 Katong Laksa</div>
@@ -531,12 +547,13 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <div class="food-loc">51 East Coast Road, Singapore 428770</div>
         <div class="food-rating"><span class="stars">⭐ 3.9/5</span> <span class="count">(3,744 đánh giá Google)</span></div>
         <div class="food-dist">~2.5 km from hotel · ~6 min drive</div>
-        <div class="food-note">27 năm, Michelin Đề cử & lên sóng Yan Can Cook. Nước dùng dừa béo ngậy với tôm, sò, chả cá. Mì cắt nhỏ — chỉ dùng thìa, không đũa. Chỉ tiền mặt. ~$10.</div>
+        <div class="food-price">💰 ~S$6–10/người</div>
+        <div class="food-note">27 năm, Michelin Đề cử & lên sóng Yan Can Cook. Nước dùng dừa béo ngậy với tôm, sò, chả cá. Mì cắt nhỏ — chỉ dùng thìa, không đũa. Chỉ tiền mặt.</div>
         <div class="food-link"><a href="https://www.google.com/maps/search/328+Katong+Laksa+Singapore" target="_blank">Xem trên Google Maps</a></div>
         <div class="food-video-btn">▶ Xem video</div>
       </div>
     </div>
-    <div class="food-card" data-address="Chin Mee Chin Confectionery, 204 E Coast Rd, Singapore 428903" data-dist="~2.5 km from hotel · ~6 min drive" data-gmaps="https://www.google.com/maps/search/Chin+Mee+Chin+Confectionery+Katong" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Kaya_toast_from_Ya_Kun_Kaya_Toast%2C_Singapore_-_20160813.jpg/500px-Kaya_toast_from_Ya_Kun_Kaya_Toast%2C_Singapore_-_20160813.jpg" data-video="https://www.youtube.com/watch?v=yIgTwyIj94w" data-caption="Kaya Toast — Chin Mee Chin Confectionery" data-food-lat="1.30490" data-food-lng="103.90300">
+    <div class="food-card" data-address="Chin Mee Chin Confectionery, 204 E Coast Rd, Singapore 428903" data-dist="~2.5 km from hotel · ~6 min drive" data-price="💰 ~S$4–8/người" data-gmaps="https://www.google.com/maps/search/Chin+Mee+Chin+Confectionery+Katong" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Kaya_toast_from_Ya_Kun_Kaya_Toast%2C_Singapore_-_20160813.jpg/500px-Kaya_toast_from_Ya_Kun_Kaya_Toast%2C_Singapore_-_20160813.jpg" data-video="https://www.youtube.com/watch?v=yIgTwyIj94w" data-caption="Kaya Toast — Chin Mee Chin Confectionery" data-food-lat="1.30490" data-food-lng="103.90300">
       <span class="food-emoji">🧇</span>
       <div class="food-info">
         <div class="food-name">Chin Mee Chin Confectionery 真美珍</div>
@@ -544,12 +561,13 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <div class="food-loc">204 East Coast Road, Singapore 428903</div>
         <div class="food-rating"><span class="stars">⭐ 4.3/5</span> <span class="count">(2,100+ đánh giá Google)</span></div>
         <div class="food-dist">~2.5 km from hotel · ~6 min drive</div>
+        <div class="food-price">💰 ~S$4–8/người</div>
         <div class="food-note">Thành lập 1925 — quán kopitiam lâu đời nhất Singapore, nay đã 100 tuổi! Gạch mosaic xanh vintage & bàn đá cẩm thạch. Nổi tiếng với bánh mì kaya, trứng lòng đào, bánh sugee, kem sừng bò. Hồi sinh 2021 bởi Ebb & Flow Group.</div>
         <div class="food-link"><a href="https://www.google.com/maps/search/Chin+Mee+Chin+Confectionery+Katong" target="_blank">Xem trên Google Maps</a></div>
         <div class="food-video-btn">▶ Xem video</div>
       </div>
     </div>
-    <div class="food-card" data-address="Lau Pa Sat, 18 Raffles Quay, Singapore 048582" data-dist="~5.5 km from hotel · ~10 min drive" data-gmaps="https://www.google.com/maps/search/Lau+Pa+Sat+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Satay_Street_Lau_Pa_Sat_Singapore.jpg/500px-Satay_Street_Lau_Pa_Sat_Singapore.jpg" data-video="https://www.youtube.com/watch?v=hlB8M9uRVdE" data-caption="Satay Street — Lau Pa Sat" data-food-lat="1.28050" data-food-lng="103.85050">
+    <div class="food-card" data-address="Lau Pa Sat, 18 Raffles Quay, Singapore 048582" data-dist="~5.5 km from hotel · ~10 min drive" data-price="💰 ~S$6–15/người" data-gmaps="https://www.google.com/maps/search/Lau+Pa+Sat+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Satay_Street_Lau_Pa_Sat_Singapore.jpg/500px-Satay_Street_Lau_Pa_Sat_Singapore.jpg" data-video="https://www.youtube.com/watch?v=hlB8M9uRVdE" data-caption="Satay Street — Lau Pa Sat" data-food-lat="1.28050" data-food-lng="103.85050">
       <span class="food-emoji">🍢</span>
       <div class="food-info">
         <div class="food-name">Lau Pa Sat</div>
@@ -557,13 +575,14 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <div class="food-loc">18 Raffles Quay, Singapore 048582</div>
         <div class="food-rating"><span class="stars">⭐ 4.1/5</span> <span class="count">(5,000+ đánh giá)</span></div>
         <div class="food-dist">~5.5 km from hotel · ~10 min drive</div>
+        <div class="food-price">💰 ~S$6–15/người</div>
         <div class="food-note">Chợ mái vòm kiểu Victoria từ 1894. Phố Satay ngoài trời mỗi tối. Cũng nổi tiếng: Hokkien Mee, Char Kway Teow, Roti Prata.</div>
         <div class="food-link"><a href="https://www.google.com/maps/search/Lau+Pa+Sat+Singapore" target="_blank">Xem trên Google Maps</a></div>
         <div class="food-video-btn">▶ Xem video</div>
       </div>
     </div>
 
-    <div class="food-card" data-address="Merci Marcel, 56 Eng Hoon St, #01-68, Singapore 160056" data-dist="~4.5 km from hotel · ~8 min drive" data-gmaps="https://www.google.com/maps/search/Merci+Marcel+Tiong+Bahru" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/CroissantDOrLunch.jpg/500px-CroissantDOrLunch.jpg" data-video="https://www.youtube.com/watch?v=LBkTsPAt_TQ" data-caption="Croissant — Merci Marcel" data-food-lat="1.28320" data-food-lng="103.82930">
+    <div class="food-card" data-address="Merci Marcel, 56 Eng Hoon St, #01-68, Singapore 160056" data-dist="~4.5 km from hotel · ~8 min drive" data-price="💰 ~S$15–25/người" data-gmaps="https://www.google.com/maps/search/Merci+Marcel+Tiong+Bahru" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/CroissantDOrLunch.jpg/500px-CroissantDOrLunch.jpg" data-video="https://www.youtube.com/watch?v=LBkTsPAt_TQ" data-caption="Croissant — Merci Marcel" data-food-lat="1.28320" data-food-lng="103.82930">
       <span class="food-emoji">🥐</span>
       <div class="food-info">
         <div class="food-name">Merci Marcel</div>
@@ -571,12 +590,13 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <div class="food-loc">56 Eng Hoon St, #01-68, Tiong Bahru, Singapore 160056</div>
         <div class="food-rating"><span class="stars">⭐ 4.3/5</span> <span class="count">(1,500+ đánh giá)</span></div>
         <div class="food-dist">~4.5 km from hotel · ~8 min drive</div>
+        <div class="food-price">💰 ~S$15–25/người</div>
         <div class="food-note">Quán cà phê Instagrammable hàng đầu ở Tiong Bahru. Phong cách Pháp-Bali với sân vườn xanh mát. Phải thử: crab rillettes, khoai tây chiên truffle, brunch.</div>
         <div class="food-link"><a href="https://www.google.com/maps/search/Merci+Marcel+Tiong+Bahru" target="_blank">Xem trên Google Maps</a></div>
         <div class="food-video-btn">▶ Xem video</div>
       </div>
     </div>
-    <div class="food-card" data-address="11 New Bridge Road, Singapore 059383" data-dist="~4.9 km from hotel · ~7 min drive" data-gmaps="https://www.google.com/maps/search/Song+Fa+Bak+Kut+Teh+11+New+Bridge+Road+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Bak_kut_teh.jpg/500px-Bak_kut_teh.jpg" data-video="https://www.youtube.com/watch?v=zdx_QD_t_8k" data-caption="Bak Kut Teh — Song Fa" data-food-lat="1.28902" data-food-lng="103.84771">
+    <div class="food-card" data-address="11 New Bridge Road, Singapore 059383" data-dist="~4.9 km from hotel · ~7 min drive" data-price="💰 ~S$8–14/người" data-gmaps="https://www.google.com/maps/search/Song+Fa+Bak+Kut+Teh+11+New+Bridge+Road+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Bak_kut_teh.jpg/500px-Bak_kut_teh.jpg" data-video="https://www.youtube.com/watch?v=zdx_QD_t_8k" data-caption="Bak Kut Teh — Song Fa" data-food-lat="1.28902" data-food-lng="103.84771">
       <span class="food-emoji">🍖</span>
       <div class="food-info">
         <div class="food-name">Song Fa Bak Kut Teh 松发肉骨茶</div>
@@ -584,6 +604,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <div class="food-loc">11 New Bridge Road, Clarke Quay, Singapore 059383</div>
         <div class="food-rating"><span class="stars">⭐ 4.2/5</span> <span class="count">(2,500+ đánh giá)</span></div>
         <div class="food-dist">~4.9 km from hotel · ~7 min drive</div>
+        <div class="food-price">💰 ~S$8–14/người</div>
         <div class="food-note">Từ 1969, Michelin Bib Gourmand. Nước dùng tiêu trắng đặc trưng, sườn non mềm rời xương. Phải thử: Pork Ribs Soup ($10), sườn cốt lết ($14), quẩy chấm súp. Có bán gia vị mang về.</div>
         <div class="food-link"><a href="https://www.google.com/maps/search/Song+Fa+Bak+Kut+Teh+11+New+Bridge+Road+Singapore" target="_blank">Xem trên Google Maps</a></div>
         <div class="food-video-btn">▶ Xem video</div>
@@ -604,6 +625,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
       <div class="preview-name" id="previewName"></div>
       <div class="preview-addr" id="previewAddr"></div>
       <div class="preview-dist" id="previewDist"></div>
+      <div class="preview-price" id="previewPrice"></div>
       <div class="preview-time" id="previewTime"></div>
       <div class="preview-gmaps" id="previewGmaps"></div>
       <div class="preview-video-btn" id="previewVideoBtn" style="display:none; margin-top:6px;"><span style="display:inline-block;font-size:0.7rem;color:#ef4444;background:#2d1a1a;border:1px solid #ef4444;border-radius:4px;padding:1px 8px;cursor:pointer;transition:all .15s;">▶ Xem video</span></div>
@@ -725,6 +747,7 @@ const previewName = document.getElementById('previewName');
 const previewAddr = document.getElementById('previewAddr');
 const previewDist = document.getElementById('previewDist');
 const previewTime = document.getElementById('previewTime');
+const previewPrice = document.getElementById('previewPrice');
 const previewGmaps = document.getElementById('previewGmaps');
 const previewVideoBtn = document.getElementById('previewVideoBtn');
 const previewPanel = document.getElementById('previewPanel');
@@ -769,6 +792,7 @@ function showPreview(el, type) {
   previewAddr.textContent = el.dataset.address || '';
   previewDist.textContent = el.dataset.dist || '';
   previewTime.textContent = el.dataset.time || '';
+  previewPrice.textContent = el.dataset.price || '';
   previewGmaps.innerHTML = el.dataset.gmaps ? '<a href="' + el.dataset.gmaps + '" target="_blank">Xem trên Google Maps</a>' : '';
   previewVideoBtn.style.display = videoUrl && type !== 'video' ? 'block' : 'none';
   previewVideoBtn._lastEl = videoUrl ? el : null;
