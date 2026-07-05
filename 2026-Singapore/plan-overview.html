@@ -152,16 +152,17 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 .wl-video-btn, .food-video-btn { display: inline-block; font-size: 0.7rem; color: #ef4444; background: #2d1a1a; border: 1px solid #ef4444; border-radius: 4px; padding: 1px 8px; margin-top: 4px; cursor: pointer; transition: all .15s; text-decoration: none; }
 .wl-video-btn:hover, .food-video-btn:hover { background: #ef4444; color: #fff; }
 
-/* Parent/sub-event pattern for wishlist */
-.wl-card.parent { cursor: pointer; display: flex; align-items: flex-start; grid-column: 1 / -1; }
-.wl-card.parent .expand-icon { font-size: 0.7rem; color: #64748b; width: 16px; text-align: center; transition: transform .2s; flex-shrink: 0; display: inline-block; vertical-align: middle; }
-.wl-card.parent.expanded .expand-icon { transform: rotate(90deg); }
-.wl-sub-events { display: none; padding-left: 10px; margin-bottom: 8px; border-left: 2px solid #334155; margin-left: 6px; grid-column: 1 / -1; }
-.wl-sub-events.open { display: block; }
-.wl-sub-events .wl-card { background: #1a2638; font-size: 0.82rem; padding: 10px 12px; margin-bottom: 6px; }
-.wl-sub-events .wl-card:hover { background: #23304a; }
-.wl-sub-events .wl-card .wl-emoji { font-size: 1.1rem; }
-.wl-sub-events .wl-card .wl-name { font-size: 0.82rem; }
+/* Location block — single grid item containing parent + sub-events */
+.wl-location-block { background: #0f172a; border-radius: 8px; border: 1px solid #334155; overflow: hidden; }
+.wl-location-block .wl-card.parent { background: transparent; border: none; border-radius: 0; padding: 12px 12px 4px; margin: 0; cursor: pointer; display: flex; align-items: flex-start; }
+.wl-location-block .wl-card.parent .expand-icon { font-size: 0.7rem; color: #64748b; width: 16px; text-align: center; transition: transform .2s; flex-shrink: 0; display: inline-block; vertical-align: middle; }
+.wl-location-block .wl-card.parent.expanded .expand-icon { transform: rotate(90deg); }
+.wl-location-block .wl-sub-events { display: none; padding-left: 10px; margin: 0 6px 6px 16px; border-left: 2px solid #334155; }
+.wl-location-block .wl-sub-events.open { display: block; }
+.wl-location-block .wl-sub-events .wl-card { background: #1a2638; font-size: 0.82rem; padding: 10px 12px; margin-bottom: 6px; }
+.wl-location-block .wl-sub-events .wl-card:hover { background: #23304a; }
+.wl-location-block .wl-sub-events .wl-card .wl-emoji { font-size: 1.1rem; }
+.wl-location-block .wl-sub-events .wl-card .wl-name { font-size: 0.82rem; }
 .wl-event-desc { font-size: 0.68rem; color: #94a3b8; line-height: 1.4; margin-top: 4px; }
 .sub-count { font-size: 0.6rem; color: #94a3b8; font-weight: 400; margin-left: 4px; }
 
@@ -374,36 +375,38 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
   <h2>Danh sách yêu thích — Cần sắp xếp</h2>
   <p class="wl-sub">Những nơi muốn đến, kéo vào ngày bất kỳ khi sẵn sàng</p>
   <div class="wishlist-grid">
-    <div class="wl-card parent expanded" onclick="toggleSub(this)" data-address="30 Sentosa Gateway, Singapore 098140" data-dist="~10.8 km from hotel · ~16 min drive" data-gmaps="https://www.google.com/maps/search/Universal+Studios+Singapore">
-      <span class="expand-icon">▶</span>
-      <span class="wl-emoji">🎢</span>
-      <div class="wl-info">
-        <div class="wl-name">Universal Studios Singapore <span class="sub-count">2 hoạt động</span></div>
-        <div class="wl-loc">30 Sentosa Gateway, Singapore 098140</div>
-        <div class="wl-dist">~10.8 km from hotel · ~16 min drive</div>
-        <div class="wl-coord">1.2542, 103.8227</div>
-        <div class="wl-link"><a href="https://www.google.com/maps/search/Universal+Studios+Singapore" target="_blank">Xem trên Google Maps</a></div>
-      </div>
-    </div>
-    <div class="wl-sub-events open">
-      <div class="wl-card" data-address="30 Sentosa Gateway, Singapore 098140" data-dist="~10.8 km from hotel · ~16 min drive" data-time="Daily 10am-9pm (holiday season)" data-price="💰 ~S$92/người (vé vào cổng)" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Universal_Globe_Singapore.jpg/500px-Universal_Globe_Singapore.jpg" data-video="https://www.youtube.com/watch?v=kkqyRLX2PGk" data-caption="🎢 Công viên giải trí — Universal Studios Singapore">
+    <div class="wl-location-block">
+      <div class="wl-card parent expanded" onclick="toggleSub(this)" data-address="30 Sentosa Gateway, Singapore 098140" data-dist="~10.8 km from hotel · ~16 min drive" data-gmaps="https://www.google.com/maps/search/Universal+Studios+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Universal_Globe_Singapore.jpg/500px-Universal_Globe_Singapore.jpg" data-caption="Universal Studios Singapore — Sentosa Island">
+        <span class="expand-icon">▶</span>
         <span class="wl-emoji">🎢</span>
         <div class="wl-info">
-          <div class="wl-name">Công viên giải trí</div>
-          <div class="wl-time">🕐 Daily 10am-9pm (holiday season)</div>
-          <div class="wl-price">💰 ~S$92/người (vé vào cổng)</div>
-          <div class="wl-event-desc">7 khu chủ đề: Hollywood, New York, Sci-Fi City, Ancient Egypt, The Lost World, Far Far Away & Madagascar. Điểm nhấn: Battlestar Galactica (roller coaster đôi), Transformers 3D, Revenge of the Mummy (indoor coaster), Water World show, Jurassic Park Rapids Adventure, Puss In Boots Giant Journey, Sesame Street Spaghetti Space Chase (cho trẻ em).</div>
-          <div class="wl-video-btn">▶ Xem video</div>
+          <div class="wl-name">Universal Studios Singapore <span class="sub-count">2 hoạt động</span></div>
+          <div class="wl-loc">30 Sentosa Gateway, Singapore 098140</div>
+          <div class="wl-dist">~10.8 km from hotel · ~16 min drive</div>
+          <div class="wl-coord">1.2542, 103.8227</div>
+          <div class="wl-link"><a href="https://www.google.com/maps/search/Universal+Studios+Singapore" target="_blank">Xem trên Google Maps</a></div>
         </div>
       </div>
-      <div class="wl-card" data-address="30 Sentosa Gateway, Singapore 098140" data-dist="~10.8 km from hotel · ~16 min drive" data-time="Dec 19–29 · Nightly ~9pm" data-price="💰 Miễn phí (đã bao gồm vé USS)" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/1_singapore_national_day_parade_2011_fireworks.jpg/500px-1_singapore_national_day_parade_2011_fireworks.jpg" data-video="https://www.youtube.com/watch?v=IaQkerBFjj0" data-caption="🎆 Lake Hollywood Christmas Fireworks — Universal Studios Singapore">
-        <span class="wl-emoji">🎆</span>
-        <div class="wl-info">
-          <div class="wl-name">Lake Hollywood Christmas Fireworks</div>
-          <div class="wl-time">🕐 Dec 19–29 · Nightly ~9pm</div>
-          <div class="wl-price">💰 Miễn phí (đã bao gồm vé USS)</div>
-          <div class="wl-event-desc">Màn trình diễn pháo hoa Giáng sinh hàng đêm tại hồ Hollywood, Universal Studios Singapore. Kết hợp âm nhạc, ánh sáng và pháo hoa rực rỡ. Thời lượng ~10 phút. Địa điểm xem lý tưởng: dọc bờ hồ Hollywood và khu vực New York street. Diễn ra từ 19–29 tháng 12.</div>
-          <div class="wl-video-btn" data-video="https://www.youtube.com/watch?v=IaQkerBFjj0">▶ Xem video</div>
+      <div class="wl-sub-events open">
+        <div class="wl-card" data-address="30 Sentosa Gateway, Singapore 098140" data-dist="~10.8 km from hotel · ~16 min drive" data-time="Daily 10am-9pm (holiday season)" data-price="💰 ~S$92/người (vé vào cổng)" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Universal_Globe_Singapore.jpg/500px-Universal_Globe_Singapore.jpg" data-video="https://www.youtube.com/watch?v=kkqyRLX2PGk" data-caption="🎢 Công viên giải trí — Universal Studios Singapore">
+          <span class="wl-emoji">🎢</span>
+          <div class="wl-info">
+            <div class="wl-name">Công viên giải trí</div>
+            <div class="wl-time">🕐 Daily 10am-9pm (holiday season)</div>
+            <div class="wl-price">💰 ~S$92/người (vé vào cổng)</div>
+            <div class="wl-event-desc">7 khu chủ đề: Hollywood, New York, Sci-Fi City, Ancient Egypt, The Lost World, Far Far Away & Madagascar. Điểm nhấn: Battlestar Galactica (roller coaster đôi), Transformers 3D, Revenge of the Mummy (indoor coaster), Water World show, Jurassic Park Rapids Adventure, Puss In Boots Giant Journey, Sesame Street Spaghetti Space Chase (cho trẻ em).</div>
+            <div class="wl-video-btn">▶ Xem video</div>
+          </div>
+        </div>
+        <div class="wl-card" data-address="30 Sentosa Gateway, Singapore 098140" data-dist="~10.8 km from hotel · ~16 min drive" data-time="Dec 19–29 · Nightly ~9pm" data-price="💰 Miễn phí (đã bao gồm vé USS)" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/1_singapore_national_day_parade_2011_fireworks.jpg/500px-1_singapore_national_day_parade_2011_fireworks.jpg" data-video="https://www.youtube.com/watch?v=IaQkerBFjj0" data-caption="🎆 Lake Hollywood Christmas Fireworks — Universal Studios Singapore">
+          <span class="wl-emoji">🎆</span>
+          <div class="wl-info">
+            <div class="wl-name">Lake Hollywood Christmas Fireworks</div>
+            <div class="wl-time">🕐 Dec 19–29 · Nightly ~9pm</div>
+            <div class="wl-price">💰 Miễn phí (đã bao gồm vé USS)</div>
+            <div class="wl-event-desc">Màn trình diễn pháo hoa Giáng sinh hàng đêm tại hồ Hollywood, Universal Studios Singapore. Kết hợp âm nhạc, ánh sáng và pháo hoa rực rỡ. Thời lượng ~10 phút. Địa điểm xem lý tưởng: dọc bờ hồ Hollywood và khu vực New York street. Diễn ra từ 19–29 tháng 12.</div>
+            <div class="wl-video-btn" data-video="https://www.youtube.com/watch?v=IaQkerBFjj0">▶ Xem video</div>
+          </div>
         </div>
       </div>
     </div>
@@ -486,46 +489,48 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
         <div class="wl-video-btn">▶ Xem video</div>
       </div>
     </div>
-    <div class="wl-card parent expanded" onclick="toggleSub(this)" data-address="18 Marina Gardens Dr, Singapore 018953" data-dist="~4 km from hotel · ~7 min drive" data-gmaps="https://www.google.com/maps/search/Gardens+by+the+Bay+Singapore">
-      <span class="expand-icon">▶</span>
-      <span class="wl-emoji">🌳</span>
-      <div class="wl-info">
-        <div class="wl-name">Gardens by the Bay <span class="sub-count">3 hoạt động</span></div>
-        <div class="wl-loc">18 Marina Gardens Dr, Singapore 018953</div>
-        <div class="wl-dist">~4 km from hotel · ~7 min drive</div>
-        <div class="wl-coord">1.2818, 103.8640</div>
-        <div class="wl-link"><a href="https://www.google.com/maps/search/Gardens+by+the+Bay+Singapore" target="_blank">Xem trên Google Maps</a></div>
-      </div>
-    </div>
-    <div class="wl-sub-events open">
-      <div class="wl-card" data-address="18 Marina Gardens Dr, Singapore 018953" data-dist="~4 km from hotel · ~7 min drive" data-time="Daily 9am-9pm" data-price="💰 ~S$15/người (vé Floral Fantasy)" data-img="https://dejiki.com/wp-content/uploads/2026/06/Disney-Garden-of-Wonder-Floral-Fantasy-Gardens-by-the-Bay_fb1.jpg" data-video="https://www.youtube.com/watch?v=mlJG58mhF-k" data-caption="🏰 Disney Garden of Wonder — Gardens by the Bay">
-        <span class="wl-emoji">🏰</span>
+    <div class="wl-location-block">
+      <div class="wl-card parent expanded" onclick="toggleSub(this)" data-address="18 Marina Gardens Dr, Singapore 018953" data-dist="~4 km from hotel · ~7 min drive" data-gmaps="https://www.google.com/maps/search/Gardens+by+the+Bay+Singapore" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Evening_light_show_in_Supertree_Grove_of_Gardens_by_the_Bay_in_Singapore.jpg/500px-Evening_light_show_in_Supertree_Grove_of_Gardens_by_the_Bay_in_Singapore.jpg" data-caption="Gardens by the Bay — Singapore">
+        <span class="expand-icon">▶</span>
+        <span class="wl-emoji">🌳</span>
         <div class="wl-info">
-          <div class="wl-name">Disney Garden of Wonder</div>
-          <div class="wl-time">🕐 Daily 9am-9pm</div>
-          <div class="wl-price">💰 ~S$15/người (vé Floral Fantasy)</div>
-          <div class="wl-event-desc">Triển lãm hoa Disney tại Floral Fantasy — các nhân vật Disney kinh điển tái hiện bằng hoa tươi. 4 khu vực: Disney Princess Garden, Pixar Friends Garden, Mickey & Friends Garden, Marvel Heroes Garden. Không gian chụp ảnh lý tưởng, thích hợp cho cả người lớn và trẻ em.</div>
-          <div class="wl-video-btn" data-video="https://www.youtube.com/watch?v=mlJG58mhF-k">▶ Xem video</div>
+          <div class="wl-name">Gardens by the Bay <span class="sub-count">3 hoạt động</span></div>
+          <div class="wl-loc">18 Marina Gardens Dr, Singapore 018953</div>
+          <div class="wl-dist">~4 km from hotel · ~7 min drive</div>
+          <div class="wl-coord">1.2818, 103.8640</div>
+          <div class="wl-link"><a href="https://www.google.com/maps/search/Gardens+by+the+Bay+Singapore" target="_blank">Xem trên Google Maps</a></div>
         </div>
       </div>
-      <div class="wl-card" data-address="18 Marina Gardens Dr, Singapore 018953" data-dist="~4 km from hotel · ~7 min drive" data-time="Daily ~6:30pm–11pm (until Jan 1)" data-price="💰 ~S$12/người (ticketed)" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Evening_light_show_in_Supertree_Grove_of_Gardens_by_the_Bay_in_Singapore.jpg/500px-Evening_light_show_in_Supertree_Grove_of_Gardens_by_the_Bay_in_Singapore.jpg" data-video="https://www.youtube.com/watch?v=TQs7vlbXNMA" data-caption="🎄 Christmas Wonderland — Gardens by the Bay">
-        <span class="wl-emoji">🎄</span>
-        <div class="wl-info">
-          <div class="wl-name">Christmas Wonderland</div>
-          <div class="wl-time">🕐 Daily ~6:30pm–11pm (until Jan 1)</div>
-          <div class="wl-price">💰 ~S$12/người (ticketed)</div>
-          <div class="wl-event-desc">Lễ hội Giáng sinh với cây thông Noel khổng lồ, chợ đêm, Gingerbread House, vòng quay ngựa gỗ, và trình diễn ánh sáng. Không khí lãng mạn và rực rỡ, thích hợp cho các cặp đôi.</div>
-          <div class="wl-video-btn" data-video="https://www.youtube.com/watch?v=TQs7vlbXNMA">▶ Xem video</div>
+      <div class="wl-sub-events open">
+        <div class="wl-card" data-address="18 Marina Gardens Dr, Singapore 018953" data-dist="~4 km from hotel · ~7 min drive" data-time="Daily 9am-9pm" data-price="💰 ~S$15/người (vé Floral Fantasy)" data-img="https://dejiki.com/wp-content/uploads/2026/06/Disney-Garden-of-Wonder-Floral-Fantasy-Gardens-by-the-Bay_fb1.jpg" data-video="https://www.youtube.com/watch?v=mlJG58mhF-k" data-caption="🏰 Disney Garden of Wonder — Gardens by the Bay">
+          <span class="wl-emoji">🏰</span>
+          <div class="wl-info">
+            <div class="wl-name">Disney Garden of Wonder</div>
+            <div class="wl-time">🕐 Daily 9am-9pm</div>
+            <div class="wl-price">💰 ~S$15/người (vé Floral Fantasy)</div>
+            <div class="wl-event-desc">Triển lãm hoa Disney tại Floral Fantasy — các nhân vật Disney kinh điển tái hiện bằng hoa tươi. 4 khu vực: Disney Princess Garden, Pixar Friends Garden, Mickey & Friends Garden, Marvel Heroes Garden. Không gian chụp ảnh lý tưởng, thích hợp cho cả người lớn và trẻ em.</div>
+            <div class="wl-video-btn" data-video="https://www.youtube.com/watch?v=mlJG58mhF-k">▶ Xem video</div>
+          </div>
         </div>
-      </div>
-      <div class="wl-card" data-address="18 Marina Gardens Dr, Singapore 018953" data-dist="~4 km from hotel · ~7 min drive" data-time="Daily 7:45pm & 8:45pm" data-price="💰 Miễn phí" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Evening_light_show_in_Supertree_Grove_of_Gardens_by_the_Bay_in_Singapore.jpg/500px-Evening_light_show_in_Supertree_Grove_of_Gardens_by_the_Bay_in_Singapore.jpg" data-video="https://www.youtube.com/watch?v=VrocGcTqAiE" data-caption="✨ Garden Rhapsody — Gardens by the Bay Supertree Grove">
-        <span class="wl-emoji">✨</span>
-        <div class="wl-info">
-          <div class="wl-name">Garden Rhapsody</div>
-          <div class="wl-time">🕐 Daily 7:45pm & 8:45pm</div>
-          <div class="wl-price">💰 Miễn phí</div>
-          <div class="wl-event-desc">Trình diễn âm thanh và ánh sáng tại Supertree Grove. Hàng ngàn đèn LED trên những siêu cây cao 50m đồng bộ theo nhạc, kéo dài ~15 phút. Một trong những trải nghiệm free đẹp nhất Singapore.</div>
-          <div class="wl-video-btn" data-video="https://www.youtube.com/watch?v=VrocGcTqAiE">▶ Xem video</div>
+        <div class="wl-card" data-address="18 Marina Gardens Dr, Singapore 018953" data-dist="~4 km from hotel · ~7 min drive" data-time="Daily ~6:30pm–11pm (until Jan 1)" data-price="💰 ~S$12/người (ticketed)" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Evening_light_show_in_Supertree_Grove_of_Gardens_by_the_Bay_in_Singapore.jpg/500px-Evening_light_show_in_Supertree_Grove_of_Gardens_by_the_Bay_in_Singapore.jpg" data-video="https://www.youtube.com/watch?v=TQs7vlbXNMA" data-caption="🎄 Christmas Wonderland — Gardens by the Bay">
+          <span class="wl-emoji">🎄</span>
+          <div class="wl-info">
+            <div class="wl-name">Christmas Wonderland</div>
+            <div class="wl-time">🕐 Daily ~6:30pm–11pm (until Jan 1)</div>
+            <div class="wl-price">💰 ~S$12/người (ticketed)</div>
+            <div class="wl-event-desc">Lễ hội Giáng sinh với cây thông Noel khổng lồ, chợ đêm, Gingerbread House, vòng quay ngựa gỗ, và trình diễn ánh sáng. Không khí lãng mạn và rực rỡ, thích hợp cho các cặp đôi.</div>
+            <div class="wl-video-btn" data-video="https://www.youtube.com/watch?v=TQs7vlbXNMA">▶ Xem video</div>
+          </div>
+        </div>
+        <div class="wl-card" data-address="18 Marina Gardens Dr, Singapore 018953" data-dist="~4 km from hotel · ~7 min drive" data-time="Daily 7:45pm & 8:45pm" data-price="💰 Miễn phí" data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Evening_light_show_in_Supertree_Grove_of_Gardens_by_the_Bay_in_Singapore.jpg/500px-Evening_light_show_in_Supertree_Grove_of_Gardens_by_the_Bay_in_Singapore.jpg" data-video="https://www.youtube.com/watch?v=VrocGcTqAiE" data-caption="✨ Garden Rhapsody — Gardens by the Bay Supertree Grove">
+          <span class="wl-emoji">✨</span>
+          <div class="wl-info">
+            <div class="wl-name">Garden Rhapsody</div>
+            <div class="wl-time">🕐 Daily 7:45pm & 8:45pm</div>
+            <div class="wl-price">💰 Miễn phí</div>
+            <div class="wl-event-desc">Trình diễn âm thanh và ánh sáng tại Supertree Grove. Hàng ngàn đèn LED trên những siêu cây cao 50m đồng bộ theo nhạc, kéo dài ~15 phút. Một trong những trải nghiệm free đẹp nhất Singapore.</div>
+            <div class="wl-video-btn" data-video="https://www.youtube.com/watch?v=VrocGcTqAiE">▶ Xem video</div>
+          </div>
         </div>
       </div>
     </div>
