@@ -23,31 +23,24 @@ The live GitHub Pages site must reflect local changes at all times. The user acc
 
 ```powershell
 # ── Geocoding (address ↔ coordinates) ──
-#   Use OSM for quick lookups, Geoapify for more precise results
 python osm_tools.py geocode "Marina Bay Sands Singapore"
 python osm_tools.py geocode "Marina Bay Sands" --provider geoapify
 python osm_tools.py reverse 1.2834 103.8607
 python osm_tools.py reverse 1.2834 103.8607 --provider geoapify
 
 # ── Routing (A→B) ──
-#   OSRM: fast, good for rough estimates.  Geoapify: better turn-by-turn
-#   with road names (including local characters like 薛尔思道)
 python osm_tools.py route 103.8607,1.2834 103.8636,1.2817 --mode walking
 python osm_tools.py route 103.8607,1.2834 103.8636,1.2817 --mode walking --provider geoapify
 
 # ── Distance/Time matrix ──
-#   OSRM: unlimited stops.  Geoapify: better accuracy, free tier may limit size
 python osm_tools.py matrix "103.8607,1.2834" "103.8636,1.2817" "103.8303,1.2494" --mode driving
 python osm_tools.py matrix "103.8607,1.2834" "103.8636,1.2817" --mode driving --provider geoapify
 
 # ── POI/Places search ──
-#   Overpass: flexible query with tags (tourism, food, etc).  Geoapify: richer
-#   results with address details and categories
 python osm_tools.py poi "Singapore" --type tourism
 python osm_tools.py poi "Singapore" --type food --provider geoapify
 
 # ── Multi-stop trip plan ──
-#   OSRM works well for any number of stops.  Geoapify free tier limited to 2.
 python osm_tools.py plan "103.8607,1.2834" "103.8636,1.2817" "103.8303,1.2494" --mode walking
 python osm_tools.py plan "103.8607,1.2834" "103.8636,1.2817" --mode driving --provider geoapify
 ```
@@ -144,7 +137,7 @@ Single self-contained HTML file with:
 
 - Clicking `.day-header` toggles `.collapsed` class on `.day-card`
 - `.day-body` uses `max-height` + `opacity` transition for smooth collapse
-- **Empty days** (not yet planned) get `empty-day` class for dashed border + reduced opacity
+- **Empty days** get `empty-day` class for dashed border + reduced opacity
 - Each `.day-body` wraps all content below `.day-header` (label + stops)
 
 ### CSS for Collapse
@@ -158,14 +151,12 @@ Single self-contained HTML file with:
 ### Stop / Sub-Event Structure
 
 ```html
-<!-- Regular stop -->
 <div class="stop" data-lat="1.31155" data-lng="103.88085" data-location="Hotel 81 Star" data-img="URL" data-caption="Caption">
   <span class="emoji">🏨</span>
   <span class="name">Stop name</span>
   <span class="time">~17:00</span>
 </div>
 
-<!-- Parent with sub-events (collapsible) -->
 <div class="stop parent expanded" onclick="toggleSub(this)" data-lat="..." data-lng="..." data-location="..." data-img="..." data-caption="...">
   <span class="expand-icon">▶</span>
   <span class="emoji">🛫</span>
@@ -177,241 +168,228 @@ Single self-contained HTML file with:
 </div>
 ```
 
-Key attributes on stops:
-- `data-lat` / `data-lng` — coordinates for map markers (only add when stop has a physical location)
-- `data-location` — clean location name for map tooltip (e.g. "Changi Airport", "Hotel 81 Star")
-- `data-img` — URL for hover preview image
-- `data-caption` — caption for the preview image
+### Data Attributes Reference
 
-### Numbering System (CSS Counters)
+| Attribute | Used on | Purpose |
+|-----------|---------|---------|
+| `data-lat`, `data-lng` | `.stop` | Map marker coordinates + numbering |
+| `data-location` | `.stop` | Map marker tooltip text |
+| `data-img` | `.stop`, `.wl-card`, `.food-card` | Hover/click preview image |
+| `data-caption` | `.stop`, `.wl-card`, `.food-card` | Preview panel name |
+| `data-address` | `.stop`, `.wl-card`, `.food-card` | Preview panel address |
+| `data-dist` | `.stop`, `.wl-card`, `.food-card` | Preview panel distance |
+| `data-gmaps` | `.stop`, `.wl-card`, `.food-card` | Google Maps link in preview |
+| `data-time` | `.wl-card` | Operating hours in preview |
+| `data-video` | `.wl-card`, `.food-card` | YouTube URL for video preview |
+| `data-food-lat`, `data-food-lng` | `.food-card` | Food marker coordinates |
 
-Only stops with coordinates (`data-lat`) receive a sequential number within each day:
+### Preview Panel Structure
 
-```css
-.day-card { counter-reset: stop-order; }
-.stop[data-lat] { counter-increment: stop-order; }
-.stop[data-lat] .name::before { content: counter(stop-order) ". "; font-weight: 700; color: #fbbf24; }
-```
-
-- Numbers restart per day-card
-- Sub-events without `data-lat` are NOT numbered
-- Map markers show the same number as the timeline stop
-
-### Preview Panel (Right Column) — Hover Detail + Pin
-
-The preview panel shows a photo + location info (name, address, distance, Google Maps link) when hovering any item with `data-img`. Clicking locks the preview until clicked again or blank space is clicked.
-
-**HTML structure:**
 ```html
 <div class="col-right">
   <div class="preview-panel" id="previewPanel">
-    <div class="preview-placeholder" id="previewPlaceholder">Hover a stop to see photo</div>
+    <div class="preview-placeholder" id="previewPlaceholder">...</div>
     <img class="preview-img" id="previewImg" style="display:none;">
+    <div class="preview-youtube-container" id="previewYoutubeContainer" style="display:none;"></div>
+    <div class="preview-video-btn" id="previewVideoBtn" style="display:none; margin-top:6px;">▶ Xem video</div>
     <div class="preview-info" id="previewInfo" style="display:none;">
       <div class="preview-name" id="previewName"></div>
       <div class="preview-addr" id="previewAddr"></div>
       <div class="preview-dist" id="previewDist"></div>
+      <div class="preview-time" id="previewTime"></div>
       <div class="preview-gmaps" id="previewGmaps"></div>
     </div>
   </div>
 </div>
 ```
 
-**Data attributes required on every hoverable element:**
-- `data-img` — image URL for preview
-- `data-caption` — location name shown in preview
-- `data-address` — full address
-- `data-dist` — distance from hotel
-- `data-gmaps` — Google Maps search URL
+**`#previewVideoBtn` must NOT contain child elements with `wl-video-btn` or `food-video-btn` class** — the global query selector will create a duplicate handler. Use plain text.
 
-**CSS:**
-```css
-.preview-panel .preview-info { padding: 12px 16px; border-top: 1px solid #334155; }
-.preview-panel .preview-name { font-size: 0.9rem; font-weight: 600; color: #f1f5f9; margin-bottom: 6px; }
-.preview-panel .preview-addr { font-size: 0.8rem; color: #94a3b8; margin-bottom: 4px; }
-.preview-panel .preview-dist { font-size: 0.8rem; color: #60a5fa; margin-bottom: 4px; }
-.preview-panel .preview-gmaps { margin-top: 6px; }
-.preview-panel .preview-gmaps a { color: #60a5fa; font-size: 0.8rem; text-decoration: none; }
-.preview-panel .preview-gmaps a:hover { text-decoration: underline; }
+### State Variables
+
+```js
+let pinnedEl = null;          // Pinned element (null = nothing pinned)
+let pinnedMode = 'image';     // 'image' | 'video' — what to re-render for pinnedEl
+let currentPreviewEl = null;  // Currently hovered element (video button fallback)
+let hideTimeout = null;       // setTimeout ID for mouseout debounce (150ms)
+let previewYoutube = null;    // Current YouTube iframe reference
 ```
 
-**JS — helpers + pin logic (copy verbatim):**
-```js
-let pinnedEl = null;
+**Declared ONCE — duplicate `let` in same `<script>` block causes SyntaxError.**
 
-function showPreview(el) {
-  const img = el.dataset.img;
-  if (!img) return;
-  previewImg.src = img;
-  previewImg.style.display = 'block';
-  previewPlaceholder.style.display = 'none';
+### showPreview(el, type)
+
+```js
+function showPreview(el, type) {
+  currentPreviewEl = el;
+  // Destroy old iframe
+  if (previewYoutube) { previewYoutube.src = ''; previewYoutube.remove(); previewYoutube = null; }
+  previewYoutubeContainer.style.display = 'none';
+
+  if (type === 'video' && el.dataset.video) {
+    // Create YouTube iframe
+    previewYoutube = document.createElement('iframe');
+    previewYoutube.className = 'preview-img';
+    previewYoutube.allow = 'autoplay; encrypted-media; fullscreen';
+    previewYoutube.allowfullscreen = true;
+    previewYoutube.src = 'https://www.youtube-nocookie.com/embed/' + ytId + '?autoplay=1&rel=0&playsinline=1';
+    previewYoutubeContainer.appendChild(previewYoutube);
+    previewYoutubeContainer.style.display = 'block';
+  } else {
+    // Show image
+    previewImg.src = el.dataset.img;
+    previewImg.style.display = 'block';
+  }
+
+  // Update info
   previewName.textContent = el.dataset.caption || '';
-  previewAddr.textContent = el.dataset.address || '';
-  previewDist.textContent = el.dataset.dist || '';
-  previewGmaps.innerHTML = el.dataset.gmaps ? '<a href="' + el.dataset.gmaps + '" target="_blank">View on Google Maps</a>' : '';
+  previewVideoBtn.style.display = el.dataset.video && type !== 'video' ? 'block' : 'none';
+  previewVideoBtn._lastEl = el.dataset.video ? el : null;
   previewInfo.style.display = 'block';
 }
+```
 
+### hidePreview()
+
+```js
 function hidePreview() {
-  if (pinnedEl) {
-    showPreview(pinnedEl);
-    return;
-  }
-  previewImg.style.display = 'none';
+  if (pinnedEl) { showPreview(pinnedEl, pinnedMode); return; }
+  pinnedMode = 'image';
+  if (previewYoutube) { previewYoutube.src = ''; previewYoutube.remove(); previewYoutube = null; }
+  previewYoutubeContainer.style.display = 'none';
   previewPlaceholder.style.display = 'flex';
   previewInfo.style.display = 'none';
 }
 ```
 
-**Pin on click — apply to all hoverable elements:**
-```js
-el.addEventListener('click', function() {
-  pinnedEl = pinnedEl === el ? null : el;
-  if (pinnedEl) showPreview(el); else hidePreview();
-});
-```
+### Map Click — Unpin
 
-**Map blank-space unpin — place after tile layer:**
 ```js
-let ignoreMapClick = false;
 map.on('click', function() {
-  if (ignoreMapClick) { ignoreMapClick = false; return; }
   pinnedEl = null;
+  pinnedMode = 'image';
   hidePreview();
 });
 ```
 
-**Marker click (prevent map click from unpinning):**
+**No `ignoreMapClick` — Leaflet markers don't fire map's click event.**
+
+### Card/Marker Click — Pin/Unpin
+
 ```js
-m.on('click', function() {
-  ignoreMapClick = true;
-  pinnedEl = pinnedEl === s ? null : s;
-  if (pinnedEl) showPreview(s); else hidePreview();
+el.addEventListener('click', function(e) {
+  if (e.target.closest('.wl-video-btn, .food-video-btn')) return;
+  pinnedEl = pinnedEl === el ? null : el;
+  pinnedMode = 'image';  // ← CRITICAL: reset to image on non-video click
+  if (pinnedEl) showPreview(el, 'image'); else hidePreview();
 });
 ```
 
-Triggered by `mouseenter`/`mouseleave` on:
-- Timeline stops with `data-img` (`.stop[data-img]`)
-- Wishlist cards with `data-img` (`.wl-card[data-img]`)
-- Food cards with `data-img` (`.food-card[data-img]`)
-- Map markers with `data-img` (via Leaflet `mouseover`/`mouseout`)
-
-### Map System (Leaflet + CartoDB)
-
-**Tile layer:** CartoDB Positron for clean, light, Google-like appearance:
-```js
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 })
-```
-
-**Per-day route layers:** Each day with geo-stops gets a numbered layer group:
-- Created on page load but removed from map (hidden)
-- Clicking a day header adds the layer to the map and fits bounds
-- Toggling off removes the layer
-- Route polyline drawn between consecutive stops in yellow (`#fbbf24`)
-
-**Numbered markers:**
-```js
-const icon = L.divIcon({ className: 'num-marker', html: '' + num, iconSize: [26, 26], iconAnchor: [13, 13] });
-const marker = L.marker([lat, lng], { icon }).bindTooltip(num + '. ' + loc, { direction: 'top' });
-```
-
-**Numbered marker CSS:**
-```css
-.num-marker { background: #fbbf24; color: #0f172a; border-radius: 50%; width: 26px; height: 26px; line-height: 22px; text-align: center; font-weight: 700; font-size: 0.8rem; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
-```
-
-### Map Route Toggle Logic
+### Marker Mouseover/Mouseout
 
 ```js
-// Click header to collapse/expand
-card.classList.toggle('collapsed');
+m.on('mouseover', () => { if (pinnedEl) return; clearTimeout(hideTimeout); showPreview(card); });
+m.on('mouseout', () => { if (pinnedEl) return; hideTimeout = setTimeout(hidePreview, 150); });
+```
 
+Preview panel cancels timeout on mouseenter, hides on mouseleave (if unpinned).
+
+### Video Button — Card Level
+
+```html
+<div class="wl-video-btn">▶ Xem video</div>
+```
+
+```js
+btn.addEventListener('click', function(e) {
+  e.stopPropagation();
+  const card = this.closest('[data-img]');
+  pinnedEl = pinnedEl === card ? null : card;
+  pinnedMode = 'video';
+  if (pinnedEl) showPreview(card, 'video'); else hidePreview();
+});
+```
+
+### Video Button — Preview Panel (`#previewVideoBtn`)
+
+```js
+previewVideoBtn.addEventListener('click', function() {
+  const el = currentPreviewEl || this._lastEl;
+  if (!el || !el.dataset.video) return;
+
+  if (pinnedEl === el && pinnedMode === 'video') {
+    // Toggle off
+    pinnedEl = null; pinnedMode = 'image'; hidePreview(); return;
+  }
+  if (pinnedEl && pinnedEl !== el) { pinnedEl = null; pinnedMode = 'image'; }
+
+  pinnedEl = el;
+  pinnedMode = 'video';
+  // create iframe...
+});
+```
+
+Uses `currentPreviewEl || this._lastEl` fallback — `_lastEl` is set by `showPreview()`.
+
+### Hover/Pin Interaction Matrix
+
+| Action | pinnedEl | pinnedMode | Result |
+|---|---|---|---|
+| Hover element | unchanged | unchanged | Image + video button |
+| Click element | set | `'image'` | Pins image |
+| Click same again | null | `'image'` | Unpins |
+| Click different | changed | `'image'` | Pins new image |
+| Click video btn (1st) | set | `'video'` | Plays video |
+| Click video btn (same) | null | `'image'` | Unpins video |
+| Click blank map | null | `'image'` | Hides everything |
+
+### Map Route Toggle
+
+```js
 if (wasCollapsed) {
-  // Expanding: show route, hide other days' routes
+  Object.keys(dayRoutes).forEach(k => map.removeLayer(dayRoutes[k].layer));
   map.addLayer(dayRoutes[dayNum].layer);
   map.fitBounds(coords, { padding: [30, 30], maxZoom: 14 });
-} else {
-  // Collapsing: remove route from map
+} else if (activeDay === dayNum) {
   map.removeLayer(dayRoutes[dayNum].layer);
+  activeDay = null;
 }
 ```
 
-### YouTube Video Preview
-
-Each wishlist/food card can have a YouTube video shown in the preview panel. Add `data-video` attribute with the URL:
-
-```html
-<div class="wl-card" data-video="https://www.youtube.com/watch?v=kkqyRLX2PGk" ...>
-```
-
-The preview panel shows a **▶ Xem video** button when hovering/clicking a card/marker that has `data-video`. Clicking it pins and plays the video in a YouTube iframe:
+### Emoji Markers
 
 ```js
+const icon = L.divIcon({ className: '',
+  html: '<div style="font-size:18px;line-height:1;text-align:center;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.5));">🎢</div>',
+  iconSize: [22,22], iconAnchor: [11,11]
+});
+```
+
+### YouTube ID Regex
+
+```js
+url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)[1]
+```
+
+### YouTube Embed
+
+```js
+// privacy: youtube-nocookie.com, always create fresh iframe per play
 previewYoutube = document.createElement('iframe');
 previewYoutube.allow = 'autoplay; encrypted-media; fullscreen';
 previewYoutube.allowfullscreen = true;
 previewYoutube.src = 'https://www.youtube-nocookie.com/embed/' + ytId + '?autoplay=1&rel=0&playsinline=1';
+previewYoutubeContainer.appendChild(previewYoutube);
 ```
 
-Uses `youtube-nocookie.com` for privacy. The `▶ Xem video` button is a `<span>` with CSS classes `wl-video-btn` / `food-video-btn` (red border badge). Clicking the card itself only shows the image — video is opt-in via the button.
+### Common Bugs
 
-**CSS:**
-```css
-.wl-video-btn, .food-video-btn { display: inline-block; font-size: 0.7rem; color: #ef4444; background: #2d1a1a; border: 1px solid #ef4444; border-radius: 4px; padding: 1px 8px; margin-top: 4px; cursor: pointer; transition: all .15s; text-decoration: none; }
-.wl-video-btn:hover, .food-video-btn:hover { background: #ef4444; color: #fff; }
-```
-
-### Preview Panel — Video Button (in-panel)
-
-A second video button sits inside the preview panel itself (`#previewVideoBtn`), so hovering a map marker also shows the video button:
-
-```html
-<div class="preview-video-btn" id="previewVideoBtn" style="display:none; margin-top:6px;">
-  <span class="wl-video-btn">▶ Xem video</span>
-</div>
-```
-
-In `showPreview()`: `previewVideoBtn.style.display = videoUrl && type !== 'video' ? 'block' : 'none';`
-
-### Pin Logic — Hover Doesn't Interrupt Video
-
-Three state variables control the preview:
-
-| Variable | Purpose |
-|----------|---------|
-| `pinnedEl` | The element whose preview is pinned (clicked to lock) |
-| `pinnedMode` | `'image'` or `'video'` — what to show when re-rendering |
-| `currentPreviewEl` | The element currently being hovered (used by preview video button) |
-
-**Key rule:** When `pinnedEl` is set, all `mouseenter`/`mouseleave`/`mouseover`/`mouseout` handlers return immediately. This prevents hover from interrupting a pinned video:
-
-```js
-el.addEventListener('mouseenter', () => {
-  if (pinnedEl) return;  // Don't override pinned content
-  showPreview(el);
-});
-```
-
-### Marker ↔ Card Sync
-
-Map markers and wishlist/food cards share the same preview panel. Both:
-- Call `showPreview(el)` on hover → shows image + video button (if `data-video`)
-- Call `hidePreview()` on leave
-- Call `showPreview(el, 'video')` on video button click
-
-The preview panel is the sync point — hovering a marker shows the same info and video button as its corresponding wishlist card. Markers use emoji-based `L.divIcon`:
-
-```js
-const icon = L.divIcon({ className: '', html: '<div style="font-size:18px;...">🎢</div>', iconSize: [22,22], iconAnchor: [11,11] });
-```
-
-### Image Sources (Free, No API Key)
-
-- **Wikimedia Commons:** Best source for landmark/attraction photos
-  - URL pattern: `https://upload.wikimedia.org/wikipedia/commons/thumb/<path>/<width>px-<filename>`
-  - Use 500px width for preview images
-- **Blog images:** Can use direct image URLs from travel blogs (check for hotlinking permission)
-- **Avoid:** Google Places API (requires API key + billing)
+1. **Duplicate `let` declarations** — causes SyntaxError, entire script fails.
+2. **`ignoreMapClick` flag** — unnecessary (Leaflet markers don't fire map click), causes first map-click to be silently dropped.
+3. **`pinnedMode` not reset on marker click** — video button sees `pinnedEl === el && pinnedMode === 'video'` and toggles off instead of playing. Always set `pinnedMode = 'image'` after non-video clicks.
+4. **Preview panel button class collision** — `<span class="wl-video-btn">` inside `#previewVideoBtn` matches global selector, creates duplicate handler. Use plain text instead.
+5. **`display:none` buttons not clickable** — ensure button is visible (`display:block`) before users can click it.
+6. **Iframe not destroyed** — old video continues audio after unpin. Always do `previewYoutube.src = ''; previewYoutube.remove(); previewYoutube = null;` in both showPreview and hidePreview.
 
 ### Leaflet CDN
 
@@ -420,67 +398,16 @@ const icon = L.divIcon({ className: '', html: '<div style="font-size:18px;...">�
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 ```
 
-### Full HTML Template Pattern
+### New Trip Checklist
 
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>City YYYY — Plan Overview</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <style>
-    /* === Layout === */
-    /* === Day Cards === */
-    /* === Stops / Sub-events / Numbering === */
-    /* === Map + Numbered Markers === */
-    /* === Preview Panel === */
-    /* === Wishlist / Food Sections === */
-    /* === Responsive === */
-  </style>
-</head>
-<body>
-
-  <div class="layout">
-    <div class="col-left">
-      <!-- Info Card -->
-      <!-- Mini Map -->
-      <div id="minimap"></div>
-      <!-- Timeline -->
-      <div class="timeline">
-        <!-- Day cards here -->
-      </div>
-      <!-- Wishlist + Food sections (inside col-left for sticky scroll) -->
-    </div>
-    <div class="col-right">
-      <!-- Preview Panel -->
-    </div>
-  </div>
-
-  <script>
-    // Map initialization + per-day route layers
-    // Day click handler (collapse + route toggle)
-    // Hover preview panel logic
-    // toggleSub() for parent stops
-  </script>
-</body>
-</html>
-```
-
-### Building a New Trip — Step Checklist
-
-1. **Create folder:** `<year>-<city>/`
-2. **Copy template structure** from an existing `plan-overview.html`
-3. **Update trip info** (flight, hotel, dates) in info card and subtitle
-4. **Create day cards** — one per day of trip
-5. **For each stop add:** `data-lat`, `data-lng`, `data-location`, `data-address`, `data-dist`, `data-gmaps`, `data-img`, `data-caption`
-6. **Set day label** — short description of the day's theme
-7. **Empty days** get `empty-day` class + placeholder text
-8. **Find images** on Wikimedia Commons for each location
-9. **Create wishlist section** — attractions with cards, Google Maps links, hover images
-10. **Add YouTube videos** to wishlist cards: add `data-video` attribute + `<div class="wl-video-btn">▶ Xem video</div>` inside card
-11. **Create food section** — restaurants with name, rating, notes, Google Maps link
-12. **Add `.nojekyll`** file at repo root if not present
-13. **Commit and push** to deploy to GitHub Pages
+1. Create `<year>-<city>/` folder
+2. Copy template from existing `plan-overview.html`
+3. Update trip info, dates, hotel, flight
+4. Create day cards (one per day)
+5. Add stops with data attributes (lat, lng, img, caption, address, dist, gmaps, video)
+6. Label empty days with `empty-day` class
+7. Find images on Wikimedia Commons (500px width)
+8. Add wishlist section with cards + YouTube videos
+9. Add food section with cards
+10. Add `.nojekyll` at repo root
+11. Commit + push
