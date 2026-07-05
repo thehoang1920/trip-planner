@@ -638,6 +638,7 @@ document.querySelectorAll('.day-card').forEach(card => {
     m.on('mouseout', () => { if (pinnedEl) return; hideTimeout = setTimeout(hidePreview, 150); });
     m.on('click', function() {
       pinnedEl = pinnedEl === s ? null : s;
+      pinnedMode = 'image';
       if (pinnedEl) showPreview(s); else hidePreview();
     });
     markers.push(m);
@@ -868,6 +869,7 @@ document.querySelectorAll('.wl-card').forEach(card => {
   m.on('mouseout', () => { if (pinnedEl) return; hideTimeout = setTimeout(hidePreview, 150); });
   m.on('click', function() {
     pinnedEl = pinnedEl === card ? null : card;
+    pinnedMode = 'image';
     if (pinnedEl) showPreview(card); else hidePreview();
   });
   wlLayer.addLayer(m);
@@ -886,6 +888,7 @@ document.querySelectorAll('.food-card').forEach(card => {
   m.on('mouseout', () => { if (pinnedEl) return; hideTimeout = setTimeout(hidePreview, 150); });
   m.on('click', function() {
     pinnedEl = pinnedEl === card ? null : card;
+    pinnedMode = 'image';
     if (pinnedEl) showPreview(card); else hidePreview();
   });
   wlLayer.addLayer(m);
