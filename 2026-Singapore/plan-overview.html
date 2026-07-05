@@ -703,11 +703,6 @@ const previewGmaps = document.getElementById('previewGmaps');
 const previewVideoBtn = document.getElementById('previewVideoBtn');
 const previewPanel = document.getElementById('previewPanel');
 
-let pinnedEl = null;
-let pinnedMode = 'image';
-let currentPreviewEl = null;
-let hideTimeout = null;
-
 function getYoutubeId(url) {
   const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
   return m ? m[1] : null;
