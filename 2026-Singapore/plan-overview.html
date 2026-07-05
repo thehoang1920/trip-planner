@@ -921,7 +921,15 @@ document.getElementById('wlToggle').addEventListener('click', function() {
   }
 });
 document.addEventListener('click', function(e) {
-  if (e.target.closest('.stop, .wl-card, .food-card, .day-header, .leaflet-container, .preview-panel, #wlToggle')) return;
+  if (e.target.closest('.stop, .wl-card, .food-card, .day-header, .preview-panel, #wlToggle')) return;
+  if (pinnedEl) {
+    pinnedEl = null;
+    pinnedMode = 'image';
+    hidePreview();
+  }
+});
+document.addEventListener('mouseup', function(e) {
+  if (e.target.closest('.stop, .wl-card, .food-card, .day-header, .preview-panel, #wlToggle, .leaflet-container')) return;
   if (pinnedEl) {
     pinnedEl = null;
     pinnedMode = 'image';
