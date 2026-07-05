@@ -28,6 +28,16 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 .preview-panel .preview-gmaps { margin-top: 6px; }
 .preview-panel .preview-gmaps a { color: #60a5fa; font-size: 0.8rem; text-decoration: none; }
 .preview-panel .preview-gmaps a:hover { text-decoration: underline; }
+.preview-sub-list { margin-top: 8px; border-top: 1px solid #334155; padding-top: 6px; }
+.preview-sub-item { display: flex; align-items: center; gap: 8px; padding: 5px 6px; border-radius: 6px; cursor: pointer; transition: background .15s; font-size: 0.78rem; }
+.preview-sub-item:hover { background: #283548; }
+.preview-sub-item.active { background: #334560; }
+.preview-sub-item .psi-emoji { font-size: 0.95rem; flex-shrink: 0; }
+.preview-sub-item .psi-info { flex: 1; min-width: 0; }
+.preview-sub-item .psi-name { color: #f1f5f9; font-weight: 500; font-size: 0.78rem; }
+.preview-sub-item .psi-meta { color: #94a3b8; font-size: 0.65rem; }
+.preview-sub-item .psi-video { color: #ef4444; font-size: 0.65rem; cursor: pointer; flex-shrink: 0; padding: 1px 6px; border: 1px solid #ef4444; border-radius: 3px; background: #2d1a1a; }
+.preview-sub-item .psi-video:hover { background: #ef4444; color: #fff; }
 
 /* Trip info card */
 .info-card { background: #1e293b; border-radius: 12px; padding: 20px; margin-bottom: 24px; border: 1px solid #334155; }
@@ -700,6 +710,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
       <div class="preview-price" id="previewPrice"></div>
       <div class="preview-time" id="previewTime"></div>
       <div class="preview-gmaps" id="previewGmaps"></div>
+      <div class="preview-sub-list" id="previewSubList" style="display:none;"></div>
       <div class="preview-video-btn" id="previewVideoBtn" style="display:none; margin-top:6px;"><span style="display:inline-block;font-size:0.7rem;color:#ef4444;background:#2d1a1a;border:1px solid #ef4444;border-radius:4px;padding:1px 8px;cursor:pointer;transition:all .15s;">▶ Xem video</span></div>
     </div>
   </div>
@@ -823,6 +834,7 @@ const previewTime = document.getElementById('previewTime');
 const previewPrice = document.getElementById('previewPrice');
 const previewGmaps = document.getElementById('previewGmaps');
 const previewVideoBtn = document.getElementById('previewVideoBtn');
+const previewSubList = document.getElementById('previewSubList');
 const previewPanel = document.getElementById('previewPanel');
 
 function getYoutubeId(url) {
@@ -871,6 +883,51 @@ function showPreview(el, type) {
   previewVideoBtn.style.display = videoUrl && type !== 'video' ? 'block' : 'none';
   previewVideoBtn._lastEl = videoUrl ? el : null;
   previewInfo.style.display = 'block';
+
+  // Populate sub-event list if parent card with sub-events
+  if (el.matches('.wl-card.parent')) {
+    previewSubList.innerHTML = '';
+    previewSubList.style.display = 'none';
+    const block = el.closest('.wl-location-block');
+    if (block) {
+      const subEvents = block.querySelector('.wl-sub-events');
+      if (subEvents && subEvents.classList.contains('open')) {
+        const subs = subEvents.querySelectorAll('.wl-card');
+        if (subs.length) {
+          subs.forEach(sub => {
+            const item = document.createElement('div');
+            item.className = 'preview-sub-item';
+            if (sub === currentPreviewEl) item.classList.add('active');
+            const name = sub.querySelector('.wl-name')?.textContent || '';
+            const emoji = sub.querySelector('.wl-emoji')?.textContent || '📌';
+            const time = sub.dataset.time || '';
+            const price = sub.dataset.price || '';
+            const hasVideo = !!sub.dataset.video;
+            item.innerHTML = '<span class="psi-emoji">' + emoji + '</span>'
+              + '<span class="psi-info"><div class="psi-name">' + name + '</div>'
+              + '<div class="psi-meta">' + time + (time && price ? ' · ' : '') + price + '</div></span>'
+              + (hasVideo ? '<span class="psi-video">▶</span>' : '');
+            item.addEventListener('click', function(e) {
+              if (e.target.closest('.psi-video') && sub.dataset.video) {
+                activeVideoUrl = sub.dataset.video;
+                pinnedEl = sub;
+                pinnedMode = 'video';
+                showPreview(sub, 'video');
+              } else {
+                pinnedEl = sub;
+                pinnedMode = 'image';
+                showPreview(sub, 'image');
+              }
+              previewSubList.querySelectorAll('.preview-sub-item').forEach(i => i.classList.remove('active'));
+              this.classList.add('active');
+            });
+            previewSubList.appendChild(item);
+          });
+          previewSubList.style.display = 'block';
+        }
+      }
+    }
+  }
 }
 
 function hidePreview() {
@@ -879,6 +936,8 @@ function hidePreview() {
     showPreview(pinnedEl, pinnedMode);
     return;
   }
+  previewSubList.innerHTML = '';
+  previewSubList.style.display = 'none';
   pinnedMode = 'image';
   previewImg.style.display = 'none';
   previewVideo.style.display = 'none';
@@ -949,11 +1008,13 @@ function toggleSub(el) {
 document.querySelectorAll('.stop[data-img], .wl-card[data-img], .food-card[data-img]').forEach(el => {
   el.addEventListener('mouseenter', () => {
     if (pinnedEl) return;
+    clearTimeout(hideTimeout);
     showPreview(el);
   });
   el.addEventListener('mouseleave', () => {
     if (pinnedEl) return;
-    hidePreview();
+    clearTimeout(hideTimeout);
+    hideTimeout = setTimeout(hidePreview, 150);
   });
   el.addEventListener('click', function(e) {
     clearTimeout(hideTimeout);
