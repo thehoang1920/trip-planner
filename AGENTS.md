@@ -312,7 +312,16 @@ btn.addEventListener('click', function(e) {
 
 ### Video Button — Preview Panel (`#previewVideoBtn`)
 
+```html
+<div id="previewVideoBtn" style="display:none; margin-top:6px;">
+  <span style="display:inline-block; font-size:0.7rem; color:#ef4444; background:#2d1a1a; border:1px solid #ef4444; border-radius:4px; padding:1px 8px; cursor:pointer; transition:all .15s;">▶ Xem video</span>
+</div>
+```
+
+**Must NOT use `wl-video-btn` class** — the global selector creates a duplicate click handler.
+
 ```js
+// Click handler
 previewVideoBtn.addEventListener('click', function() {
   const el = currentPreviewEl || this._lastEl;
   if (!el || !el.dataset.video) return;
@@ -326,6 +335,16 @@ previewVideoBtn.addEventListener('click', function() {
   pinnedEl = el;
   pinnedMode = 'video';
   // create iframe...
+});
+
+// Hover effect — CSS :hover on nested &lt;span&gt; can be unreliable; use JS instead
+previewVideoBtn.addEventListener('mouseenter', function() {
+  const s = this.querySelector('span');
+  if (s) { s.style.background = '#ef4444'; s.style.color = '#fff'; }
+});
+previewVideoBtn.addEventListener('mouseleave', function() {
+  const s = this.querySelector('span');
+  if (s) { s.style.background = '#2d1a1a'; s.style.color = '#ef4444'; }
 });
 ```
 
@@ -390,6 +409,8 @@ previewYoutubeContainer.appendChild(previewYoutube);
 4. **Preview panel button class collision** — `<span class="wl-video-btn">` inside `#previewVideoBtn` matches global selector, creates duplicate handler. Use plain text instead.
 5. **`display:none` buttons not clickable** — ensure button is visible (`display:block`) before users can click it.
 6. **Iframe not destroyed** — old video continues audio after unpin. Always do `previewYoutube.src = ''; previewYoutube.remove(); previewYoutube = null;` in both showPreview and hidePreview.
+
+7. **CSS `:hover` on nested span unreliable** — `#previewVideoBtn span:hover` may not work consistently in all environments. Use JS `mouseenter`/`mouseleave` events to toggle inline background/color instead.
 
 ### Leaflet CDN
 
