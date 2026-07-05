@@ -168,6 +168,68 @@ Single self-contained HTML file with:
 </div>
 ```
 
+### Wishlist Sub-Event / Location Block Pattern
+
+When multiple wishlist items share the same address, merge them into a single `.wl-location-block`. This keeps the 2-column grid intact while grouping sub-events.
+
+```html
+<div class="wl-location-block">
+  <div class="wl-card parent expanded" onclick="toggleSub(this)" data-address="..." data-dist="..." data-gmaps="..." data-img="..." data-caption="Location Overview">
+    <span class="expand-icon">▶</span>
+    <span class="wl-emoji">🎢</span>
+    <div class="wl-info">
+      <div class="wl-name">Location Name <span class="sub-count">3 hoạt động</span></div>
+      <div class="wl-loc">Address</div>
+      <div class="wl-dist">Distance info</div>
+      <div class="wl-coord">1.2542, 103.8227</div>
+      <div class="wl-link"><a href="..." target="_blank">Xem trên Google Maps</a></div>
+    </div>
+  </div>
+  <div class="wl-sub-events open">
+    <div class="wl-card" data-address="..." data-dist="..." data-time="..." data-price="..." data-img="..." data-video="..." data-caption="Event 1 Caption">
+      <span class="wl-emoji">🎢</span>
+      <div class="wl-info">
+        <div class="wl-name">Event 1</div>
+        <div class="wl-time">🕐 Operating hours</div>
+        <div class="wl-price">💰 Price</div>
+        <div class="wl-event-desc">Detailed description of the event.</div>
+        <div class="wl-video-btn">▶ Xem video</div>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+CSS:
+```css
+.wl-location-block { background: #0f172a; border-radius: 8px; border: 1px solid #334155; overflow: hidden; }
+.wl-location-block .wl-card.parent { background: transparent; border: none; border-radius: 0; padding: 12px 12px 4px; margin: 0; cursor: pointer; display: flex; align-items: flex-start; }
+.wl-location-block .wl-card.parent .expand-icon { font-size: 0.7rem; color: #64748b; width: 16px; text-align: center; transition: transform .2s; flex-shrink: 0; display: inline-block; vertical-align: middle; }
+.wl-location-block .wl-card.parent.expanded .expand-icon { transform: rotate(90deg); }
+.wl-location-block .wl-sub-events { display: none; padding-left: 10px; margin: 0 6px 6px 16px; border-left: 2px solid #334155; }
+.wl-location-block .wl-sub-events.open { display: block; }
+.wl-location-block .wl-sub-events .wl-card { background: #1a2638; font-size: 0.82rem; padding: 10px 12px; margin-bottom: 6px; }
+.wl-location-block .wl-sub-events .wl-card:hover { background: #23304a; }
+```
+
+Key points:
+- `.wl-location-block` is a single grid item in `.wishlist-grid` (2-column layout)
+- Parent `.wl-card.parent` has location info + `onclick="toggleSub(this)"` for expand/collapse
+- `.wl-sub-events` is a sibling (not child) of `.wl-card.parent` — `toggleSub()` uses `el.nextElementSibling`
+- Each sub-event `.wl-card` has its own data-img, data-caption, data-video, data-time, data-price — independently hoverable/clickable
+- Parent `.wl-card` has data-img/data-caption for location overview (used by map marker clicks)
+- Sub-event `.wl-card` elements do NOT have `.wl-coord` — they inherit the marker from the parent
+- `toggleSub()` function checks for both `sub-events` and `wl-sub-events` classes:
+  ```js
+  function toggleSub(el) {
+    el.classList.toggle('expanded');
+    const sub = el.nextElementSibling;
+    if (sub && (sub.classList.contains('sub-events') || sub.classList.contains('wl-sub-events'))) {
+      sub.classList.toggle('open');
+    }
+  }
+  ```
+
 ### Data Attributes Reference
 
 | Attribute | Used on | Purpose |
@@ -180,7 +242,7 @@ Single self-contained HTML file with:
 | `data-dist` | `.stop`, `.wl-card`, `.food-card` | Preview panel distance |
 | `data-gmaps` | `.stop`, `.wl-card`, `.food-card` | Google Maps link in preview |
 | `data-time` | `.wl-card` | Operating hours in preview |
-| `data-video` | `.wl-card`, `.food-card` | YouTube URL for video preview |
+| `data-video` | `.wl-card`, `.food-card`, `.wl-video-btn` | YouTube URL for video preview |
 | `data-food-lat`, `data-food-lng` | `.food-card` | Food marker coordinates |
 
 ### Preview Panel Structure
@@ -213,6 +275,7 @@ let pinnedMode = 'image';     // 'image' | 'video' — what to re-render for pin
 let currentPreviewEl = null;  // Currently hovered element (video button fallback)
 let hideTimeout = null;       // setTimeout ID for mouseout debounce (150ms)
 let previewYoutube = null;    // Current YouTube iframe reference
+let activeVideoUrl = null;    // Video URL for per-button video (overrides card's data-video)
 ```
 
 **Declared ONCE — duplicate `let` in same `<script>` block causes SyntaxError.**
@@ -221,13 +284,17 @@ let previewYoutube = null;    // Current YouTube iframe reference
 
 ```js
 function showPreview(el, type) {
+  if (type !== 'video') activeVideoUrl = null;
+  const videoUrl = activeVideoUrl || el.dataset.video;
+  const useVideo = type === 'video' && videoUrl;
   currentPreviewEl = el;
   // Destroy old iframe
   if (previewYoutube) { previewYoutube.src = ''; previewYoutube.remove(); previewYoutube = null; }
   previewYoutubeContainer.style.display = 'none';
 
-  if (type === 'video' && el.dataset.video) {
+  if (useVideo) {
     // Create YouTube iframe
+    const ytId = getYoutubeId(videoUrl);
     previewYoutube = document.createElement('iframe');
     previewYoutube.className = 'preview-img';
     previewYoutube.allow = 'autoplay; encrypted-media; fullscreen';
@@ -236,23 +303,25 @@ function showPreview(el, type) {
     previewYoutubeContainer.appendChild(previewYoutube);
     previewYoutubeContainer.style.display = 'block';
   } else {
-    // Show image
     previewImg.src = el.dataset.img;
     previewImg.style.display = 'block';
   }
 
   // Update info
   previewName.textContent = el.dataset.caption || '';
-  previewVideoBtn.style.display = el.dataset.video && type !== 'video' ? 'block' : 'none';
-  previewVideoBtn._lastEl = el.dataset.video ? el : null;
+  previewVideoBtn.style.display = videoUrl && type !== 'video' ? 'block' : 'none';
+  previewVideoBtn._lastEl = videoUrl ? el : null;
   previewInfo.style.display = 'block';
 }
 ```
+
+`activeVideoUrl` allows multiple `.wl-video-btn` within one card to use different video URLs. Set in click handler via `videoBtn.dataset.video || card.dataset.video`.
 
 ### hidePreview()
 
 ```js
 function hidePreview() {
+  activeVideoUrl = null;
   if (pinnedEl) { showPreview(pinnedEl, pinnedMode); return; }
   pinnedMode = 'image';
   if (previewYoutube) { previewYoutube.src = ''; previewYoutube.remove(); previewYoutube = null; }
@@ -295,6 +364,7 @@ el.addEventListener('click', function(e) {
   const videoBtn = e.target.closest('.wl-video-btn, .food-video-btn');
   if (videoBtn) {
     const card = this;
+    activeVideoUrl = videoBtn.dataset.video || card.dataset.video;
     if (pinnedEl === card && pinnedMode === 'video') {
       pinnedEl = null; pinnedMode = 'image'; hidePreview();
     } else {
@@ -453,6 +523,11 @@ previewYoutubeContainer.appendChild(previewYoutube);
 10. **Stale `hideTimeout` fires after click** — A 150ms `setTimeout` from a previous `mouseout` on a card/marker can fire `hidePreview()` milliseconds after a click handler sets new state, showing the placeholder. Fix: `clearTimeout(hideTimeout)` at the top of every click handler.
 11. **Document-level handlers are unnecessary** — Map `mousedown` + map `click` + card/marker click handlers cover all blank-area unpin scenarios. Document-level `click`/`mouseup` handlers add complexity and potential bugs (e.g., excluding `.leaflet-container` prevents map drag detection).
 12. **Console logging for debugging** — When a bug's root cause is unclear, add `console.log` traces at every key decision point (`showPreview`, `hidePreview`, each click handler) to trace the exact code path. This is faster than guessing.
+13. **`data-video` on `.wl-video-btn` ignored** — If the click handler only reads `card.dataset.video`, video buttons with their own `data-video` attribute won't work. Fix: `activeVideoUrl = videoBtn.dataset.video || card.dataset.video;` and pass `activeVideoUrl` to `showPreview()`.
+14. **Parent card hover conflicts with sub-event hover** — If both parent `.wl-card.parent` and sub-event `.wl-card` have `data-img`, mouseleave from a sub-event calls `hidePreview()` even if still inside the parent. Acceptable UX — sub-events show their own preview, and moving between sub-events briefly shows placeholder. Parent's `data-img` is needed for map marker click previews.
+15. **`wl-sub-events` not found by `toggleSub`** — The `toggleSub` function checks for `sub-events` class. If you use a different class like `wl-sub-events`, update the check to `sub.classList.contains('sub-events') || sub.classList.contains('wl-sub-events')`.
+16. **Grid layout broken by parent/sub siblings** — `.wl-card.parent` and `.wl-sub-events` are separate grid items in `.wishlist-grid`. Without `grid-column: 1 / -1`, they occupy separate columns. Fix: wrap both in `.wl-location-block` which is a single grid item (no special grid-column needed).
+17. **Map marker creates duplicate preview for sub-event cards** — Sub-event `.wl-card` elements don't have `.wl-coord`, so the marker loop (`document.querySelectorAll('.wl-card')`) skips them. Only the parent `.wl-card` creates a map marker, which correctly shows the location overview on click.
 
 ### Leaflet CDN
 
@@ -471,6 +546,7 @@ previewYoutubeContainer.appendChild(previewYoutube);
 6. Label empty days with `empty-day` class
 7. Find images on Wikimedia Commons (500px width)
 8. Add wishlist section with cards + YouTube videos
+   - If multiple items share the same address, merge into a `.wl-location-block` with sub-events (see "Wishlist Sub-Event / Location Block Pattern" above)
 9. Add food section with cards
 10. Add `.nojekyll` at repo root
 11. Commit + push
