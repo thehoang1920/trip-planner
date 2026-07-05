@@ -757,6 +757,7 @@ function hidePreview() {
     showPreview(pinnedEl, pinnedMode);
     return;
   }
+  pinnedMode = 'image';
   previewImg.style.display = 'none';
   previewVideo.style.display = 'none';
   previewVideo.pause();
@@ -767,14 +768,19 @@ function hidePreview() {
 }
 
 previewVideoBtn.addEventListener('click', function() {
-  const el = this._lastEl;
+  const el = currentPreviewEl || this._lastEl;
   if (!el || !el.dataset.video) return;
   const ytId = getYoutubeId(el.dataset.video);
   if (!ytId) return;
   if (pinnedEl === el && pinnedMode === 'video') {
     pinnedEl = null;
+    pinnedMode = 'image';
     hidePreview();
     return;
+  }
+  if (pinnedEl && pinnedEl !== el) {
+    pinnedEl = null;
+    pinnedMode = 'image';
   }
   pinnedEl = el;
   pinnedMode = 'video';
