@@ -1217,15 +1217,47 @@ async function drawDayRoute(stops, currentStop, fit) {
 
   const routeLayer = L.layerGroup();
 
+  function drawArrow(coords, color, layer) {
+    const step = Math.max(1, Math.floor(coords.length / 4));
+    for (var k = step; k < coords.length - 1; k += step) {
+      var p1 = coords[k], p2 = coords[Math.min(k + 1, coords.length - 1)];
+      var angle = Math.atan2(p2[1] - p1[1], p2[0] - p1[0]) * 180 / Math.PI;
+      var mid = [(p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2];
+      L.marker(mid, {
+        icon: L.divIcon({
+          className: '',
+          html: '<div style="width:0;height:0;border-left:6px solid ' + color + ';border-top:5px solid transparent;border-bottom:5px solid transparent;transform:rotate(' + angle + 'deg);filter:drop-shadow(0 0 1px rgba(0,0,0,0.8));"></div>',
+          iconSize: [10, 10], iconAnchor: [5, 5]
+        }),
+        interactive: false
+      }).addTo(layer);
+    }
+    // Also add an arrowhead at the end
+    if (coords.length >= 2) {
+      var last = coords.length - 1;
+      var prev = Math.max(0, last - 3);
+      var a2 = Math.atan2(coords[last][1] - coords[prev][1], coords[last][0] - coords[prev][0]) * 180 / Math.PI;
+      var end = coords[last];
+      L.marker(end, {
+        icon: L.divIcon({
+          className: '',
+          html: '<div style="width:0;height:0;border-left:10px solid ' + color + ';border-top:6px solid transparent;border-bottom:6px solid transparent;transform:rotate(' + a2 + 'deg);filter:drop-shadow(0 0 2px rgba(0,0,0,0.9));"></div>',
+          iconSize: [12, 12], iconAnchor: [10, 6]
+        }),
+        interactive: false
+      }).addTo(layer);
+    }
+  }
+
   for (const seg of allSegments) {
     const st = SEG_STYLES[seg.mode];
     if (!st || !seg.coords || !seg.coords.length) continue;
-    const opts = { color: st.color, weight: st.weight, opacity: 0.85, smoothFactor: 1.5 };
+    var opts = { color: st.color, weight: st.weight, opacity: 0.7, smoothFactor: 1.5 };
     if (st.dash) opts.dashArray = st.dash;
-    const poly = L.polyline(seg.coords, opts).addTo(routeLayer);
-    poly.bindTooltip(st.icon + ' ' + st.label + ': ' + formatDist(seg.distance) + ' · ' + formatDur(seg.duration), {
+    L.polyline(seg.coords, opts).addTo(routeLayer).bindTooltip(st.icon + ' ' + st.label + ': ' + formatDist(seg.distance) + ' · ' + formatDur(seg.duration), {
       sticky: true, direction: 'top', offset: [0, -8]
     });
+    drawArrow(seg.coords, st.color, routeLayer);
   }
   routeLayer.addTo(map);
   currentRouteLayer = routeLayer;
