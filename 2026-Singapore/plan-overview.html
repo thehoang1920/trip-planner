@@ -1156,7 +1156,10 @@ async function drawDayRoute(stops) {
     if (!st || !seg.coords || !seg.coords.length) continue;
     const opts = { color: st.color, weight: st.weight, opacity: 0.85, smoothFactor: 1.5 };
     if (st.dash) opts.dashArray = st.dash;
-    L.polyline(seg.coords, opts).addTo(routeLayer);
+    const poly = L.polyline(seg.coords, opts).addTo(routeLayer);
+    poly.bindTooltip(st.icon + ' ' + st.label + ': ' + formatDist(seg.distance) + ' · ' + formatDur(seg.duration), {
+      sticky: true, direction: 'top', offset: [0, -8]
+    });
   }
   routeLayer.addTo(map);
   currentRouteLayer = routeLayer;
