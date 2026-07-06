@@ -92,7 +92,13 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 
 #minimap { height: 450px; border-radius: 8px; }
 
-.num-marker { background: #fbbf24; color: #0f172a; border-radius: 50%; width: 26px; height: 26px; line-height: 22px; text-align: center; font-weight: 700; font-size: 0.8rem; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+.num-marker { background: #fbbf24; color: #0f172a; border-radius: 50%; width: 32px; height: 26px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.3); cursor: pointer; }
+.num-marker .num { min-width: 14px; text-align: center; }
+.num-marker .chk { cursor: pointer; font-size: 0.7rem; line-height: 1; margin-left: 1px; color: #0f172a; opacity: 0.4; user-select: none; }
+.num-marker .chk:hover { opacity: 1; }
+.num-marker.done .chk { opacity: 1; color: #22c55e; }
+.num-marker.done { background: #334155; border-color: #22c55e; color: #94a3b8; }
+.num-marker.current { background: #fbbf24; border-color: #3b82f6; }
 
 .hotel-marker { background: none !important; border: none !important; }
 .hotel-pin { position: relative; }
@@ -1103,6 +1109,7 @@ L.marker([1.31155, 103.88085], { icon: hotelIcon }).addTo(map).bindTooltip('Hote
 // OPTIMAL ROUTE RENDERING
 // ============================================================
 const dayMarkers = {};
+const routeState = {}; // { dayNum: { stops: [], completedUpTo: 0 } }
 let activeDay = null;
 let activeRouteToken = 0;
 let currentRouteLayer = null;
@@ -1143,7 +1150,24 @@ function buildRouteLegend(segments) {
   container.style.display = 'flex';
 }
 
-async function drawDayRoute(stops) {
+function updateMarkerIcons(dayNum) {
+  const completed = routeState[dayNum] ? routeState[dayNum].completedUpTo : 0;
+  (dayMarkers[dayNum] || []).forEach(function(m, idx) {
+    const el = m.getElement();
+    if (!el) return;
+    const isDone = idx < completed;
+    el.classList.toggle('done', isDone);
+    el.classList.toggle('current', idx === completed);
+    const chk = el.querySelector('.chk');
+    if (chk) {
+      if (idx === completed) chk.textContent = '●';
+      else if (isDone) chk.textContent = '✓';
+      else chk.textContent = '○';
+    }
+  });
+}
+
+async function drawDayRoute(stops, completedUpTo) {
   const token = ++activeRouteToken;
   const legendEl = document.getElementById('routeLegend');
 
@@ -1152,36 +1176,27 @@ async function drawDayRoute(stops) {
   clearRoute();
   if (!stops || stops.length < 2) { legendEl.style.display = 'none'; return; }
 
-  const allSegments = [];
+  const legs = []; // [{ fromStopIdx, segments: [...] }]
 
   for (let i = 0; i < stops.length - 1; i++) {
+    if (i < completedUpTo) { legs.push(null); continue; } // skip completed
     const from = stops[i], to = stops[i + 1];
     const segs = await getOptimalRoute(from.lat, from.lng, to.lat, to.lng);
     if (token !== activeRouteToken) return;
-    for (const s of segs) allSegments.push(s);
+    legs.push({ fromStopIdx: i, segments: segs });
   }
 
   if (token !== activeRouteToken) return;
+
+  const allSegments = [];
+  for (const leg of legs) {
+    if (!leg) continue;
+    for (const s of leg.segments) allSegments.push(s);
+  }
+
   if (!allSegments.length) { legendEl.style.display = 'none'; return; }
 
   const routeLayer = L.layerGroup();
-
-  function addDirArrow(coords, color, layer) {
-    const step = Math.max(1, Math.floor((coords.length - 1) / 3));
-    for (let k = step; k < coords.length - 1; k += step) {
-      const p1 = coords[k], p2 = coords[Math.min(k + 1, coords.length - 1)];
-      const angle = Math.atan2(p2[1] - p1[1], p2[0] - p1[0]) * 180 / Math.PI;
-      const mid = [(p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2];
-      L.marker(mid, {
-        icon: L.divIcon({
-          className: '',
-          html: '<div style="transform:rotate(' + angle + 'deg);font-size:10px;line-height:1;color:' + color + ';text-shadow:0 0 2px #000,0 0 2px #000;">&#9654;</div>',
-          iconSize: [10, 10], iconAnchor: [5, 5]
-        }),
-        interactive: false
-      }).addTo(layer);
-    }
-  }
 
   for (const seg of allSegments) {
     const st = SEG_STYLES[seg.mode];
@@ -1192,7 +1207,6 @@ async function drawDayRoute(stops) {
     poly.bindTooltip(st.icon + ' ' + st.label + ': ' + formatDist(seg.distance) + ' · ' + formatDur(seg.duration), {
       sticky: true, direction: 'top', offset: [0, -8]
     });
-    addDirArrow(seg.coords, st.color, routeLayer);
   }
   routeLayer.addTo(map);
   currentRouteLayer = routeLayer;
@@ -1207,6 +1221,7 @@ async function drawDayRoute(stops) {
     else allCoords.push(ll);
   });
   if (allCoords.length) map.fitBounds(allCoords, { padding: [40, 40], maxZoom: 14 });
+  updateMarkerIcons(activeDay);
 }
 
 // ============================================================
@@ -1242,17 +1257,47 @@ document.querySelectorAll('.day-card .day-header').forEach(function(header) {
         stopNum++;
         const loc = s.dataset.location || 'Stop ' + stopNum;
         stopData.push({ lat: lat, lng: lng, el: s });
-        const icon = L.divIcon({ className: 'num-marker', html: '' + stopNum, iconSize: [26, 26], iconAnchor: [13, 13] });
+        var iconHtml = '<span class="num">' + stopNum + '</span><span class="chk" data-toggle="1">○</span>';
+        const icon = L.divIcon({ className: 'num-marker', html: iconHtml, iconSize: [32, 26], iconAnchor: [16, 13] });
         const m = L.marker([lat, lng], { icon: icon }).bindTooltip(stopNum + '. ' + loc, { direction: 'top' });
         m.on('mouseover', function() { if (pinnedEl) return; clearTimeout(hideTimeout); showPreview(s); });
         m.on('mouseout', function() { if (pinnedEl) return; hideTimeout = setTimeout(hidePreview, 150); });
         m.on('click', function() { pinnedEl = s; pinnedMode = 'image'; showPreview(s); });
+        // Checkmark toggle: mark this stop as reached, hide legs before it
+        m._toggleCompletion = function() {
+          var st = routeState[dayNum];
+          if (!st) return;
+          var target = m._stopIdx; // 0-based index of this stop
+          if (st.completedUpTo === target) {
+            // Already at this stop — go back one
+            st.completedUpTo = Math.max(0, target - 1);
+          } else {
+            // Mark all legs up to this stop as completed
+            st.completedUpTo = target;
+          }
+          clearRoute();
+          drawDayRoute(st.stops, st.completedUpTo);
+        };
+        // Checkmark toggle via DOM
+        m.on('add', function() {
+          var el = m.getElement();
+          if (!el) return;
+          var chk = el.querySelector('.chk');
+          if (chk) {
+            chk.addEventListener('click', function(e) {
+              e.stopPropagation();
+              if (m._toggleCompletion) m._toggleCompletion();
+            });
+          }
+        });
+        m._stopIdx = stopNum - 1;
         markers.push(m);
         map.addLayer(m);
       });
 
+      routeState[dayNum] = { stops: stopData, completedUpTo: 0 };
       dayMarkers[dayNum] = markers;
-      drawDayRoute(stopData);
+      drawDayRoute(stopData, 0);
 
     } else {
       if (activeDay === dayNum) {
