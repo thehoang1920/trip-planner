@@ -12,12 +12,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 h1 { font-size: 1.6rem; margin-bottom: 4px; }
 .subtitle { color: #94a3b8; font-size: 0.9rem; margin-bottom: 24px; }
 
-/* Two-column layout */
 .layout { display: flex; gap: 24px; align-items: flex-start; }
 .col-left { flex: 1; min-width: 0; }
 .col-right { width: 320px; flex-shrink: 0; position: sticky; top: 24px; }
 
-/* Preview panel */
 .preview-panel { background: #1e293b; border-radius: 12px; border: 1px solid #334155; overflow: hidden; min-height: 240px; display: flex; flex-direction: column; }
 .preview-panel .preview-img { width: 100%; height: 220px; object-fit: cover; display: block; }
 .preview-panel .preview-placeholder { flex: 1; display: flex; align-items: center; justify-content: center; color: #475569; font-size: 0.85rem; font-style: italic; min-height: 220px; }
@@ -39,7 +37,6 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 .preview-sub-item .psi-video { color: #ef4444; font-size: 0.65rem; cursor: pointer; flex-shrink: 0; padding: 1px 6px; border: 1px solid #ef4444; border-radius: 3px; background: #2d1a1a; }
 .preview-sub-item .psi-video:hover { background: #ef4444; color: #fff; }
 
-/* Trip info card */
 .info-card { background: #1e293b; border-radius: 12px; padding: 20px; margin-bottom: 24px; border: 1px solid #334155; }
 .info-row { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 14px; }
 .info-row:last-child { margin-bottom: 0; }
@@ -53,7 +50,6 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 .tag.depart { background: #7c2d12; color: #fdba74; }
 .tag.hotel-tag { background: #713f12; color: #fcd34d; }
 
-/* Timeline */
 .timeline { position: relative; padding-left: 40px; }
 .timeline::before { content: ''; position: absolute; left: 18px; top: 8px; bottom: 8px; width: 2px; background: #334155; }
 
@@ -72,7 +68,6 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 .day-date { font-size: 0.8rem; color: #94a3b8; }
 .day-label { font-size: 0.8rem; color: #64748b; margin-bottom: 10px; }
 
-/* Stop */
 .day-card { counter-reset: stop-order; }
 .stop { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; background: #334155; margin-bottom: 6px; cursor: default; transition: background .15s; }
 .stop:hover { background: #3b4a63; }
@@ -83,7 +78,6 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 .stop .name { font-size: 0.85rem; flex: 1; }
 .stop .time { font-size: 0.75rem; color: #94a3b8; }
 
-/* Expand / collapse */
 .stop.parent { cursor: pointer; }
 .stop.parent .expand-icon { font-size: 0.7rem; color: #64748b; width: 16px; text-align: center; transition: transform .2s; flex-shrink: 0; }
 .stop.parent.expanded .expand-icon { transform: rotate(90deg); }
@@ -96,19 +90,15 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 
 .placeholder-text { color: #64748b; font-size: 0.82rem; font-style: italic; padding: 4px 0; }
 
-/* Mini map */
 #minimap { height: 450px; border-radius: 8px; }
 
-/* Numbered map markers */
 .num-marker { background: #fbbf24; color: #0f172a; border-radius: 50%; width: 26px; height: 26px; line-height: 22px; text-align: center; font-weight: 700; font-size: 0.8rem; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
 
-/* Hotel marker */
 .hotel-marker { background: none !important; border: none !important; }
 .hotel-pin { position: relative; }
 .hotel-icon { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: #ef4444; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); box-shadow: 0 2px 8px rgba(239,68,68,0.5); font-size: 16px; }
 .hotel-icon::after { content: '🏠'; transform: rotate(45deg); display: block; }
 
-/* Active day card */
 .day-card.active { border-color: #60a5fa; box-shadow: 0 0 0 1px #60a5fa; }
 .day-card.active .day-num { color: #fbbf24; }
 .day-card .day-header { cursor: pointer; }
@@ -117,7 +107,6 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 .day-card.collapsed .day-body { max-height: 0; opacity: 0; }
 .day-card.collapsed .collapse-icon { transform: rotate(-90deg); }
 
-/* Wishlist */
 .wishlist, .food-wl { background: #1e293b; border-radius: 12px; border: 1px dashed #334155; padding: 20px; margin-top: 20px; }
 .wishlist h2, .food-wl h2 { font-size: 1.1rem; color: #fbbf24; margin-bottom: 4px; }
 .wishlist .wl-sub, .food-wl .wl-sub { color: #94a3b8; font-size: 0.8rem; margin-bottom: 16px; }
@@ -138,7 +127,6 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 .preview-time { font-size: 0.8rem; color: #a78bfa; margin-top: 2px; }
 .preview-price { font-size: 0.8rem; color: #34d399; margin-top: 2px; font-weight: 600; }
 
-/* Food & Drink wishlist */
 .food-wl { border-color: #7c2d12; }
 .food-wl h2 { color: #fb923c; }
 .food-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -158,11 +146,9 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 .food-card .food-link a { color: #60a5fa; text-decoration: none; }
 .food-card .food-link a:hover { text-decoration: underline; }
 
-/* Video indicator */
 .wl-video-btn, .food-video-btn { display: inline-block; font-size: 0.7rem; color: #ef4444; background: #2d1a1a; border: 1px solid #ef4444; border-radius: 4px; padding: 1px 8px; margin-top: 4px; cursor: pointer; transition: all .15s; text-decoration: none; }
 .wl-video-btn:hover, .food-video-btn:hover { background: #ef4444; color: #fff; }
 
-/* Location block — single grid item containing parent + sub-events */
 .wl-location-block { background: #0f172a; border-radius: 8px; border: 1px solid #334155; overflow: hidden; }
 .wl-location-block .wl-card.parent { background: transparent; border: none; border-radius: 0; padding: 12px 12px 4px; margin: 0; cursor: pointer; display: flex; align-items: flex-start; }
 .wl-location-block .wl-card.parent .expand-icon { font-size: 0.7rem; color: #64748b; width: 16px; text-align: center; transition: transform .2s; flex-shrink: 0; display: inline-block; vertical-align: middle; }
@@ -176,7 +162,6 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 .wl-event-desc { font-size: 0.68rem; color: #94a3b8; line-height: 1.4; margin-top: 4px; }
 .sub-count { font-size: 0.6rem; color: #94a3b8; font-weight: 400; margin-left: 4px; }
 
-/* Footer */
 .wl-toggle-btn { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; transition: all .2s; }
 .wl-toggle-btn:hover { background: #334155; color: #f1f5f9; }
 .wl-toggle-btn.active { background: #3b2f1e; border-color: #fbbf24; color: #fbbf24; }
@@ -192,6 +177,25 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 .tip-body { min-width: 0; }
 .tip-title { font-weight: 600; color: #e2e8f0; font-size: 0.88rem; margin-bottom: 3px; }
 .tip-text { font-size: 0.8rem; color: #94a3b8; line-height: 1.5; }
+
+/* Route legend */
+.route-legend { background: #1e293b; border-radius: 8px; border: 1px solid #334155; padding: 10px 14px; margin-bottom: 16px; font-size: 0.75rem; display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; }
+.route-legend .legend-title { color: #94a3b8; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.3px; margin-right: 4px; }
+.route-legend .legend-item { display: inline-flex; align-items: center; gap: 5px; color: #cbd5e1; cursor: default; padding: 2px 8px 2px 4px; border-radius: 4px; transition: background .15s; }
+.route-legend .legend-item:hover { background: #334155; }
+.route-legend .legend-item .legend-line { width: 20px; height: 3px; border-radius: 2px; flex-shrink: 0; }
+.route-legend .legend-item .legend-icon { font-size: 0.9rem; }
+.route-legend .legend-item .legend-info { font-size: 0.65rem; color: #64748b; margin-left: 2px; }
+
+.route-loading { display: inline-block; font-size: 0.7rem; color: #60a5fa; margin-left: 8px; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+/* Route info popup (Leaflet tooltip-like) */
+.route-info-popup { background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 8px 12px; font-size: 0.75rem; line-height: 1.5; min-width: 120px; }
+.route-info-popup .rip-mode { font-weight: 600; margin-bottom: 2px; }
+
+/* Route hover label on map */
+.route-label { font-size: 0.65rem; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.8); pointer-events: none; white-space: nowrap; padding: 2px 6px; border-radius: 3px; background: rgba(15,23,42,0.75); }
 
 @media (max-width: 900px) {
   .layout { flex-direction: column; }
@@ -212,7 +216,6 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 <h1>Singapore 2026</h1>
 <p class="subtitle">26–31 Th12 · 6 ngày · Geylang</p>
 
-<!-- Trip Info -->
 <div class="info-card">
   <div class="info-row">
     <div class="info-icon flight">✈️</div>
@@ -240,13 +243,16 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 <div class="layout">
 <div class="col-left">
 
-<!-- Mini Map -->
 <div id="minimap"></div>
 <div style="margin-bottom: 8px;"></div>
+
+<div id="routeLegend" class="route-legend" style="display:none;">
+  <span class="legend-title">Tuyến đường:</span>
+</div>
+
 <button id="wlToggle" class="wl-toggle-btn">📍 Hiển thị danh sách yêu thích trên bản đồ</button>
 <div style="margin-bottom: 20px;"></div>
 
-<!-- Timeline -->
 <div class="timeline">
 
   <!-- Day 1 -->
@@ -308,7 +314,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
       <span class="name">Buổi tối: khám phá ẩm thực Geylang</span>
       <span class="time">free</span>
     </div>
-    </div><!-- /day-body -->
+    </div>
   </div>
 
   <!-- Day 2 -->
@@ -331,7 +337,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
       <span class="name">Universal Studios Singapore</span>
       <span class="time">09:00–18:00</span>
     </div>
-    </div><!-- /day-body -->
+    </div>
   </div>
 
   <!-- Day 3 -->
@@ -342,7 +348,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
       <span class="day-date">Mon, Dec 28</span>
       <span class="collapse-icon">▼</span>
     </div>
-    <div class="day-body"><div class="placeholder-text">• chưa lên kế hoạch</div></div><!-- /day-body -->
+    <div class="day-body"><div class="placeholder-text">• chưa lên kế hoạch</div></div>
   </div>
 
   <!-- Day 4 -->
@@ -353,7 +359,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
       <span class="day-date">Tue, Dec 29</span>
       <span class="collapse-icon">▼</span>
     </div>
-    <div class="day-body"><div class="placeholder-text">• chưa lên kế hoạch</div></div><!-- /day-body -->
+    <div class="day-body"><div class="placeholder-text">• chưa lên kế hoạch</div></div>
   </div>
 
   <!-- Day 5 -->
@@ -364,7 +370,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
       <span class="day-date">Wed, Dec 30</span>
       <span class="collapse-icon">▼</span>
     </div>
-    <div class="day-body"><div class="placeholder-text">• chưa lên kế hoạch</div></div><!-- /day-body -->
+    <div class="day-body"><div class="placeholder-text">• chưa lên kế hoạch</div></div>
   </div>
 
   <!-- Day 6 -->
@@ -392,9 +398,9 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
       <span class="name">SIN → SGN (Singapore Airlines)</span>
       <span class="time">13:50–15:00</span>
     </div>
-    </div><!-- /day-body -->
+    </div>
   </div>
-</div><!-- /timeline -->
+</div>
 
 <div class="wishlist">
   <h2>Danh sách yêu thích — Cần sắp xếp</h2>
@@ -744,7 +750,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
   </div>
 </div>
 
-</div><!-- /col-left -->
+</div>
 
 <div class="col-right">
   <div class="preview-panel" id="previewPanel">
@@ -764,14 +770,297 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
     </div>
   </div>
 </div>
-</div><!-- /layout -->
+</div>
 
 <div class="footer">Kế hoạch tạo ngày 3/7/2026 · <span style="color:#60a5fa;">Ngày 2–5</span> sẵn sàng để điền · Di chuột vào điểm dừng để xem ảnh</div>
 
 <script>
-// Map
+// ============================================================
+// MRT STATION DATABASE
+// ============================================================
+const S = {}; // stations keyed by station code
+const C = {}; // connections (adjacency list)
+
+function addStation(code, name, lat, lng) {
+  S[code] = { code, name, lat, lng };
+  if (!C[code]) C[code] = [];
+}
+
+function connect(c1, c2) {
+  if (!C[c1]) C[c1] = [];
+  if (!C[c2]) C[c2] = [];
+  if (!C[c1].includes(c2)) C[c1].push(c2);
+  if (!C[c2].includes(c1)) C[c2].push(c1);
+}
+
+// East-West Line + Changi branch
+addStation('CG2','Changi Airport',1.3585,103.9887);
+addStation('CG1','Tanah Merah',1.3271,103.9467);
+addStation('EW4','Tanah Merah',1.3271,103.9467);
+addStation('EW5','Bedok',1.3237,103.9295);
+addStation('EW6','Kembangan',1.3166,103.9124);
+addStation('EW7','Eunos',1.3196,103.9028);
+addStation('EW8','Paya Lebar',1.3183,103.8924);
+addStation('EW9','Aljunied',1.3164,103.8834);
+addStation('EW10','Kallang',1.3116,103.8717);
+addStation('EW11','Lavender',1.3070,103.8630);
+addStation('EW12','Bugis',1.3005,103.8550);
+addStation('EW13','City Hall',1.2929,103.8528);
+addStation('EW14','Raffles Place',1.2841,103.8518);
+addStation('EW15','Tanjong Pagar',1.2764,103.8460);
+addStation('EW16','Outram Park',1.2802,103.8390);
+addStation('EW17','Tiong Bahru',1.2865,103.8265);
+addStation('EW18','Redhill',1.2898,103.8165);
+addStation('EW19','Queenstown',1.2950,103.8060);
+
+connect('CG2','CG1');
+connect('CG1','EW4');
+connect('EW4','EW5');
+connect('EW5','EW6');
+connect('EW6','EW7');
+connect('EW7','EW8');
+connect('EW8','EW9');
+connect('EW9','EW10');
+connect('EW10','EW11');
+connect('EW11','EW12');
+connect('EW12','EW13');
+connect('EW13','EW14');
+connect('EW14','EW15');
+connect('EW15','EW16');
+connect('EW16','EW17');
+connect('EW17','EW18');
+connect('EW18','EW19');
+
+// Circle Line
+addStation('CC1','Outram Park',1.2802,103.8390);
+addStation('CC2','Telok Blangah',1.2716,103.8301);
+addStation('CC3','HarbourFront',1.2649,103.8230);
+addStation('CC8','Dakota',1.3081,103.8889);
+addStation('CC9','Paya Lebar',1.3183,103.8924);
+
+connect('CC1','CC2');
+connect('CC2','CC3');
+connect('CC8','CC9');
+connect('EW8','CC9');
+connect('EW16','CC1');
+
+// North-East Line
+addStation('NE1','HarbourFront',1.2649,103.8230);
+addStation('NE3','Outram Park',1.2802,103.8390);
+addStation('NE4','Chinatown',1.2847,103.8438);
+addStation('NE5','Clarke Quay',1.2897,103.8461);
+addStation('NE6','Dhoby Ghaut',1.2988,103.8460);
+
+connect('NE1','NE3');
+connect('NE3','NE4');
+connect('NE4','NE5');
+connect('NE5','NE6');
+connect('CC1','NE3');
+
+// North-South Line
+addStation('NS22','Orchard',1.3015,103.8325);
+addStation('NS24','Dhoby Ghaut',1.2988,103.8460);
+addStation('NS25','City Hall',1.2929,103.8528);
+addStation('NS27','Raffles Place',1.2841,103.8518);
+addStation('NS28','Marina Bay',1.2791,103.8544);
+
+connect('NS22','NS24');
+connect('NS24','NS25');
+connect('NS25','NS27');
+connect('NS27','NS28');
+connect('EW13','NS25');
+connect('EW14','NS27');
+
+// Downtown Line (partial)
+addStation('DT16','Bayfront',1.2836,103.8589);
+addStation('DT17','Chinatown',1.2847,103.8438);
+addStation('DT18','Telok Ayer',1.2817,103.8478);
+addStation('DT19','Raffles Place',1.2841,103.8518);
+addStation('DT20','Marina Bay',1.2791,103.8544);
+
+connect('DT16','DT17');
+connect('DT17','DT18');
+connect('DT18','DT19');
+connect('DT19','DT20');
+
+// BFS route finder
+function findMRT(fromCode, toCode) {
+  if (fromCode === toCode) return [fromCode];
+  const q = [[fromCode]];
+  const visited = new Set([fromCode]);
+  while (q.length) {
+    const path = q.shift();
+    const last = path[path.length - 1];
+    const neighbors = C[last] || [];
+    for (const n of neighbors) {
+      if (visited.has(n)) continue;
+      visited.add(n);
+      const newPath = path.concat([n]);
+      if (n === toCode) return newPath;
+      q.push(newPath);
+    }
+  }
+  return null;
+}
+
+function nearestStation(lat, lng) {
+  let best = null, bestDist = Infinity;
+  for (const code in S) {
+    const s = S[code];
+    const d = (s.lat - lat) ** 2 + (s.lng - lng) ** 2;
+    if (d < bestDist) { bestDist = d; best = code; }
+  }
+  return best;
+}
+
+// ============================================================
+// ROUTE MODE SYSTEM
+// ============================================================
+const ROUTE_MODES = {
+  mrt:   { color: '#22c55e', weight: 4, dash: '',       label: 'MRT',      icon: '🚇', profile: 'walking' },
+  walk:  { color: '#eab308', weight: 3, dash: '4,4',    label: 'Walking',  icon: '🚶', profile: 'walking' },
+  bus:   { color: '#3b82f6', weight: 3, dash: '8,4',    label: 'Bus',      icon: '🚌', profile: 'driving' },
+  car:   { color: '#a855f7', weight: 3, dash: '',       label: 'Car/Taxi', icon: '🚗', profile: 'driving' },
+  mrtWalk: { color: '#22c55e', weight: 2, dash: '2,4',  label: 'MRT Walk', icon: '🚶', profile: 'walking' }
+};
+
+const MODE_ORDER = ['mrt', 'walk', 'bus', 'car'];
+
+// ============================================================
+// ROUTE CACHE
+// ============================================================
+const routeCache = {};
+const pendings = {};
+
+async function fetchRoute(profile, coords) {
+  const key = profile + '|' + coords.map(c => c.join(',')).join(';');
+  if (routeCache[key]) return routeCache[key];
+  if (pendings[key]) return pendings[key];
+  const url = 'https://router.project-osrm.org/route/v1/' + profile + '/' + coords.map(c => c[1] + ',' + c[0]).join(';') + '?geometries=geojson&overview=full';
+  const p = (async () => {
+    try {
+      const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
+      if (!r.ok) return null;
+      const j = await r.json();
+      if (!j.code || j.code !== 'Ok' || !j.routes || !j.routes.length) return null;
+      const route = j.routes[0];
+      const coords2 = route.geometry.coordinates.map(c => [c[1], c[0]]);
+      routeCache[key] = { coords: coords2, distance: route.distance, duration: route.duration };
+      return routeCache[key];
+    } catch (e) {
+      return null;
+    }
+  })();
+  pendings[key] = p;
+  const result = await p;
+  delete pendings[key];
+  return result;
+}
+
+function formatDist(m) {
+  if (!m) return '?';
+  return (m / 1000).toFixed(1) + ' km';
+}
+
+function formatDur(s) {
+  if (!s) return '?';
+  const m = s / 60;
+  if (m < 60) return Math.round(m) + ' min';
+  const h = Math.floor(m / 60);
+  const min = Math.round(m % 60);
+  return h + 'h ' + min + 'min';
+}
+
+function haversine(lat1, lng1, lat2, lng2) {
+  const R = 6371000;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+async function computeSegmentRoutes(fromLat, fromLng, toLat, toLng) {
+  const results = {};
+
+  // Walking
+  const walk = await fetchRoute('walking', [[fromLat, fromLng], [toLat, toLng]]);
+  if (walk) {
+    results.walk = { coords: walk.coords, distance: walk.distance, duration: walk.duration };
+  }
+
+  // Driving (also used for bus and car)
+  const drive = await fetchRoute('driving', [[fromLat, fromLng], [toLat, toLng]]);
+  if (drive) {
+    results.car = { coords: drive.coords, distance: drive.distance, duration: drive.duration };
+    results.bus = { coords: drive.coords, distance: drive.distance, duration: drive.duration };
+  }
+
+  // MRT: origin -> nearest station -> MRT route -> nearest station -> destination
+  const fromStation = nearestStation(fromLat, fromLng);
+  const toStation = nearestStation(toLat, toLng);
+  if (fromStation && toStation) {
+    const mrtPath = findMRT(fromStation, toStation);
+    if (mrtPath && mrtPath.length >= 1) {
+      const walkSegments = [];
+
+      // Origin -> first station (MRT station, use walking)
+      const s1 = S[fromStation];
+      if (s1) {
+        const w1 = await fetchRoute('walking', [[fromLat, fromLng], [s1.lat, s1.lng]]);
+        if (w1) walkSegments.push({ coords: w1.coords, distance: w1.distance, duration: w1.duration });
+        else walkSegments.push({ coords: [[fromLat, fromLng], [s1.lat, s1.lng]], distance: haversine(fromLat, fromLng, s1.lat, s1.lng), duration: 0 });
+      }
+
+      // Stations in sequence (as one walking route through stations)
+      const stationCoords = mrtPath.map(code => [S[code].lat, S[code].lng]);
+      if (stationCoords.length >= 2) {
+        const wRoute = await fetchRoute('walking', stationCoords);
+        if (wRoute) walkSegments.push({ coords: wRoute.coords, distance: wRoute.distance, duration: wRoute.duration });
+        else {
+          // Fallback: direct between stations
+          for (let i = 0; i < stationCoords.length - 1; i++) {
+            walkSegments.push({
+              coords: [stationCoords[i], stationCoords[i + 1]],
+              distance: haversine(stationCoords[i][0], stationCoords[i][1], stationCoords[i+1][0], stationCoords[i+1][1]),
+              duration: 0
+            });
+          }
+        }
+      }
+
+      // Last station -> destination
+      const sN = S[mrtPath[mrtPath.length - 1]];
+      if (sN && (sN.lat !== toLat || sN.lng !== toLng)) {
+        const wN = await fetchRoute('walking', [[sN.lat, sN.lng], [toLat, toLng]]);
+        if (wN) walkSegments.push({ coords: wN.coords, distance: wN.distance, duration: wN.duration });
+        else walkSegments.push({ coords: [[sN.lat, sN.lng], [toLat, toLng]], distance: haversine(sN.lat, sN.lng, toLat, toLng), duration: 0 });
+      }
+
+      // Combine all segments
+      if (walkSegments.length) {
+        const allCoords = [];
+        let totalDist = 0, totalDur = 0;
+        for (const seg of walkSegments) {
+          allCoords.push(...seg.coords);
+          totalDist += seg.distance;
+          totalDur += seg.duration;
+        }
+        results.mrt = { coords: allCoords, distance: totalDist, duration: totalDur };
+      }
+    }
+  }
+
+  return results;
+}
+
+// ============================================================
+// MAP SETUP
+// ============================================================
 const map = L.map('minimap', { zoomControl: true, scrollWheelZoom: true, dragging: true }).setView([1.32, 103.85], 11);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>' }).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  maxZoom: 19,
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>'
+}).addTo(map);
 
 let pinnedEl = null, pinnedMode = 'image';
 let currentPreviewEl = null, hideTimeout = null;
@@ -790,86 +1079,171 @@ map.on('mousedown', function() {
   }
 });
 
-// Hotel marker (always visible)
+// Hotel marker
 const hotelIcon = L.divIcon({ className: 'hotel-marker', html: '<div class="hotel-pin"><div class="hotel-icon"></div></div>', iconSize: [32, 40], iconAnchor: [16, 40] });
 L.marker([1.31155, 103.88085], { icon: hotelIcon }).addTo(map).bindTooltip('Hotel 81 Star', { direction: 'top' });
 
-// Per-day route layers
+// ============================================================
+// MULTI-MODE ROUTE SYSTEM
+// ============================================================
 const dayRoutes = {};
 let activeDay = null;
+let currentRouteLayers = null; // map of mode -> L.polyline
 
-document.querySelectorAll('.day-card').forEach(card => {
-  const stops = card.querySelectorAll('.stop[data-lat]');
-  if (!stops.length) return;
-  const dayNum = card.querySelector('.day-num')?.textContent || '0';
-  const layer = L.layerGroup().addTo(map);
-  const coords = [];
-  const markers = [];
+function clearRouteLayers() {
+  if (currentRouteLayers) {
+    Object.values(currentRouteLayers).forEach(l => { if (l.polyline) map.removeLayer(l.polyline); if (l.walkLines) l.walkLines.forEach(wl => map.removeLayer(wl)); });
+    currentRouteLayers = null;
+  }
+}
 
-  stops.forEach((s, i) => {
-    const lat = parseFloat(s.dataset.lat);
-    const lng = parseFloat(s.dataset.lng);
-    if (isNaN(lat) || isNaN(lng)) return;
-    coords.push([lat, lng]);
-    const loc = s.dataset.location || 'Stop';
-    const num = i + 1;
-    const icon = L.divIcon({ className: 'num-marker', html: '' + num, iconSize: [26, 26], iconAnchor: [13, 13] });
-    const m = L.marker([lat, lng], { icon }).bindTooltip(num + '. ' + loc, { direction: 'top' });
-    m.on('mouseover', () => { if (pinnedEl) return; clearTimeout(hideTimeout); showPreview(s); });
-    m.on('mouseout', () => { if (pinnedEl) return; hideTimeout = setTimeout(hidePreview, 150); });
-    m.on('click', function() {
-      pinnedEl = s;
-      pinnedMode = 'image';
-      showPreview(s);
-    });
-    markers.push(m);
-    layer.addLayer(m);
-  });
+function buildLegend(routeData) {
+  const container = document.getElementById('routeLegend');
+  container.innerHTML = '<span class="legend-title">Tuyến đường:</span>';
+  let hasAny = false;
+  for (const mode of MODE_ORDER) {
+    const d = routeData[mode];
+    const m = ROUTE_MODES[mode];
+    if (!d || !m) continue;
+    hasAny = true;
+    const item = document.createElement('span');
+    item.className = 'legend-item';
+    const dashStyle = m.dash ? 'stroke-dasharray:' + m.dash : '';
+    item.innerHTML = '<span class="legend-icon">' + m.icon + '</span><span class="legend-line" style="background:' + m.color + ';' + dashStyle + '"></span>' + m.label + ' <span class="legend-info">' + formatDist(d.distance) + ' · ' + formatDur(d.duration) + '</span>';
+    container.appendChild(item);
+  }
+  container.style.display = hasAny ? 'flex' : 'none';
+}
 
-  if (coords.length > 1) {
-    const polyline = L.polyline(coords, { color: '#fbbf24', weight: 3, opacity: 0.8 }).addTo(layer);
-    dayRoutes[dayNum] = { layer, markers, polyline, coords };
-  } else if (coords.length === 1) {
-    dayRoutes[dayNum] = { layer, markers, polyline: null, coords };
+async function loadDayRoutes(dayNum, stops) {
+  clearRouteLayers();
+  if (!stops || stops.length < 2) return;
+
+  const allSegments = {};
+  let hasData = false;
+
+  for (let i = 0; i < stops.length - 1; i++) {
+    const from = stops[i];
+    const to = stops[i + 1];
+    const segRoutes = await computeSegmentRoutes(from.lat, from.lng, to.lat, to.lng);
+    allSegments[i] = segRoutes;
+    for (const mode in segRoutes) {
+      if (segRoutes[mode]) hasData = true;
+    }
   }
 
-  map.removeLayer(layer);
-});
+  if (!hasData) return;
 
-// Day click handler — collapse/expand + map route
-const dayHeaders = document.querySelectorAll('.day-card .day-header');
-dayHeaders.forEach(header => {
+  // Combine segments into full route per mode
+  const merged = {};
+  for (const segIdx in allSegments) {
+    for (const mode of MODE_ORDER) {
+      const seg = allSegments[segIdx][mode];
+      if (!seg) continue;
+      if (!merged[mode]) merged[mode] = { coords: [], distance: 0, duration: 0 };
+      merged[mode].coords.push(...seg.coords);
+      merged[mode].distance += seg.distance;
+      merged[mode].duration += seg.duration;
+    }
+  }
+
+  const layers = {};
+  for (const mode of MODE_ORDER) {
+    const d = merged[mode];
+    const m = ROUTE_MODES[mode];
+    if (!d || !m || !d.coords.length) continue;
+    const opts = { color: m.color, weight: m.weight, opacity: 0.85, smoothFactor: 1.5 };
+    if (m.dash) opts.dashArray = m.dash;
+    const polyline = L.polyline(d.coords, opts).addTo(map);
+    layers[mode] = { polyline, distance: d.distance, duration: d.duration };
+  }
+
+  currentRouteLayers = layers;
+  buildLegend(merged);
+
+  // Fit bounds
+  const allCoords = [];
+  for (const mode in layers) {
+    const line = layers[mode].polyline;
+    line.getLatLngs().forEach(c => {
+      if (Array.isArray(c[0])) c.forEach(sub => allCoords.push(sub));
+      else allCoords.push(c);
+    });
+  }
+  if (allCoords.length) {
+    map.fitBounds(allCoords, { padding: [40, 40], maxZoom: 14 });
+  }
+}
+
+// Day click handler
+document.querySelectorAll('.day-card .day-header').forEach(header => {
   header.addEventListener('click', function() {
     const card = this.closest('.day-card');
     const dayNum = card.querySelector('.day-num')?.textContent || '0';
     const wasCollapsed = card.classList.contains('collapsed');
 
-    // Toggle collapse
     card.classList.toggle('collapsed');
 
     if (wasCollapsed) {
-      // Expanding: show this day's route, hide others
       document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active'));
-      if (activeDay && dayRoutes[activeDay]) map.removeLayer(dayRoutes[activeDay].layer);
-      if (dayRoutes[dayNum]) {
-        map.addLayer(dayRoutes[dayNum].layer);
-        const c = dayRoutes[dayNum].coords;
-        if (c.length) map.fitBounds(c, { padding: [30, 30], maxZoom: 14 });
+      clearRouteLayers();
+      if (activeDay && dayRoutes[activeDay] && dayRoutes[activeDay].markers) {
+        dayRoutes[activeDay].markers.forEach(m => map.removeLayer(m));
+      }
+      if (dayRoutes[dayNum] && dayRoutes[dayNum].markers) {
+        dayRoutes[dayNum].markers.forEach(m => map.addLayer(m));
       }
       card.classList.add('active');
       activeDay = dayNum;
+
+      // Create numbered markers for this day
+      const stops = card.querySelectorAll('.stop[data-lat]');
+      const stopData = [];
+      const markers = [];
+      let stopNum = 0;
+      stops.forEach(s => {
+        const lat = parseFloat(s.dataset.lat);
+        const lng = parseFloat(s.dataset.lng);
+        if (isNaN(lat) || isNaN(lng)) return;
+        stopNum++;
+        const loc = s.dataset.location || 'Stop ' + stopNum;
+        stopData.push({ lat, lng, el: s });
+        const icon = L.divIcon({ className: 'num-marker', html: '' + stopNum, iconSize: [26, 26], iconAnchor: [13, 13] });
+        const m = L.marker([lat, lng], { icon }).bindTooltip(stopNum + '. ' + loc, { direction: 'top' });
+        m.on('mouseover', () => { if (pinnedEl) return; clearTimeout(hideTimeout); showPreview(s); });
+        m.on('mouseout', () => { if (pinnedEl) return; hideTimeout = setTimeout(hidePreview, 150); });
+        m.on('click', function() {
+          pinnedEl = s;
+          pinnedMode = 'image';
+          showPreview(s);
+        });
+        markers.push(m);
+        map.addLayer(m);
+      });
+
+      dayRoutes[dayNum] = { markers };
+
+      // Load route modes between consecutive stops
+      loadDayRoutes(dayNum, stopData);
+
     } else {
-      // Collapsing: hide route if this day was active
       if (activeDay === dayNum) {
         document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active'));
-        if (dayRoutes[dayNum]) map.removeLayer(dayRoutes[dayNum].layer);
+        clearRouteLayers();
+        if (dayRoutes[dayNum] && dayRoutes[dayNum].markers) {
+          dayRoutes[dayNum].markers.forEach(m => map.removeLayer(m));
+        }
+        delete dayRoutes[dayNum];
         activeDay = null;
+        document.getElementById('routeLegend').style.display = 'none';
       }
     }
   });
 });
 
-// Hover preview panel
+// ============================================================
+// PREVIEW PANEL CODE
+// ============================================================
 const previewImg = document.getElementById('previewImg');
 const previewVideo = document.getElementById('previewVideo');
 const previewYoutubeContainer = document.getElementById('previewYoutubeContainer');
@@ -933,7 +1307,6 @@ function showPreview(el, type) {
   previewVideoBtn._lastEl = videoUrl ? el : null;
   previewInfo.style.display = 'block';
 
-  // Populate sub-event list if parent card with sub-events
   if (el.matches('.wl-card.parent')) {
     previewSubList.innerHTML = '';
     previewSubList.style.display = 'none';
@@ -1031,7 +1404,6 @@ previewVideoBtn.addEventListener('click', function() {
   previewVideoBtn.style.display = 'none';
 });
 
-// Preview panel video button hover
 previewVideoBtn.addEventListener('mouseenter', function() {
   const s = this.querySelector('span');
   if (s) { s.style.background = '#ef4444'; s.style.color = '#fff'; }
@@ -1092,7 +1464,9 @@ document.querySelectorAll('.stop[data-img], .wl-card[data-img], .food-card[data-
   });
 });
 
-// Wishlist marker layer (toggle on/off)
+// ============================================================
+// WISHLIST / FOOD MARKERS (unchanged)
+// ============================================================
 const wlLayer = L.layerGroup();
 let wlVisible = false;
 
@@ -1118,7 +1492,6 @@ document.querySelectorAll('.wl-card').forEach(card => {
   wlLayer.addLayer(m);
 });
 
-// Food card markers (using data-food-lat / data-food-lng)
 document.querySelectorAll('.food-card').forEach(card => {
   const lat = parseFloat(card.dataset.foodLat);
   const lng = parseFloat(card.dataset.foodLng);
@@ -1152,8 +1525,6 @@ document.getElementById('wlToggle').addEventListener('click', function() {
     hidePreview();
   }
 });
-
-
 </script>
 </body>
 </html>
