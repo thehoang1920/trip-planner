@@ -1221,12 +1221,12 @@ async function drawDayRoute(stops, currentStop, fit) {
     const step = Math.max(1, Math.floor(coords.length / 4));
     for (var k = step; k < coords.length - 1; k += step) {
       var p1 = coords[k], p2 = coords[Math.min(k + 1, coords.length - 1)];
-      var angle = Math.atan2(p2[1] - p1[1], p2[0] - p1[0]) * 180 / Math.PI;
+      var ang = Math.atan2(p2[1] - p1[1], p2[0] - p1[0]) * 180 / Math.PI - 90;
       var mid = [(p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2];
       L.marker(mid, {
         icon: L.divIcon({
           className: '',
-          html: '<div style="width:0;height:0;border-left:6px solid ' + color + ';border-top:5px solid transparent;border-bottom:5px solid transparent;transform:rotate(' + angle + 'deg);filter:drop-shadow(0 0 1px rgba(0,0,0,0.8));"></div>',
+          html: '<div style="width:0;height:0;border-left:6px solid ' + color + ';border-top:5px solid transparent;border-bottom:5px solid transparent;transform:rotate(' + ang + 'deg);filter:drop-shadow(0 0 1px rgba(0,0,0,0.8));"></div>',
           iconSize: [10, 10], iconAnchor: [5, 5]
         }),
         interactive: false
@@ -1236,7 +1236,7 @@ async function drawDayRoute(stops, currentStop, fit) {
     if (coords.length >= 2) {
       var last = coords.length - 1;
       var prev = Math.max(0, last - 3);
-      var a2 = Math.atan2(coords[last][1] - coords[prev][1], coords[last][0] - coords[prev][0]) * 180 / Math.PI;
+      var a2 = Math.atan2(coords[last][1] - coords[prev][1], coords[last][0] - coords[prev][0]) * 180 / Math.PI - 90;
       var end = coords[last];
       L.marker(end, {
         icon: L.divIcon({
