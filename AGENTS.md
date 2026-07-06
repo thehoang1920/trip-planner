@@ -509,7 +509,324 @@ previewYoutube.src = 'https://www.youtube-nocookie.com/embed/' + ytId + '?autopl
 previewYoutubeContainer.appendChild(previewYoutube);
 ```
 
-### Common Bugs — Lessons Learned
+#### Route Rendering — Draw Day Route
+
+```js
+async function drawDayRoute(stops, completedUpTo) {
+  const token = ++activeRouteToken;
+  const legendEl = document.getElementById('routeLegend');
+  legendEl.innerHTML = '<span class="legend-title">Tuyến tối ưu:</span><span class="route-loading">⏳ Đang tính...</span>';
+  legendEl.style.display = 'flex';
+  clearRoute();
+  if (!stops || stops.length < 2) { legendEl.style.display = 'none'; return; }
+
+  const legs = [];
+  for (let i = 0; i < stops.length - 1; i++) {
+    if (i < completedUpTo) { legs.push(null); continue; } // skip completed
+    const from = stops[i], to = stops[i + 1];
+    const segs = await getOptimalRoute(from.lat, from.lng, to.lat, to.lng);
+    if (token !== activeRouteToken) return;
+    legs.push({ fromStopIdx: i, segments: segs });
+  }
+
+  // Flatten + draw all non-completed segments
+  const allSegments = [];
+  for (const leg of legs) {
+    if (!leg) continue;
+    for (const s of leg.segments) allSegments.push(s);
+  }
+  // ... draw polylines on routeLayer, add tooltips
+  routeLayer.addTo(map);
+  currentRouteLayer = routeLayer;
+  buildRouteLegend(allSegments);
+  map.fitBounds(allCoords, { padding: [40, 40], maxZoom: 14 });
+  updateMarkerIcons(activeDay);
+}
+```
+
+### Completion Checkmarks (○/✓)
+
+Each stop marker shows a clickable ○/✓ button to track progress:
+
+```js
+// Marker creation
+var iconHtml = '<span class="num">' + stopNum + '</span><span class="chk" data-toggle="1">○</span>';
+const icon = L.divIcon({ className: 'num-marker', html: iconHtml, iconSize: [32, 26], iconAnchor: [16, 13] });
+const m = L.marker([lat, lng], { icon: icon }).bindTooltip(stopNum + '. ' + loc, { direction: 'top' });
+
+// Click handler checks if target is .chk
+m.on('click', function(e) {
+  if (e.originalEvent && e.originalEvent.target && e.originalEvent.target.classList.contains('chk')) {
+    toggleComplete(m, dayNum);
+    return;
+  }
+  pinnedEl = s; pinnedMode = 'image'; showPreview(s);
+});
+m._stopIdx = stopNum - 1;
+```
+
+```js
+function toggleComplete(m, dayNum) {
+  var st = routeState[dayNum];
+  var target = m._stopIdx;
+  if (st.completedUpTo === target) st.completedUpTo = Math.max(0, target - 1);
+  else st.completedUpTo = target;
+  clearRoute();
+  drawDayRoute(st.stops, st.completedUpTo);
+}
+```
+
+Marker icon states:
+- **○** = not yet reached
+- **●** = current stop (in progress)
+- **✓** = completed (route segment before this stop is hidden)
+
+CSS:
+```css
+.num-marker { background: #fbbf24; width: 32px; height: 26px; display: flex; align-items: center; justify-content: center; }
+.num-marker .chk { cursor: pointer; font-size: 0.7rem; opacity: 0.4; user-select: none; }
+.num-marker .chk:hover { opacity: 1; }
+.num-marker.done { background: #334155; border-color: #22c55e; }
+.num-marker.done .chk { opacity: 1; color: #22c55e; }
+.num-marker.current { background: #fbbf24; border-color: #3b82f6; }
+```
+
+### Route Legend
+
+```js
+function buildRouteLegend(segments) {
+  container.innerHTML = '<span class="legend-title">Tuyến tối ưu:</span>';
+  for (const mode of modeOrder) {
+    if (!modeSet[mode]) continue;
+    // Show ████ colored line + mode label for each mode present
+  }
+  // Total distance/time
+  total.textContent = 'Tổng: ' + formatDist(totalDist) + ' · ' + formatDur(totalDur);
+}
+```
+
+---
+
+## Routing Engine — Complete Reference
+
+This section documents the multi-mode routing system built for the Singapore 2026 planner. Use this as a template for future trips.
+
+### Architecture Overview
+
+The routing system is embedded entirely in the HTML planner. It provides:
+1. **MRT station DB** with BFS pathfinding (Singapore MRT/LRT network)
+2. **Sentosa Express monorail** as an extension of the MRT network
+3. **Optimal route engine** with priority: MRT > Bus > Walking > Car
+4. **OSRM integration** for real road/walking geometry
+5. **Route cache** to avoid redundant API calls
+6. **Stale-request guard** using incrementing token (prevents race conditions)
+
+### MRT Station Database
+
+```js
+const S = {}; // stations keyed by station code
+const C = {}; // connections (adjacency list)
+
+function addStation(code, name, lat, lng) {
+  S[code] = { code, name, lat, lng };
+  if (!C[code]) C[code] = [];
+}
+
+function connect(c1, c2) {
+  if (!C[c1].includes(c2)) C[c1].push(c2);
+  if (!C[c2].includes(c1)) C[c2].push(c1);
+}
+```
+
+**Station format:** `{ code: 'EW9', name: 'Aljunied', lat: 1.3164, lng: 103.8834 }`
+
+**Code convention:** 2-letter line prefix + number (e.g., `EW9` = East-West line, station 9; `NE1` = North-East line, station 1; `CC3` = Circle line, station 3; `CG2` = Changi Airport branch; `SE1` = Sentosa Express).
+
+### BFS Route Finder
+
+```js
+function findMRT(fromCode, toCode) {
+  const q = [[fromCode]];
+  const visited = new Set([fromCode]);
+  while (q.length) {
+    const path = q.shift();
+    const last = path[path.length - 1];
+    for (const n of (C[last] || [])) {
+      if (visited.has(n)) continue;
+      visited.add(n);
+      const newPath = path.concat([n]);
+      if (n === toCode) return newPath;
+      q.push(newPath);
+    }
+  }
+  return null; // no path found
+}
+```
+
+Returns array of station codes representing the shortest path, or `null` if unreachable.
+
+### Nearest Station
+
+```js
+function nearestStation(lat, lng) {
+  let best = null, bestDist = Infinity;
+  for (const code in S) {
+    const s = S[code];
+    const d = (s.lat - lat) ** 2 + (s.lng - lng) ** 2;
+    if (d < bestDist) { bestDist = d; best = code; }
+  }
+  return best;
+}
+```
+
+Simple Euclidean distance (squared) — sufficient for station proximity checks (not for distance measurement).
+
+### MRT Lines Covered
+
+| Line | Codes | Stations |
+|------|-------|----------|
+| East-West (main) | EW4–EW19 | Tanah Merah → Queenstown + interchanges |
+| Changi Branch | CG1–CG2 | Tanah Merah → Changi Airport |
+| Circle Line | CC1–CC3, CC8–CC9 | Outram Park → HarbourFront, Dakota → Paya Lebar |
+| North-East | NE1, NE3–NE6 | HarbourFront → Dhoby Ghaut |
+| North-South | NS22, NS24–NS25, NS27–NS28 | Orchard → Marina Bay |
+| Downtown | DT16–DT20 | Bayfront → Marina Bay |
+| Sentosa Express | SE1–SE3 | Waterfront → Imbiah → Beach (connected to NE1 HarbourFront) |
+
+### Sentosa Express (Special)
+
+The Sentosa Express monorail is added as MRT stations (`SE1`, `SE2`, `SE3`) connected to HarbourFront MRT (`NE1`):
+
+```js
+addStation('SE1','Waterfront Sentosa',1.2546,103.8206);
+addStation('SE2','Imbiah',1.2528,103.8137);
+addStation('SE3','Beach Sentosa',1.2505,103.8200);
+connect('NE1','SE1');
+connect('SE1','SE2');
+connect('SE2','SE3');
+```
+
+This means Universal Studios Singapore (nearest station: SE1 Waterfront, ~240m) automatically routes via Sentosa Express instead of walking 1.2km from HarbourFront MRT.
+
+### OSRM Route Fetching
+
+```js
+async function fetchRoute(profile, coords) {
+  const url = 'https://router.project-osrm.org/route/v1/' + profile + '/'
+    + coords.map(c => c[1] + ',' + c[0]).join(';')
+    + '?geometries=geojson&overview=full';
+  const controller = new AbortController();
+  const timer = setTimeout(function() { controller.abort(); }, 8000);
+  // ...
+}
+```
+
+**IMPORTANT — Do NOT use `AbortSignal.timeout()`:** Not supported in legacy browsers. Use manual `AbortController` + `setTimeout` pattern.
+
+**Profiles:**
+- `walking` — used for actual walking + MRT track geometry (approximated via walking path)
+- `driving` — used for bus and car routes (buses follow roads)
+
+**Caching:** Routes are cached in `routeCache` by `profile|coord1,coord2;coord3,coord4` key to avoid redundant API calls. Pending requests are tracked in `pendings` to deduplicate concurrent identical requests.
+
+### Haversine Distance
+
+```js
+function haversine(lat1, lng1, lat2, lng2) {
+  const R = 6371000;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+```
+
+Returns distance in meters.
+
+### Format Helpers
+
+```js
+function formatDist(m) {
+  if (!m) return '?';
+  return (m / 1000).toFixed(1) + ' km';
+}
+
+function formatDur(s) {
+  if (!s) return '?';
+  const m = s / 60;
+  if (m < 60) return Math.round(m) + ' min';
+  const h = Math.floor(m / 60);
+  const min = Math.round(m % 60);
+  return h + 'h ' + min + 'min';
+}
+```
+
+### Optimal Route Engine
+
+```js
+async function getOptimalRoute(fromLat, fromLng, toLat, toLng) {
+  const directDist = haversine(fromLat, fromLng, toLat, toLng);
+```
+
+**Priority order:**
+
+1. **MRT** (if stations within 2km of both ends):
+   - Walk from origin → first station (yellow dashed)
+   - MRT through stations (green solid, OSRM walking profile for geometry)
+   - Walk from last station → destination (yellow dashed)
+   
+2. **Bus** (if direct distance > 300m):
+   - Single segment using OSRM driving profile (blue dashed)
+
+3. **Walking** (always available):
+   - Single straight line from origin → destination (yellow dashed)
+   
+4. **Car** (last resort):
+   - Single segment using OSRM driving profile (purple solid)
+
+**Returns:** Array of `{ mode, coords, distance, duration }` objects.
+
+### Route Segment Styles
+
+```js
+const SEG_STYLES = {
+  mrt:  { color: '#22c55e', weight: 5, dash: '',       label: 'MRT',      icon: '🚇' },
+  walk: { color: '#eab308', weight: 3, dash: '4,4',    label: 'Walking',  icon: '🚶' },
+  bus:  { color: '#3b82f6', weight: 3, dash: '8,4',    label: 'Bus',      icon: '🚌' },
+  car:  { color: '#a855f7', weight: 3, dash: '',       label: 'Car/Taxi', icon: '🚗' }
+};
+```
+
+- Solid lines = MRT, Car
+- Dashed lines = Walking (4,4), Bus (8,4)
+- MRT is boldest (weight: 5)
+
+### Stale Request Guard
+
+```js
+let activeRouteToken = 0;
+
+async function drawDayRoute(stops, completedUpTo) {
+  const token = ++activeRouteToken;
+  // ... fetch routes in loop ...
+  if (token !== activeRouteToken) return; // stale check after each await
+}
+```
+
+Each day-click generates a new token. If a previous async `getOptimalRoute` resolves after a newer click, the stale result is discarded. This prevents race conditions when rapidly switching days.
+
+### Adding to a New Trip
+
+1. Define MRT stations using `addStation()` + `connect()` for Singapore's network
+2. Add any special transit (like Sentosa Express) as stations connected to the nearest MRT
+3. Copy `getOptimalRoute()`, `SEG_STYLES`, `fetchRoute()`, `haversine()`, `formatDist()`, `formatDur()`, `nearestStation()`, `findMRT()`
+4. Copy `drawDayRoute()`, `buildRouteLegend()`, `clearRoute()`, `toggleComplete()`, `updateMarkerIcons()`
+5. Add `routeState`, `dayMarkers`, `activeDay`, `activeRouteToken`, `currentRouteLayer` state variables
+6. Hook the day click handler to call `drawDayRoute(stopData, 0)` when expanding a day
+
+---
+
+## Common Bugs — Lessons Learned
 
 1. **Duplicate `let` declarations** — causes SyntaxError, entire script fails.
 2. **`ignoreMapClick` flag** — unnecessary (Leaflet markers don't fire map click), causes first map-click to be silently dropped.
