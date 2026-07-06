@@ -1182,10 +1182,10 @@ function toggleComplete(m, dayNum) {
     st.currentStop = target;
   }
   clearRoute();
-  drawDayRoute(st.stops, st.currentStop);
+  drawDayRoute(st.stops, st.currentStop, false);
 }
 
-async function drawDayRoute(stops, currentStop) {
+async function drawDayRoute(stops, currentStop, fit) {
   const token = ++activeRouteToken;
   const legendEl = document.getElementById('routeLegend');
 
@@ -1239,7 +1239,7 @@ async function drawDayRoute(stops, currentStop) {
     if (Array.isArray(ll[0])) ll.forEach(function(sub) { allCoords.push(sub); });
     else allCoords.push(ll);
   });
-  if (allCoords.length) map.fitBounds(allCoords, { padding: [40, 40], maxZoom: 14 });
+  if (fit !== false && allCoords.length) map.fitBounds(allCoords, { padding: [40, 40], maxZoom: 14 });
   updateMarkerIcons(activeDay);
 }
 
@@ -1296,7 +1296,7 @@ document.querySelectorAll('.day-card .day-header').forEach(function(header) {
 
       routeState[dayNum] = { stops: stopData, currentStop: 0 };
       dayMarkers[dayNum] = markers;
-      drawDayRoute(stopData, 0);
+      drawDayRoute(stopData, 0, true);
       updateMarkerIcons(dayNum);
 
     } else {
