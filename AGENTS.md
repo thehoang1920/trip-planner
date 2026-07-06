@@ -544,17 +544,50 @@ async function drawDayRoute(stops, completedUpTo) {
 }
 ```
 
-### Completion Checkmarks (○/✓)
+### One-Leg-at-a-Time Routing
 
-Each stop marker shows a clickable ○/✓ button to track progress:
+**Default:** Only the forward leg (from the current stop to the next destination) is shown. Return legs are hidden until the destination is marked as reached.
+
+**State model:**
+```js
+const routeState = {}; // { dayNum: { stops: [], currentStop: 0 } }
+```
+- `currentStop` = 0-based index of where you currently are
+- Only the leg FROM `currentStop` TO `currentStop + 1` is drawn
+- If `currentStop >= stops.length - 1`, no route is shown (at last stop)
+
+**Toggle logic:**
+```js
+function toggleComplete(m, dayNum) {
+  var st = routeState[dayNum];
+  var target = m._stopIdx;
+  if (st.currentStop === target) st.currentStop = Math.max(0, target - 1);
+  else st.currentStop = target;
+  clearRoute();
+  drawDayRoute(st.stops, st.currentStop);
+}
+```
+
+**Draw logic:**
+```js
+// Show only the leg FROM currentStop TO the next stop
+var legIdx = currentStop;
+if (legIdx < stops.length - 1) {
+  const from = stops[legIdx], to = stops[legIdx + 1];
+  const segs = await getOptimalRoute(from.lat, from.lng, to.lat, to.lng);
+  // draw segs...
+}
+```
+
+### Completion Checkmarks (○ → ● → ✓)
+
+Each stop marker shows a clickable ○/●/✓ that advances `currentStop`:
 
 ```js
-// Marker creation
 var iconHtml = '<span class="num">' + stopNum + '</span><span class="chk" data-toggle="1">○</span>';
 const icon = L.divIcon({ className: 'num-marker', html: iconHtml, iconSize: [32, 26], iconAnchor: [16, 13] });
 const m = L.marker([lat, lng], { icon: icon }).bindTooltip(stopNum + '. ' + loc, { direction: 'top' });
 
-// Click handler checks if target is .chk
 m.on('click', function(e) {
   if (e.originalEvent && e.originalEvent.target && e.originalEvent.target.classList.contains('chk')) {
     toggleComplete(m, dayNum);
@@ -565,21 +598,10 @@ m.on('click', function(e) {
 m._stopIdx = stopNum - 1;
 ```
 
-```js
-function toggleComplete(m, dayNum) {
-  var st = routeState[dayNum];
-  var target = m._stopIdx;
-  if (st.completedUpTo === target) st.completedUpTo = Math.max(0, target - 1);
-  else st.completedUpTo = target;
-  clearRoute();
-  drawDayRoute(st.stops, st.completedUpTo);
-}
-```
-
 Marker icon states:
-- **○** = not yet reached
-- **●** = current stop (in progress)
-- **✓** = completed (route segment before this stop is hidden)
+- **○** = not yet reached (future stop)
+- **●** = current stop (the leg FROM this stop is shown)
+- **✓** = already passed (route was shown and completed)
 
 CSS:
 ```css
