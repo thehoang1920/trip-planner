@@ -1001,61 +1001,39 @@ function haversine(lat1, lng1, lat2, lng2) {
 }
 
 // ============================================================
-// OVERPASS API — Singapore bus stops & routes
+// SINGAPORE BUS STOPS & ROUTES (hardcoded)
 // ============================================================
-const OVERPASS_URL = 'https://overpass-api.de/api/interpreter';
+var BS = {};
+function addBusStop(code, name, lat, lng, routes) {
+  BS[code] = { name: name, lat: lat, lng: lng, routes: routes || [] };
+}
 
-async function opQuery(query) {
-  const controller = new AbortController();
-  const timer = setTimeout(function() { controller.abort(); }, 10000);
-  try {
-    const resp = await fetch(OVERPASS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: 'data=' + encodeURIComponent(query),
-      signal: controller.signal
-    });
-    if (!resp.ok) return null;
-    return await resp.json();
-  } catch (e) {
-    return null;
-  } finally {
-    clearTimeout(timer);
+addBusStop('GL18', 'Bef Lor 18 Geylang',      1.3122, 103.8798, ['100']);
+addBusStop('HBFT', 'HarbourFront Int',         1.2655, 103.8225, ['100']);
+addBusStop('RWS',  'Resorts World Sentosa',    1.2540, 103.8240, []);
+
+function findBusStopNear(lat, lng, maxDist) {
+  maxDist = maxDist || 400;
+  var best = null, bestDist = Infinity;
+  for (var k in BS) {
+    var s = BS[k];
+    var d = haversine(lat, lng, s.lat, s.lng);
+    if (d < maxDist && d < bestDist) {
+      best = { code: k, stop: s, dist: d };
+      bestDist = d;
+    }
   }
-}
-
-async function findBusStopsNear(lat, lng, radius) {
-  radius = radius || 400;
-  const q = '[out:json];node["highway"="bus_stop"](around:' + radius + ',' + lat + ',' + lng + ');out body;';
-  const data = await opQuery(q);
-  if (!data || !data.elements) return [];
-  return data.elements.filter(function(e) { return e.tags; }).map(function(e) {
-    return {
-      id: e.id,
-      lat: e.lat,
-      lng: e.lon,
-      name: e.tags.name || '',
-      ref: e.tags.ref || '',
-      routes: (e.tags.routes || e.tags.route_ref || '').split(/[,;]\s*/).filter(Boolean)
-    };
-  });
-}
-
-async function findConnectingRoute(fromStops, toStops) {
-  var fromRoutes = {};
-  fromStops.forEach(function(s) {
-    s.routes.forEach(function(r) { fromRoutes[r] = s; });
-  });
-  var best = null;
-  toStops.forEach(function(ts) {
-    ts.routes.forEach(function(r) {
-      var fs = fromRoutes[r];
-      if (fs) {
-        if (!best) best = { route: r, fromStop: fs, toStop: ts };
-      }
-    });
-  });
   return best;
+}
+
+function findConnectingBusRoute(fromStop, toStop) {
+  for (var i = 0; i < fromStop.stop.routes.length; i++) {
+    var r = fromStop.stop.routes[i];
+    for (var j = 0; j < toStop.stop.routes.length; j++) {
+      if (toStop.stop.routes[j] === r) return r;
+    }
+  }
+  return null;
 }
 
 // ============================================================
@@ -1118,26 +1096,26 @@ async function getOptimalRoute(fromLat, fromLng, toLat, toLng) {
 
   // -- 2. Bus (medium/long distances) --
   if (directDist > 300) {
-    // Try using real bus stops from OSM
-    var [fromStops, toStops] = await Promise.all([ findBusStopsNear(fromLat, fromLng), findBusStopsNear(toLat, toLng) ]);
-    if (fromStops.length && toStops.length) {
-      var conn = findConnectingRoute(fromStops, toStops);
-      if (conn) {
+    var fromStop = findBusStopNear(fromLat, fromLng);
+    var toStop = findBusStopNear(toLat, toLng);
+    if (fromStop && toStop) {
+      var routeNum = findConnectingBusRoute(fromStop, toStop);
+      if (routeNum) {
         var segs = [];
-        var d1 = haversine(fromLat, fromLng, conn.fromStop.lat, conn.fromStop.lng);
-        var w1 = await fetchRoute('walking', [[fromLat, fromLng], [conn.fromStop.lat, conn.fromStop.lng]]);
+        var d1 = haversine(fromLat, fromLng, fromStop.stop.lat, fromStop.stop.lng);
+        var w1 = await fetchRoute('walking', [[fromLat, fromLng], [fromStop.stop.lat, fromStop.stop.lng]]);
         if (w1) segs.push({ mode: 'walk', coords: w1.coords, distance: w1.distance, duration: w1.duration });
-        else segs.push({ mode: 'walk', coords: [[fromLat, fromLng], [conn.fromStop.lat, conn.fromStop.lng]], distance: d1, duration: 0 });
-        var bus = await fetchRoute('driving', [[conn.fromStop.lat, conn.fromStop.lng], [conn.toStop.lat, conn.toStop.lng]]);
-        if (bus) segs.push({ mode: 'bus', coords: bus.coords, distance: bus.distance, duration: bus.duration, label: 'Bus\u00a0' + conn.route + ' (' + conn.fromStop.name + ' → ' + conn.toStop.name + ')' });
+        else segs.push({ mode: 'walk', coords: [[fromLat, fromLng], [fromStop.stop.lat, fromStop.stop.lng]], distance: d1, duration: 0 });
+        var bus = await fetchRoute('driving', [[fromStop.stop.lat, fromStop.stop.lng], [toStop.stop.lat, toStop.stop.lng]]);
+        if (bus) segs.push({ mode: 'bus', coords: bus.coords, distance: bus.distance, duration: bus.duration, label: 'Bus\u00a0' + routeNum + ' (' + fromStop.stop.name + ' → ' + toStop.stop.name + ')' });
         else {
-          var d2 = haversine(conn.fromStop.lat, conn.fromStop.lng, conn.toStop.lat, conn.toStop.lng);
-          segs.push({ mode: 'bus', coords: [[conn.fromStop.lat, conn.fromStop.lng], [conn.toStop.lat, conn.toStop.lng]], distance: d2, duration: 0, label: 'Bus\u00a0' + conn.route });
+          var d2 = haversine(fromStop.stop.lat, fromStop.stop.lng, toStop.stop.lat, toStop.stop.lng);
+          segs.push({ mode: 'bus', coords: [[fromStop.stop.lat, fromStop.stop.lng], [toStop.stop.lat, toStop.stop.lng]], distance: d2, duration: 0, label: 'Bus\u00a0' + routeNum });
         }
-        var d3 = haversine(conn.toStop.lat, conn.toStop.lng, toLat, toLng);
-        var w2 = await fetchRoute('walking', [[conn.toStop.lat, conn.toStop.lng], [toLat, toLng]]);
+        var d3 = haversine(toStop.stop.lat, toStop.stop.lng, toLat, toLng);
+        var w2 = await fetchRoute('walking', [[toStop.stop.lat, toStop.stop.lng], [toLat, toLng]]);
         if (w2) segs.push({ mode: 'walk', coords: w2.coords, distance: w2.distance, duration: w2.duration });
-        else segs.push({ mode: 'walk', coords: [[conn.toStop.lat, conn.toStop.lng], [toLat, toLng]], distance: d3, duration: 0 });
+        else segs.push({ mode: 'walk', coords: [[toStop.stop.lat, toStop.stop.lng], [toLat, toLng]], distance: d3, duration: 0 });
         if (segs.length) return segs;
       }
     }
