@@ -1165,6 +1165,24 @@ async function drawDayRoute(stops) {
   if (!allSegments.length) { legendEl.style.display = 'none'; return; }
 
   const routeLayer = L.layerGroup();
+
+  function addDirArrow(coords, color, layer) {
+    const step = Math.max(1, Math.floor((coords.length - 1) / 3));
+    for (let k = step; k < coords.length - 1; k += step) {
+      const p1 = coords[k], p2 = coords[Math.min(k + 1, coords.length - 1)];
+      const angle = Math.atan2(p2[1] - p1[1], p2[0] - p1[0]) * 180 / Math.PI;
+      const mid = [(p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2];
+      L.marker(mid, {
+        icon: L.divIcon({
+          className: '',
+          html: '<div style="transform:rotate(' + angle + 'deg);font-size:10px;line-height:1;color:' + color + ';text-shadow:0 0 2px #000,0 0 2px #000;">&#9654;</div>',
+          iconSize: [10, 10], iconAnchor: [5, 5]
+        }),
+        interactive: false
+      }).addTo(layer);
+    }
+  }
+
   for (const seg of allSegments) {
     const st = SEG_STYLES[seg.mode];
     if (!st || !seg.coords || !seg.coords.length) continue;
@@ -1174,6 +1192,7 @@ async function drawDayRoute(stops) {
     poly.bindTooltip(st.icon + ' ' + st.label + ': ' + formatDist(seg.distance) + ' · ' + formatDur(seg.duration), {
       sticky: true, direction: 'top', offset: [0, -8]
     });
+    addDirArrow(seg.coords, st.color, routeLayer);
   }
   routeLayer.addTo(map);
   currentRouteLayer = routeLayer;
