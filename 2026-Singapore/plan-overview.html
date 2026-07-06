@@ -893,6 +893,15 @@ connect('DT17','DT18');
 connect('DT18','DT19');
 connect('DT19','DT20');
 
+// Sentosa Express (monorail — connected to HarbourFront)
+addStation('SE1','Waterfront Sentosa',1.2546,103.8206);
+addStation('SE2','Imbiah',1.2528,103.8137);
+addStation('SE3','Beach Sentosa',1.2505,103.8200);
+
+connect('NE1','SE1');
+connect('SE1','SE2');
+connect('SE2','SE3');
+
 // BFS route finder
 function findMRT(fromCode, toCode) {
   if (fromCode === toCode) return [fromCode];
