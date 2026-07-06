@@ -914,20 +914,17 @@ function nearestStation(lat, lng) {
 }
 
 // ============================================================
-// ROUTE MODE SYSTEM
+// ROUTE SEGMENT STYLES
 // ============================================================
-const ROUTE_MODES = {
-  mrt:   { color: '#22c55e', weight: 4, dash: '',       label: 'MRT',      icon: '🚇', profile: 'walking' },
-  walk:  { color: '#eab308', weight: 3, dash: '4,4',    label: 'Walking',  icon: '🚶', profile: 'walking' },
-  bus:   { color: '#3b82f6', weight: 3, dash: '8,4',    label: 'Bus',      icon: '🚌', profile: 'driving' },
-  car:   { color: '#a855f7', weight: 3, dash: '',       label: 'Car/Taxi', icon: '🚗', profile: 'driving' },
-  mrtWalk: { color: '#22c55e', weight: 2, dash: '2,4',  label: 'MRT Walk', icon: '🚶', profile: 'walking' }
+const SEG_STYLES = {
+  mrt:  { color: '#22c55e', weight: 5, dash: '',       label: 'MRT',      icon: '🚇' },
+  walk: { color: '#eab308', weight: 3, dash: '4,4',    label: 'Walking',  icon: '🚶' },
+  bus:  { color: '#3b82f6', weight: 3, dash: '8,4',    label: 'Bus',      icon: '🚌' },
+  car:  { color: '#a855f7', weight: 3, dash: '',       label: 'Car/Taxi', icon: '🚗' }
 };
 
-const MODE_ORDER = ['mrt', 'walk', 'bus', 'car'];
-
 // ============================================================
-// ROUTE CACHE
+// ROUTE CACHE & HELPERS
 // ============================================================
 const routeCache = {};
 const pendings = {};
@@ -983,107 +980,79 @@ function haversine(lat1, lng1, lat2, lng2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-async function computeSegmentRoutes(fromLat, fromLng, toLat, toLng) {
-  const results = {};
-  const straightCoords = [[fromLat, fromLng], [toLat, toLng]];
-  const straightDist = haversine(fromLat, fromLng, toLat, toLng);
+// ============================================================
+// OPTIMAL ROUTE ENGINE
+// Priority: MRT > Bus > Walking > Car
+// Returns array of segments: [{ mode, coords, distance, duration }, ...]
+// ============================================================
+async function getOptimalRoute(fromLat, fromLng, toLat, toLng) {
+  const directDist = haversine(fromLat, fromLng, toLat, toLng);
+  const straightSeg = [{ mode: 'walk', coords: [[fromLat, fromLng], [toLat, toLng]], distance: directDist, duration: 0 }];
 
-  // Run all OSRM calls in parallel
-  const [walkResult, driveResult] = await Promise.all([
-    fetchRoute('walking', [[fromLat, fromLng], [toLat, toLng]]),
-    fetchRoute('driving', [[fromLat, fromLng], [toLat, toLng]])
-  ]);
-
-  // Walking — fallback to straight line
-  if (walkResult) {
-    results.walk = { coords: walkResult.coords, distance: walkResult.distance, duration: walkResult.duration };
-  } else {
-    results.walk = { coords: straightCoords, distance: straightDist, duration: 0 };
-  }
-
-  // Driving (car + bus share geometry) — fallback to straight
-  if (driveResult) {
-    results.car = { coords: driveResult.coords, distance: driveResult.distance, duration: driveResult.duration };
-    results.bus = { coords: driveResult.coords, distance: driveResult.distance, duration: driveResult.duration };
-  } else {
-    results.car = { coords: straightCoords, distance: straightDist, duration: 0 };
-    results.bus = { coords: straightCoords, distance: straightDist, duration: 0 };
-  }
-
-  // MRT: origin -> nearest station -> MRT route -> nearest station -> destination
+  // -- 1. Try MRT (if stations within 2km of both ends) --
   const fromStation = nearestStation(fromLat, fromLng);
   const toStation = nearestStation(toLat, toLng);
   if (fromStation && toStation) {
-    const mrtPath = findMRT(fromStation, toStation);
-    if (mrtPath && mrtPath.length >= 1) {
-      const walkSegments = [];
-      const s1 = S[fromStation];
-      const sN = S[mrtPath[mrtPath.length - 1]];
-      const stationCoords = mrtPath.map(code => [S[code].lat, S[code].lng]);
-      const fetchCalls = [];
+    const s1 = S[fromStation];
+    const s2 = S[toStation];
+    const distFrom = haversine(fromLat, fromLng, s1.lat, s1.lng);
+    const distTo = haversine(toLat, toLng, s2.lat, s2.lng);
+    if (distFrom < 2000 && distTo < 2000) {
+      const mrtPath = findMRT(fromStation, toStation);
+      if (mrtPath && mrtPath.length >= 1) {
+        const segments = [];
 
-      // Origin -> first station
-      if (s1) {
-        fetchCalls.push(
-          fetchRoute('walking', [[fromLat, fromLng], [s1.lat, s1.lng]])
-            .then(function(w1) {
-              if (w1) walkSegments.push({ coords: w1.coords, distance: w1.distance, duration: w1.duration });
-              else walkSegments.push({ coords: [[fromLat, fromLng], [s1.lat, s1.lng]], distance: haversine(fromLat, fromLng, s1.lat, s1.lng), duration: 0 });
-            })
-        );
-      }
+        // Walk to first station
+        const w1 = await fetchRoute('walking', [[fromLat, fromLng], [s1.lat, s1.lng]]);
+        if (w1) segments.push({ mode: 'walk', coords: w1.coords, distance: w1.distance, duration: w1.duration });
+        else segments.push({ mode: 'walk', coords: [[fromLat, fromLng], [s1.lat, s1.lng]], distance: distFrom, duration: 0 });
 
-      // Stations in sequence
-      if (stationCoords.length >= 2) {
-        fetchCalls.push(
-          fetchRoute('walking', stationCoords)
-            .then(function(wRoute) {
-              if (wRoute) walkSegments.push({ coords: wRoute.coords, distance: wRoute.distance, duration: wRoute.duration });
-              else {
-                for (let i = 0; i < stationCoords.length - 1; i++) {
-                  walkSegments.push({
-                    coords: [stationCoords[i], stationCoords[i + 1]],
-                    distance: haversine(stationCoords[i][0], stationCoords[i][1], stationCoords[i+1][0], stationCoords[i+1][1]),
-                    duration: 0
-                  });
-                }
-              }
-            })
-        );
-      }
-
-      // Last station -> destination
-      if (sN && (sN.lat !== toLat || sN.lng !== toLng)) {
-        fetchCalls.push(
-          fetchRoute('walking', [[sN.lat, sN.lng], [toLat, toLng]])
-            .then(function(wN) {
-              if (wN) walkSegments.push({ coords: wN.coords, distance: wN.distance, duration: wN.duration });
-              else walkSegments.push({ coords: [[sN.lat, sN.lng], [toLat, toLng]], distance: haversine(sN.lat, sN.lng, toLat, toLng), duration: 0 });
-            })
-        );
-      }
-
-      await Promise.all(fetchCalls);
-
-      if (walkSegments.length) {
-        const allCoords = [];
-        let totalDist = 0, totalDur = 0;
-        for (const seg of walkSegments) {
-          allCoords.push(...seg.coords);
-          totalDist += seg.distance;
-          totalDur += seg.duration;
+        // MRT through stations
+        const stationCoords = mrtPath.map(code => [S[code].lat, S[code].lng]);
+        if (stationCoords.length >= 2) {
+          const mrtRoute = await fetchRoute('walking', stationCoords);
+          if (mrtRoute) {
+            segments.push({ mode: 'mrt', coords: mrtRoute.coords, distance: mrtRoute.distance, duration: mrtRoute.duration });
+          } else {
+            for (let i = 0; i < stationCoords.length - 1; i++) {
+              segments.push({
+                mode: 'mrt',
+                coords: [stationCoords[i], stationCoords[i + 1]],
+                distance: haversine(stationCoords[i][0], stationCoords[i][1], stationCoords[i+1][0], stationCoords[i+1][1]),
+                duration: 0
+              });
+            }
+          }
         }
-        results.mrt = { coords: allCoords, distance: totalDist, duration: totalDur };
+
+        // Walk from last station
+        const sN = S[mrtPath[mrtPath.length - 1]];
+        if (sN) {
+          const w2 = await fetchRoute('walking', [[sN.lat, sN.lng], [toLat, toLng]]);
+          if (w2) segments.push({ mode: 'walk', coords: w2.coords, distance: w2.distance, duration: w2.duration });
+          else segments.push({ mode: 'walk', coords: [[sN.lat, sN.lng], [toLat, toLng]], distance: distTo, duration: 0 });
+        }
+
+        if (segments.length) return segments;
       }
     }
   }
 
-  // If MRT failed, use walking as fallback
-  if (!results.mrt && results.walk) {
-    results.mrt = { coords: results.walk.coords, distance: results.walk.distance, duration: results.walk.duration };
+  // -- 2. Try Bus (medium/long distances) --
+  if (directDist > 300) {
+    const drive = await fetchRoute('driving', [[fromLat, fromLng], [toLat, toLng]]);
+    if (drive) return [{ mode: 'bus', coords: drive.coords, distance: drive.distance, duration: drive.duration }];
   }
 
-  return results;
+  // -- 3. Walking --
+  const walk = await fetchRoute('walking', [[fromLat, fromLng], [toLat, toLng]]);
+  if (walk) return [{ mode: 'walk', coords: walk.coords, distance: walk.distance, duration: walk.duration }];
+
+  // -- 4. Car (last resort) --
+  const drive2 = await fetchRoute('driving', [[fromLat, fromLng], [toLat, toLng]]);
+  if (drive2) return [{ mode: 'car', coords: drive2.coords, distance: drive2.distance, duration: drive2.duration }];
+
+  return straightSeg;
 }
 
 // ============================================================
@@ -1117,111 +1086,99 @@ const hotelIcon = L.divIcon({ className: 'hotel-marker', html: '<div class="hote
 L.marker([1.31155, 103.88085], { icon: hotelIcon }).addTo(map).bindTooltip('Hotel 81 Star', { direction: 'top' });
 
 // ============================================================
-// MULTI-MODE ROUTE SYSTEM
+// OPTIMAL ROUTE RENDERING
 // ============================================================
-const dayRoutes = {};
+const dayMarkers = {};
 let activeDay = null;
 let activeRouteToken = 0;
-let currentRouteLayers = null; // map of mode -> L.polyline
+let currentRouteLayer = null;
 
-function clearRouteLayers() {
-  if (currentRouteLayers) {
-    Object.values(currentRouteLayers).forEach(l => { if (l.polyline) map.removeLayer(l.polyline); if (l.walkLines) l.walkLines.forEach(wl => map.removeLayer(wl)); });
-    currentRouteLayers = null;
-  }
+function clearRoute() {
+  if (currentRouteLayer) { map.removeLayer(currentRouteLayer); currentRouteLayer = null; }
 }
 
-function buildLegend(routeData) {
+function buildRouteLegend(segments) {
   const container = document.getElementById('routeLegend');
-  container.innerHTML = '<span class="legend-title">Tuyến đường:</span>';
-  let hasAny = false;
-  for (const mode of MODE_ORDER) {
-    const d = routeData[mode];
-    const m = ROUTE_MODES[mode];
-    if (!d || !m) continue;
-    hasAny = true;
+  let totalDist = 0, totalDur = 0;
+  const modeSet = {};
+  for (const seg of segments) {
+    totalDist += seg.distance || 0;
+    totalDur += seg.duration || 0;
+    if (seg.mode) modeSet[seg.mode] = (modeSet[seg.mode] || 0) + 1;
+  }
+  if (!segments.length) { container.style.display = 'none'; return; }
+
+  container.innerHTML = '<span class="legend-title">Tuyến tối ưu:</span>';
+
+  // Mode badges
+  const modeOrder = ['mrt','bus','walk','car'];
+  for (const mode of modeOrder) {
+    if (!modeSet[mode]) continue;
+    const st = SEG_STYLES[mode];
+    if (!st) continue;
     const item = document.createElement('span');
     item.className = 'legend-item';
-    const dashStyle = m.dash ? 'stroke-dasharray:' + m.dash : '';
-    item.innerHTML = '<span class="legend-icon">' + m.icon + '</span><span class="legend-line" style="background:' + m.color + ';' + dashStyle + '"></span>' + m.label + ' <span class="legend-info">' + formatDist(d.distance) + ' · ' + formatDur(d.duration) + '</span>';
+    const dash = st.dash ? 'stroke-dasharray:' + st.dash : '';
+    item.innerHTML = '<span class="legend-icon">' + st.icon + '</span><span class="legend-line" style="background:' + st.color + ';' + dash + '"></span>' + st.label;
     container.appendChild(item);
   }
-  container.style.display = hasAny ? 'flex' : 'none';
+
+  // Total
+  const total = document.createElement('span');
+  total.style.cssText = 'color:#94a3b8;font-size:0.65rem;margin-left:auto;';
+  total.textContent = 'Tổng: ' + formatDist(totalDist) + ' · ' + formatDur(totalDur);
+  container.appendChild(total);
+  container.style.display = 'flex';
 }
 
-async function loadDayRoutes(dayNum, stops) {
+async function drawDayRoute(stops) {
   const token = ++activeRouteToken;
-  const legendContainer = document.getElementById('routeLegend');
+  const legendEl = document.getElementById('routeLegend');
 
-  // Show loading
-  legendContainer.innerHTML = '<span class="legend-title">Tuyến đường:</span><span class="route-loading">⏳ Đang tính toán...</span>';
-  legendContainer.style.display = 'flex';
+  legendEl.innerHTML = '<span class="legend-title">Tuyến tối ưu:</span><span class="route-loading">⏳ Đang tính...</span>';
+  legendEl.style.display = 'flex';
+  clearRoute();
+  if (!stops || stops.length < 2) { legendEl.style.display = 'none'; return; }
 
-  clearRouteLayers();
-  if (!stops || stops.length < 2) { legendContainer.style.display = 'none'; return; }
-
-  const allSegments = {};
-  let hasData = false;
+  const allSegments = [];
 
   for (let i = 0; i < stops.length - 1; i++) {
-    const from = stops[i];
-    const to = stops[i + 1];
-    const segRoutes = await computeSegmentRoutes(from.lat, from.lng, to.lat, to.lng);
-    if (token !== activeRouteToken) return; // stale
-    allSegments[i] = segRoutes;
-    for (const mode in segRoutes) {
-      if (segRoutes[mode]) hasData = true;
-    }
-  }
-
-  if (!hasData) { legendContainer.style.display = 'none'; return; }
-  if (token !== activeRouteToken) return;
-
-  // Combine segments into full route per mode
-  const merged = {};
-  for (const segIdx in allSegments) {
-    for (const mode of MODE_ORDER) {
-      const seg = allSegments[segIdx][mode];
-      if (!seg) continue;
-      if (!merged[mode]) merged[mode] = { coords: [], distance: 0, duration: 0 };
-      merged[mode].coords.push(...seg.coords);
-      merged[mode].distance += seg.distance;
-      merged[mode].duration += seg.duration;
-    }
+    const from = stops[i], to = stops[i + 1];
+    const segs = await getOptimalRoute(from.lat, from.lng, to.lat, to.lng);
+    if (token !== activeRouteToken) return;
+    for (const s of segs) allSegments.push(s);
   }
 
   if (token !== activeRouteToken) return;
+  if (!allSegments.length) { legendEl.style.display = 'none'; return; }
 
-  const layers = {};
-  for (const mode of MODE_ORDER) {
-    const d = merged[mode];
-    const m = ROUTE_MODES[mode];
-    if (!d || !m || !d.coords.length) continue;
-    const opts = { color: m.color, weight: m.weight, opacity: 0.85, smoothFactor: 1.5 };
-    if (m.dash) opts.dashArray = m.dash;
-    const polyline = L.polyline(d.coords, opts).addTo(map);
-    layers[mode] = { polyline, distance: d.distance, duration: d.duration };
+  const routeLayer = L.layerGroup();
+  for (const seg of allSegments) {
+    const st = SEG_STYLES[seg.mode];
+    if (!st || !seg.coords || !seg.coords.length) continue;
+    const opts = { color: st.color, weight: st.weight, opacity: 0.85, smoothFactor: 1.5 };
+    if (st.dash) opts.dashArray = st.dash;
+    L.polyline(seg.coords, opts).addTo(routeLayer);
   }
+  routeLayer.addTo(map);
+  currentRouteLayer = routeLayer;
 
-  currentRouteLayers = layers;
-  buildLegend(merged);
+  buildRouteLegend(allSegments);
 
-  // Fit bounds
   const allCoords = [];
-  for (const mode in layers) {
-    const line = layers[mode].polyline;
-    line.getLatLngs().forEach(c => {
-      if (Array.isArray(c[0])) c.forEach(sub => allCoords.push(sub));
-      else allCoords.push(c);
-    });
-  }
-  if (allCoords.length) {
-    map.fitBounds(allCoords, { padding: [40, 40], maxZoom: 14 });
-  }
+  routeLayer.eachLayer(function(l) {
+    if (!l.getLatLngs) return;
+    const ll = l.getLatLngs();
+    if (Array.isArray(ll[0])) ll.forEach(function(sub) { allCoords.push(sub); });
+    else allCoords.push(ll);
+  });
+  if (allCoords.length) map.fitBounds(allCoords, { padding: [40, 40], maxZoom: 14 });
 }
 
-// Day click handler
-document.querySelectorAll('.day-card .day-header').forEach(header => {
+// ============================================================
+// DAY CLICK HANDLER
+// ============================================================
+document.querySelectorAll('.day-card .day-header').forEach(function(header) {
   header.addEventListener('click', function() {
     const card = this.closest('.day-card');
     const dayNum = card.querySelector('.day-num')?.textContent || '0';
@@ -1230,55 +1187,47 @@ document.querySelectorAll('.day-card .day-header').forEach(header => {
     card.classList.toggle('collapsed');
 
     if (wasCollapsed) {
-      document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active'));
-      clearRouteLayers();
-      if (activeDay && dayRoutes[activeDay] && dayRoutes[activeDay].markers) {
-        dayRoutes[activeDay].markers.forEach(m => map.removeLayer(m));
-      }
-      if (dayRoutes[dayNum] && dayRoutes[dayNum].markers) {
-        dayRoutes[dayNum].markers.forEach(m => map.addLayer(m));
+      // Remove previous day markers
+      document.querySelectorAll('.day-card').forEach(function(c) { c.classList.remove('active'); });
+      clearRoute();
+      if (activeDay && dayMarkers[activeDay]) {
+        dayMarkers[activeDay].forEach(function(m) { map.removeLayer(m); });
       }
       card.classList.add('active');
       activeDay = dayNum;
 
-      // Create numbered markers for this day
+      // Build stop markers
       const stops = card.querySelectorAll('.stop[data-lat]');
       const stopData = [];
       const markers = [];
-      let stopNum = 0;
-      stops.forEach(s => {
+      var stopNum = 0;
+      stops.forEach(function(s) {
         const lat = parseFloat(s.dataset.lat);
         const lng = parseFloat(s.dataset.lng);
         if (isNaN(lat) || isNaN(lng)) return;
         stopNum++;
         const loc = s.dataset.location || 'Stop ' + stopNum;
-        stopData.push({ lat, lng, el: s });
+        stopData.push({ lat: lat, lng: lng, el: s });
         const icon = L.divIcon({ className: 'num-marker', html: '' + stopNum, iconSize: [26, 26], iconAnchor: [13, 13] });
-        const m = L.marker([lat, lng], { icon }).bindTooltip(stopNum + '. ' + loc, { direction: 'top' });
-        m.on('mouseover', () => { if (pinnedEl) return; clearTimeout(hideTimeout); showPreview(s); });
-        m.on('mouseout', () => { if (pinnedEl) return; hideTimeout = setTimeout(hidePreview, 150); });
-        m.on('click', function() {
-          pinnedEl = s;
-          pinnedMode = 'image';
-          showPreview(s);
-        });
+        const m = L.marker([lat, lng], { icon: icon }).bindTooltip(stopNum + '. ' + loc, { direction: 'top' });
+        m.on('mouseover', function() { if (pinnedEl) return; clearTimeout(hideTimeout); showPreview(s); });
+        m.on('mouseout', function() { if (pinnedEl) return; hideTimeout = setTimeout(hidePreview, 150); });
+        m.on('click', function() { pinnedEl = s; pinnedMode = 'image'; showPreview(s); });
         markers.push(m);
         map.addLayer(m);
       });
 
-      dayRoutes[dayNum] = { markers };
-
-      // Load route modes between consecutive stops
-      loadDayRoutes(dayNum, stopData);
+      dayMarkers[dayNum] = markers;
+      drawDayRoute(stopData);
 
     } else {
       if (activeDay === dayNum) {
-        document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active'));
-        clearRouteLayers();
-        if (dayRoutes[dayNum] && dayRoutes[dayNum].markers) {
-          dayRoutes[dayNum].markers.forEach(m => map.removeLayer(m));
+        document.querySelectorAll('.day-card').forEach(function(c) { c.classList.remove('active'); });
+        clearRoute();
+        if (dayMarkers[dayNum]) {
+          dayMarkers[dayNum].forEach(function(m) { map.removeLayer(m); });
         }
-        delete dayRoutes[dayNum];
+        delete dayMarkers[dayNum];
         activeDay = null;
         document.getElementById('routeLegend').style.display = 'none';
       }
