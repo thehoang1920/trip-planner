@@ -937,9 +937,12 @@ async function fetchRoute(profile, coords) {
   if (routeCache[key]) return routeCache[key];
   if (pendings[key]) return pendings[key];
   const url = 'https://router.project-osrm.org/route/v1/' + profile + '/' + coords.map(c => c[1] + ',' + c[0]).join(';') + '?geometries=geojson&overview=full';
+  const controller = new AbortController();
+  const timer = setTimeout(function() { controller.abort(); }, 8000);
   const p = (async () => {
     try {
-      const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
+      const r = await fetch(url, { signal: controller.signal });
+      clearTimeout(timer);
       if (!r.ok) return null;
       const j = await r.json();
       if (!j.code || j.code !== 'Ok' || !j.routes || !j.routes.length) return null;
@@ -948,6 +951,7 @@ async function fetchRoute(profile, coords) {
       routeCache[key] = { coords: coords2, distance: route.distance, duration: route.duration };
       return routeCache[key];
     } catch (e) {
+      clearTimeout(timer);
       return null;
     }
   })();
@@ -981,18 +985,29 @@ function haversine(lat1, lng1, lat2, lng2) {
 
 async function computeSegmentRoutes(fromLat, fromLng, toLat, toLng) {
   const results = {};
+  const straightCoords = [[fromLat, fromLng], [toLat, toLng]];
+  const straightDist = haversine(fromLat, fromLng, toLat, toLng);
 
-  // Walking
-  const walk = await fetchRoute('walking', [[fromLat, fromLng], [toLat, toLng]]);
-  if (walk) {
-    results.walk = { coords: walk.coords, distance: walk.distance, duration: walk.duration };
+  // Run all OSRM calls in parallel
+  const [walkResult, driveResult] = await Promise.all([
+    fetchRoute('walking', [[fromLat, fromLng], [toLat, toLng]]),
+    fetchRoute('driving', [[fromLat, fromLng], [toLat, toLng]])
+  ]);
+
+  // Walking — fallback to straight line
+  if (walkResult) {
+    results.walk = { coords: walkResult.coords, distance: walkResult.distance, duration: walkResult.duration };
+  } else {
+    results.walk = { coords: straightCoords, distance: straightDist, duration: 0 };
   }
 
-  // Driving (also used for bus and car)
-  const drive = await fetchRoute('driving', [[fromLat, fromLng], [toLat, toLng]]);
-  if (drive) {
-    results.car = { coords: drive.coords, distance: drive.distance, duration: drive.duration };
-    results.bus = { coords: drive.coords, distance: drive.distance, duration: drive.duration };
+  // Driving (car + bus share geometry) — fallback to straight
+  if (driveResult) {
+    results.car = { coords: driveResult.coords, distance: driveResult.distance, duration: driveResult.duration };
+    results.bus = { coords: driveResult.coords, distance: driveResult.distance, duration: driveResult.duration };
+  } else {
+    results.car = { coords: straightCoords, distance: straightDist, duration: 0 };
+    results.bus = { coords: straightCoords, distance: straightDist, duration: 0 };
   }
 
   // MRT: origin -> nearest station -> MRT route -> nearest station -> destination
@@ -1002,41 +1017,54 @@ async function computeSegmentRoutes(fromLat, fromLng, toLat, toLng) {
     const mrtPath = findMRT(fromStation, toStation);
     if (mrtPath && mrtPath.length >= 1) {
       const walkSegments = [];
-
-      // Origin -> first station (MRT station, use walking)
       const s1 = S[fromStation];
+      const sN = S[mrtPath[mrtPath.length - 1]];
+      const stationCoords = mrtPath.map(code => [S[code].lat, S[code].lng]);
+      const fetchCalls = [];
+
+      // Origin -> first station
       if (s1) {
-        const w1 = await fetchRoute('walking', [[fromLat, fromLng], [s1.lat, s1.lng]]);
-        if (w1) walkSegments.push({ coords: w1.coords, distance: w1.distance, duration: w1.duration });
-        else walkSegments.push({ coords: [[fromLat, fromLng], [s1.lat, s1.lng]], distance: haversine(fromLat, fromLng, s1.lat, s1.lng), duration: 0 });
+        fetchCalls.push(
+          fetchRoute('walking', [[fromLat, fromLng], [s1.lat, s1.lng]])
+            .then(function(w1) {
+              if (w1) walkSegments.push({ coords: w1.coords, distance: w1.distance, duration: w1.duration });
+              else walkSegments.push({ coords: [[fromLat, fromLng], [s1.lat, s1.lng]], distance: haversine(fromLat, fromLng, s1.lat, s1.lng), duration: 0 });
+            })
+        );
       }
 
-      // Stations in sequence (as one walking route through stations)
-      const stationCoords = mrtPath.map(code => [S[code].lat, S[code].lng]);
+      // Stations in sequence
       if (stationCoords.length >= 2) {
-        const wRoute = await fetchRoute('walking', stationCoords);
-        if (wRoute) walkSegments.push({ coords: wRoute.coords, distance: wRoute.distance, duration: wRoute.duration });
-        else {
-          // Fallback: direct between stations
-          for (let i = 0; i < stationCoords.length - 1; i++) {
-            walkSegments.push({
-              coords: [stationCoords[i], stationCoords[i + 1]],
-              distance: haversine(stationCoords[i][0], stationCoords[i][1], stationCoords[i+1][0], stationCoords[i+1][1]),
-              duration: 0
-            });
-          }
-        }
+        fetchCalls.push(
+          fetchRoute('walking', stationCoords)
+            .then(function(wRoute) {
+              if (wRoute) walkSegments.push({ coords: wRoute.coords, distance: wRoute.distance, duration: wRoute.duration });
+              else {
+                for (let i = 0; i < stationCoords.length - 1; i++) {
+                  walkSegments.push({
+                    coords: [stationCoords[i], stationCoords[i + 1]],
+                    distance: haversine(stationCoords[i][0], stationCoords[i][1], stationCoords[i+1][0], stationCoords[i+1][1]),
+                    duration: 0
+                  });
+                }
+              }
+            })
+        );
       }
 
       // Last station -> destination
-      const sN = S[mrtPath[mrtPath.length - 1]];
       if (sN && (sN.lat !== toLat || sN.lng !== toLng)) {
-        const wN = await fetchRoute('walking', [[sN.lat, sN.lng], [toLat, toLng]]);
-        if (wN) walkSegments.push({ coords: wN.coords, distance: wN.distance, duration: wN.duration });
-        else walkSegments.push({ coords: [[sN.lat, sN.lng], [toLat, toLng]], distance: haversine(sN.lat, sN.lng, toLat, toLng), duration: 0 });
+        fetchCalls.push(
+          fetchRoute('walking', [[sN.lat, sN.lng], [toLat, toLng]])
+            .then(function(wN) {
+              if (wN) walkSegments.push({ coords: wN.coords, distance: wN.distance, duration: wN.duration });
+              else walkSegments.push({ coords: [[sN.lat, sN.lng], [toLat, toLng]], distance: haversine(sN.lat, sN.lng, toLat, toLng), duration: 0 });
+            })
+        );
       }
 
-      // Combine all segments
+      await Promise.all(fetchCalls);
+
       if (walkSegments.length) {
         const allCoords = [];
         let totalDist = 0, totalDur = 0;
@@ -1048,6 +1076,11 @@ async function computeSegmentRoutes(fromLat, fromLng, toLat, toLng) {
         results.mrt = { coords: allCoords, distance: totalDist, duration: totalDur };
       }
     }
+  }
+
+  // If MRT failed, use walking as fallback
+  if (!results.mrt && results.walk) {
+    results.mrt = { coords: results.walk.coords, distance: results.walk.distance, duration: results.walk.duration };
   }
 
   return results;
@@ -1088,6 +1121,7 @@ L.marker([1.31155, 103.88085], { icon: hotelIcon }).addTo(map).bindTooltip('Hote
 // ============================================================
 const dayRoutes = {};
 let activeDay = null;
+let activeRouteToken = 0;
 let currentRouteLayers = null; // map of mode -> L.polyline
 
 function clearRouteLayers() {
@@ -1116,8 +1150,15 @@ function buildLegend(routeData) {
 }
 
 async function loadDayRoutes(dayNum, stops) {
+  const token = ++activeRouteToken;
+  const legendContainer = document.getElementById('routeLegend');
+
+  // Show loading
+  legendContainer.innerHTML = '<span class="legend-title">Tuyến đường:</span><span class="route-loading">⏳ Đang tính toán...</span>';
+  legendContainer.style.display = 'flex';
+
   clearRouteLayers();
-  if (!stops || stops.length < 2) return;
+  if (!stops || stops.length < 2) { legendContainer.style.display = 'none'; return; }
 
   const allSegments = {};
   let hasData = false;
@@ -1126,13 +1167,15 @@ async function loadDayRoutes(dayNum, stops) {
     const from = stops[i];
     const to = stops[i + 1];
     const segRoutes = await computeSegmentRoutes(from.lat, from.lng, to.lat, to.lng);
+    if (token !== activeRouteToken) return; // stale
     allSegments[i] = segRoutes;
     for (const mode in segRoutes) {
       if (segRoutes[mode]) hasData = true;
     }
   }
 
-  if (!hasData) return;
+  if (!hasData) { legendContainer.style.display = 'none'; return; }
+  if (token !== activeRouteToken) return;
 
   // Combine segments into full route per mode
   const merged = {};
@@ -1146,6 +1189,8 @@ async function loadDayRoutes(dayNum, stops) {
       merged[mode].duration += seg.duration;
     }
   }
+
+  if (token !== activeRouteToken) return;
 
   const layers = {};
   for (const mode of MODE_ORDER) {
