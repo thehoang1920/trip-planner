@@ -1621,9 +1621,6 @@ document.getElementById('wlToggle').addEventListener('click', function() {
   this.textContent = wlVisible ? '📍 Ẩn danh sách yêu thích' : '📍 Hiển thị danh sách yêu thích trên bản đồ';
   if (wlVisible) {
     map.addLayer(wlLayer);
-    const allCoords = [];
-    wlLayer.eachLayer(l => { if (l.getLatLng) allCoords.push(l.getLatLng()); });
-    if (allCoords.length) map.fitBounds(allCoords, { padding: [40, 40], maxZoom: 13 });
   } else {
     map.removeLayer(wlLayer);
     pinnedEl = null;
