@@ -1167,6 +1167,19 @@ function updateMarkerIcons(dayNum) {
   });
 }
 
+function toggleComplete(m, dayNum) {
+  var st = routeState[dayNum];
+  if (!st) return;
+  var target = m._stopIdx;
+  if (st.completedUpTo === target) {
+    st.completedUpTo = Math.max(0, target - 1);
+  } else {
+    st.completedUpTo = target;
+  }
+  clearRoute();
+  drawDayRoute(st.stops, st.completedUpTo);
+}
+
 async function drawDayRoute(stops, completedUpTo) {
   const token = ++activeRouteToken;
   const legendEl = document.getElementById('routeLegend');
@@ -1262,33 +1275,13 @@ document.querySelectorAll('.day-card .day-header').forEach(function(header) {
         const m = L.marker([lat, lng], { icon: icon }).bindTooltip(stopNum + '. ' + loc, { direction: 'top' });
         m.on('mouseover', function() { if (pinnedEl) return; clearTimeout(hideTimeout); showPreview(s); });
         m.on('mouseout', function() { if (pinnedEl) return; hideTimeout = setTimeout(hidePreview, 150); });
-        m.on('click', function() { pinnedEl = s; pinnedMode = 'image'; showPreview(s); });
-        // Checkmark toggle: mark this stop as reached, hide legs before it
-        m._toggleCompletion = function() {
-          var st = routeState[dayNum];
-          if (!st) return;
-          var target = m._stopIdx; // 0-based index of this stop
-          if (st.completedUpTo === target) {
-            // Already at this stop — go back one
-            st.completedUpTo = Math.max(0, target - 1);
-          } else {
-            // Mark all legs up to this stop as completed
-            st.completedUpTo = target;
+        m.on('click', function(e) {
+          // Check if click was on the checkmark button
+          if (e.originalEvent && e.originalEvent.target && e.originalEvent.target.classList.contains('chk')) {
+            toggleComplete(m, dayNum);
+            return;
           }
-          clearRoute();
-          drawDayRoute(st.stops, st.completedUpTo);
-        };
-        // Checkmark toggle via DOM
-        m.on('add', function() {
-          var el = m.getElement();
-          if (!el) return;
-          var chk = el.querySelector('.chk');
-          if (chk) {
-            chk.addEventListener('click', function(e) {
-              e.stopPropagation();
-              if (m._toggleCompletion) m._toggleCompletion();
-            });
-          }
+          pinnedEl = s; pinnedMode = 'image'; showPreview(s);
         });
         m._stopIdx = stopNum - 1;
         markers.push(m);
