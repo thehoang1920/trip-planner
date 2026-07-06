@@ -1100,28 +1100,28 @@ function clearRoute() {
 function buildRouteLegend(segments) {
   const container = document.getElementById('routeLegend');
   let totalDist = 0, totalDur = 0;
+  const modeSet = {};
+  for (const seg of segments) {
+    totalDist += seg.distance || 0;
+    totalDur += seg.duration || 0;
+    if (seg.mode) modeSet[seg.mode] = true;
+  }
   if (!segments.length) { container.style.display = 'none'; return; }
 
   container.innerHTML = '<span class="legend-title">Tuyến tối ưu:</span>';
 
-  for (let i = 0; i < segments.length; i++) {
-    const seg = segments[i];
-    totalDist += seg.distance || 0;
-    totalDur += seg.duration || 0;
-    const st = SEG_STYLES[seg.mode];
+  const modeOrder = ['mrt','bus','walk','car'];
+  for (const mode of modeOrder) {
+    if (!modeSet[mode]) continue;
+    const st = SEG_STYLES[mode];
     if (!st) continue;
     const item = document.createElement('span');
     item.className = 'legend-item';
     const dash = st.dash ? 'stroke-dasharray:' + st.dash : '';
-    item.innerHTML = '<span class="legend-icon">' + st.icon + '</span><span class="legend-line" style="background:' + st.color + ';' + dash + '"></span>'
-      + st.label + ' <span class="legend-info">' + formatDist(seg.distance) + ' · ' + formatDur(seg.duration) + '</span>';
-    if (i < segments.length - 1) {
-      item.innerHTML += '<span style="color:#475569;font-size:0.6rem;margin-left:2px;">→</span>';
-    }
+    item.innerHTML = '<span class="legend-icon">' + st.icon + '</span><span class="legend-line" style="background:' + st.color + ';' + dash + '"></span>' + st.label;
     container.appendChild(item);
   }
 
-  // Total
   const total = document.createElement('span');
   total.style.cssText = 'color:#94a3b8;font-size:0.65rem;margin-left:auto;';
   total.textContent = 'Tổng: ' + formatDist(totalDist) + ' · ' + formatDur(totalDur);
