@@ -730,6 +730,64 @@ connect('SE2','SE3');
 
 This means Universal Studios Singapore (nearest station: SE1 Waterfront, ~240m) automatically routes via Sentosa Express instead of walking 1.2km from HarbourFront MRT.
 
+### Bus Stop Database (Hardcoded)
+
+Instead of relying on the Overpass API (which is unreliable — frequent rate limits and timeouts on the public instance), bus stops and routes are hardcoded for the most commonly needed routes:
+
+```js
+var BS = {};
+function addBusStop(code, name, lat, lng, routes) {
+  BS[code] = { name: name, lat: lat, lng: lng, routes: routes || [] };
+}
+
+// Route numbers listed in the `routes` array — shared routes connect stops
+addBusStop('GL18', 'Bef Lor 18 Geylang',      1.3122, 103.8798, ['100']);
+addBusStop('HBFT', 'HarbourFront Int',         1.2655, 103.8225, ['100']);
+addBusStop('RWS',  'Resorts World Sentosa',    1.2540, 103.8240, []);
+```
+
+**Bus stop lookup:**
+```js
+function findBusStopNear(lat, lng, maxDist) {
+  maxDist = maxDist || 400;
+  var best = null, bestDist = Infinity;
+  for (var k in BS) {
+    var s = BS[k];
+    var d = haversine(lat, lng, s.lat, s.lng);
+    if (d < maxDist && d < bestDist) {
+      best = { code: k, stop: s, dist: d };
+      bestDist = d;
+    }
+  }
+  return best;
+}
+```
+
+**Route matching:**
+```js
+function findConnectingBusRoute(fromStop, toStop) {
+  for (var i = 0; i < fromStop.stop.routes.length; i++) {
+    var r = fromStop.stop.routes[i];
+    for (var j = 0; j < toStop.stop.routes.length; j++) {
+      if (toStop.stop.routes[j] === r) return r;
+    }
+  }
+  return null;
+}
+```
+
+- Bus stops are searched within a 400m radius of both origin and destination
+- A route is found if both stops share the same route number in their `routes` array
+- If a connecting route is found, the bus segment shows: walk → bus (OSRM driving profile between stops) → walk
+- The tooltip displays the route number and stop names, e.g. `Bus 100 (Bef Lor 18 Geylang → HarbourFront Int)`
+- If no connecting bus route is found, falls back to direct OSRM driving from origin → destination (blue dashed)
+
+**Why hardcoded instead of Overpass API:**
+- The public Overpass API instance (`overpass-api.de`) has aggressive rate limits (~2 req/sec) and frequent timeouts
+- The `routes` tag on Singapore OSM bus stop nodes is inconsistently populated
+- Hardcoded stops are deterministic, fast, and work offline
+- For production, consider replacing with LTA DataMall API (free registration at https://datamall.lta.gov.sg)
+
 ### OSRM Route Fetching
 
 ```js
@@ -798,15 +856,18 @@ async function getOptimalRoute(fromLat, fromLng, toLat, toLng) {
    - Walk from last station → destination (yellow dashed)
    
 2. **Bus** (if direct distance > 300m):
-   - Single segment using OSRM driving profile (blue dashed)
+   - First tries hardcoded bus stops: `findBusStopNear` both ends, then `findConnectingBusRoute` for shared route number
+   - If found: walk → bus (OSRM driving between stops, blue dashed `8,4`) → walk
+   - Fallback: direct OSRM driving origin → destination (blue dashed)
 
 3. **Walking** (always available):
-   - Single straight line from origin → destination (yellow dashed)
+   - Single straight line from origin → destination (yellow dashed `4,4`)
    
 4. **Car** (last resort):
    - Single segment using OSRM driving profile (purple solid)
 
-**Returns:** Array of `{ mode, coords, distance, duration }` objects.
+**Returns:** Array of `{ mode, coords, distance, duration, label? }` objects.
+- `label` is optional: set to `'Bus 100 (Stop A → Stop B)'` for descriptive tooltips
 
 ### Route Segment Styles
 
@@ -841,10 +902,11 @@ Each day-click generates a new token. If a previous async `getOptimalRoute` reso
 
 1. Define MRT stations using `addStation()` + `connect()` for Singapore's network
 2. Add any special transit (like Sentosa Express) as stations connected to the nearest MRT
-3. Copy `getOptimalRoute()`, `SEG_STYLES`, `fetchRoute()`, `haversine()`, `formatDist()`, `formatDur()`, `nearestStation()`, `findMRT()`
-4. Copy `drawDayRoute()`, `buildRouteLegend()`, `clearRoute()`, `toggleComplete()`, `updateMarkerIcons()`
-5. Add `routeState`, `dayMarkers`, `activeDay`, `activeRouteToken`, `currentRouteLayer` state variables
-6. Hook the day click handler to call `drawDayRoute(stopData, 0)` when expanding a day
+3. Define bus stops using `addBusStop()` for key routes (Bus 100, etc.) — include route numbers in the `routes` array
+4. Copy `getOptimalRoute()`, `SEG_STYLES`, `fetchRoute()`, `haversine()`, `formatDist()`, `formatDur()`, `nearestStation()`, `findMRT()`, `findBusStopNear()`, `findConnectingBusRoute()`
+5. Copy `drawDayRoute()`, `buildRouteLegend()`, `clearRoute()`, `toggleComplete()`, `updateMarkerIcons()`
+6. Add `routeState`, `dayMarkers`, `activeDay`, `activeRouteToken`, `currentRouteLayer` state variables
+7. Hook the day click handler to call `drawDayRoute(stopData, 0)` when expanding a day
 
 ---
 
@@ -867,6 +929,12 @@ Each day-click generates a new token. If a previous async `getOptimalRoute` reso
 15. **`wl-sub-events` not found by `toggleSub`** — The `toggleSub` function checks for `sub-events` class. If you use a different class like `wl-sub-events`, update the check to `sub.classList.contains('sub-events') || sub.classList.contains('wl-sub-events')`.
 16. **Grid layout broken by parent/sub siblings** — `.wl-card.parent` and `.wl-sub-events` are separate grid items in `.wishlist-grid`. Without `grid-column: 1 / -1`, they occupy separate columns. Fix: wrap both in `.wl-location-block` which is a single grid item (no special grid-column needed).
 17. **Map marker creates duplicate preview for sub-event cards** — Sub-event `.wl-card` elements don't have `.wl-coord`, so the marker loop (`document.querySelectorAll('.wl-card')`) skips them. Only the parent `.wl-card` creates a map marker, which correctly shows the location overview on click.
+
+18. **Overpass API unreliable for real-time routing** — The public Overpass API (`overpass-api.de`) has rate limits (~2 req/sec) and frequent timeouts. For a client-side planner, hardcode bus stops/routes instead. If dynamic data is needed, register for LTA DataMall API (free, Singapore-specific transit data including GTFS).
+
+19. **`routes` tag on OSM bus stop nodes is inconsistent** — In Singapore, the `routes` or `route_ref` tag on `highway=bus_stop` nodes is often missing or incomplete. Route information is stored in OSM route relations, not on the stop nodes themselves. This makes Overpass-based bus routing extremely difficult without understanding the relation model.
+
+20. **Segment `label` overrides tooltip** — If a segment has a `label` property, the tooltip shows `seg.label: distance · duration` instead of the default `🚇 MRT: distance · duration`. Used for bus routes to display route number + stop names.
 
 ### Leaflet CDN
 
