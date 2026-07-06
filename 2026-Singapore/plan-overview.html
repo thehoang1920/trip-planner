@@ -1009,66 +1009,62 @@ async function getOptimalRoute(fromLat, fromLng, toLat, toLng) {
   const directDist = haversine(fromLat, fromLng, toLat, toLng);
   const straightSeg = [{ mode: 'walk', coords: [[fromLat, fromLng], [toLat, toLng]], distance: directDist, duration: 0 }];
 
-  // -- 1. Try MRT (if stations within 2km of both ends) --
-  const fromStation = nearestStation(fromLat, fromLng);
-  const toStation = nearestStation(toLat, toLng);
-  if (fromStation && toStation) {
-    const s1 = S[fromStation];
-    const s2 = S[toStation];
+  async function tryMRT() {
+    const fromStation = nearestStation(fromLat, fromLng);
+    const toStation = nearestStation(toLat, toLng);
+    if (!fromStation || !toStation) return null;
+    const s1 = S[fromStation], s2 = S[toStation];
     const distFrom = haversine(fromLat, fromLng, s1.lat, s1.lng);
     const distTo = haversine(toLat, toLng, s2.lat, s2.lng);
-    if (distFrom < 2000 && distTo < 2000) {
-      const mrtPath = findMRT(fromStation, toStation);
-      if (mrtPath && mrtPath.length >= 1) {
-        const segments = [];
-
-        // Walk to first station
-        const w1 = await fetchRoute('walking', [[fromLat, fromLng], [s1.lat, s1.lng]]);
-        if (w1) segments.push({ mode: 'walk', coords: w1.coords, distance: w1.distance, duration: w1.duration });
-        else segments.push({ mode: 'walk', coords: [[fromLat, fromLng], [s1.lat, s1.lng]], distance: distFrom, duration: 0 });
-
-        // MRT through stations
-        const stationCoords = mrtPath.map(code => [S[code].lat, S[code].lng]);
-        if (stationCoords.length >= 2) {
-          const mrtRoute = await fetchRoute('walking', stationCoords);
-          if (mrtRoute) {
-            segments.push({ mode: 'mrt', coords: mrtRoute.coords, distance: mrtRoute.distance, duration: mrtRoute.duration });
-          } else {
-            for (let i = 0; i < stationCoords.length - 1; i++) {
-              segments.push({
-                mode: 'mrt',
-                coords: [stationCoords[i], stationCoords[i + 1]],
-                distance: haversine(stationCoords[i][0], stationCoords[i][1], stationCoords[i+1][0], stationCoords[i+1][1]),
-                duration: 0
-              });
-            }
-          }
+    if (distFrom >= 2000 || distTo >= 2000) return null;
+    const mrtPath = findMRT(fromStation, toStation);
+    if (!mrtPath || !mrtPath.length) return null;
+    const segs = [];
+    const w1 = await fetchRoute('walking', [[fromLat, fromLng], [s1.lat, s1.lng]]);
+    if (w1) segs.push({ mode: 'walk', coords: w1.coords, distance: w1.distance, duration: w1.duration });
+    else segs.push({ mode: 'walk', coords: [[fromLat, fromLng], [s1.lat, s1.lng]], distance: distFrom, duration: 0 });
+    const stationCoords = mrtPath.map(code => [S[code].lat, S[code].lng]);
+    if (stationCoords.length >= 2) {
+      const mrtRoute = await fetchRoute('walking', stationCoords);
+      if (mrtRoute) {
+        segs.push({ mode: 'mrt', coords: mrtRoute.coords, distance: mrtRoute.distance, duration: mrtRoute.duration });
+      } else {
+        for (let i = 0; i < stationCoords.length - 1; i++) {
+          segs.push({ mode: 'mrt', coords: [stationCoords[i], stationCoords[i + 1]], distance: haversine(stationCoords[i][0], stationCoords[i][1], stationCoords[i+1][0], stationCoords[i+1][1]), duration: 0 });
         }
-
-        // Walk from last station
-        const sN = S[mrtPath[mrtPath.length - 1]];
-        if (sN) {
-          const w2 = await fetchRoute('walking', [[sN.lat, sN.lng], [toLat, toLng]]);
-          if (w2) segments.push({ mode: 'walk', coords: w2.coords, distance: w2.distance, duration: w2.duration });
-          else segments.push({ mode: 'walk', coords: [[sN.lat, sN.lng], [toLat, toLng]], distance: distTo, duration: 0 });
-        }
-
-        if (segments.length) return segments;
       }
     }
+    const sN = S[mrtPath[mrtPath.length - 1]];
+    if (sN) {
+      const w2 = await fetchRoute('walking', [[sN.lat, sN.lng], [toLat, toLng]]);
+      if (w2) segs.push({ mode: 'walk', coords: w2.coords, distance: w2.distance, duration: w2.duration });
+      else segs.push({ mode: 'walk', coords: [[sN.lat, sN.lng], [toLat, toLng]], distance: distTo, duration: 0 });
+    }
+    return segs.length ? segs : null;
   }
 
-  // -- 2. Try Bus (medium/long distances) --
-  if (directDist > 300) {
-    const drive = await fetchRoute('driving', [[fromLat, fromLng], [toLat, toLng]]);
-    if (drive) return [{ mode: 'bus', coords: drive.coords, distance: drive.distance, duration: drive.duration }];
+  async function tryBus() {
+    if (directDist <= 300) return null;
+    const d = await fetchRoute('driving', [[fromLat, fromLng], [toLat, toLng]]);
+    if (!d) return null;
+    return [{ mode: 'bus', coords: d.coords, distance: d.distance, duration: d.duration }];
   }
 
-  // -- 3. Walking --
+  // Try MRT and Bus in parallel, pick the faster one
+  const [mrtSegs, busSegs] = await Promise.all([tryMRT(), tryBus()]);
+  if (mrtSegs && busSegs) {
+    const tMrt = mrtSegs.reduce((s, x) => s + (x.duration || 0), 0);
+    const tBus = busSegs.reduce((s, x) => s + (x.duration || 0), 0);
+    return tMrt <= tBus ? mrtSegs : busSegs;
+  }
+  if (mrtSegs) return mrtSegs;
+  if (busSegs) return busSegs;
+
+  // -- Walking --
   const walk = await fetchRoute('walking', [[fromLat, fromLng], [toLat, toLng]]);
   if (walk) return [{ mode: 'walk', coords: walk.coords, distance: walk.distance, duration: walk.duration }];
 
-  // -- 4. Car (last resort) --
+  // -- Car (last resort) --
   const drive2 = await fetchRoute('driving', [[fromLat, fromLng], [toLat, toLng]]);
   if (drive2) return [{ mode: 'car', coords: drive2.coords, distance: drive2.distance, duration: drive2.duration }];
 
