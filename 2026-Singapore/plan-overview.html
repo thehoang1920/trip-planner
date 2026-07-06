@@ -1001,6 +1001,64 @@ function haversine(lat1, lng1, lat2, lng2) {
 }
 
 // ============================================================
+// OVERPASS API — Singapore bus stops & routes
+// ============================================================
+const OVERPASS_URL = 'https://overpass-api.de/api/interpreter';
+
+async function opQuery(query) {
+  const controller = new AbortController();
+  const timer = setTimeout(function() { controller.abort(); }, 10000);
+  try {
+    const resp = await fetch(OVERPASS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'data=' + encodeURIComponent(query),
+      signal: controller.signal
+    });
+    if (!resp.ok) return null;
+    return await resp.json();
+  } catch (e) {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function findBusStopsNear(lat, lng, radius) {
+  radius = radius || 400;
+  const q = '[out:json];node["highway"="bus_stop"](around:' + radius + ',' + lat + ',' + lng + ');out body;';
+  const data = await opQuery(q);
+  if (!data || !data.elements) return [];
+  return data.elements.filter(function(e) { return e.tags; }).map(function(e) {
+    return {
+      id: e.id,
+      lat: e.lat,
+      lng: e.lon,
+      name: e.tags.name || '',
+      ref: e.tags.ref || '',
+      routes: (e.tags.routes || e.tags.route_ref || '').split(/[,;]\s*/).filter(Boolean)
+    };
+  });
+}
+
+async function findConnectingRoute(fromStops, toStops) {
+  var fromRoutes = {};
+  fromStops.forEach(function(s) {
+    s.routes.forEach(function(r) { fromRoutes[r] = s; });
+  });
+  var best = null;
+  toStops.forEach(function(ts) {
+    ts.routes.forEach(function(r) {
+      var fs = fromRoutes[r];
+      if (fs) {
+        if (!best) best = { route: r, fromStop: fs, toStop: ts };
+      }
+    });
+  });
+  return best;
+}
+
+// ============================================================
 // OPTIMAL ROUTE ENGINE
 // Priority: MRT > Bus > Walking > Car
 // Returns array of segments: [{ mode, coords, distance, duration }, ...]
@@ -1060,6 +1118,30 @@ async function getOptimalRoute(fromLat, fromLng, toLat, toLng) {
 
   // -- 2. Bus (medium/long distances) --
   if (directDist > 300) {
+    // Try using real bus stops from OSM
+    var [fromStops, toStops] = await Promise.all([ findBusStopsNear(fromLat, fromLng), findBusStopsNear(toLat, toLng) ]);
+    if (fromStops.length && toStops.length) {
+      var conn = findConnectingRoute(fromStops, toStops);
+      if (conn) {
+        var segs = [];
+        var d1 = haversine(fromLat, fromLng, conn.fromStop.lat, conn.fromStop.lng);
+        var w1 = await fetchRoute('walking', [[fromLat, fromLng], [conn.fromStop.lat, conn.fromStop.lng]]);
+        if (w1) segs.push({ mode: 'walk', coords: w1.coords, distance: w1.distance, duration: w1.duration });
+        else segs.push({ mode: 'walk', coords: [[fromLat, fromLng], [conn.fromStop.lat, conn.fromStop.lng]], distance: d1, duration: 0 });
+        var bus = await fetchRoute('driving', [[conn.fromStop.lat, conn.fromStop.lng], [conn.toStop.lat, conn.toStop.lng]]);
+        if (bus) segs.push({ mode: 'bus', coords: bus.coords, distance: bus.distance, duration: bus.duration, label: 'Bus\u00a0' + conn.route + ' (' + conn.fromStop.name + ' → ' + conn.toStop.name + ')' });
+        else {
+          var d2 = haversine(conn.fromStop.lat, conn.fromStop.lng, conn.toStop.lat, conn.toStop.lng);
+          segs.push({ mode: 'bus', coords: [[conn.fromStop.lat, conn.fromStop.lng], [conn.toStop.lat, conn.toStop.lng]], distance: d2, duration: 0, label: 'Bus\u00a0' + conn.route });
+        }
+        var d3 = haversine(conn.toStop.lat, conn.toStop.lng, toLat, toLng);
+        var w2 = await fetchRoute('walking', [[conn.toStop.lat, conn.toStop.lng], [toLat, toLng]]);
+        if (w2) segs.push({ mode: 'walk', coords: w2.coords, distance: w2.distance, duration: w2.duration });
+        else segs.push({ mode: 'walk', coords: [[conn.toStop.lat, conn.toStop.lng], [toLat, toLng]], distance: d3, duration: 0 });
+        if (segs.length) return segs;
+      }
+    }
+    // Fallback: direct driving route
     const drive = await fetchRoute('driving', [[fromLat, fromLng], [toLat, toLng]]);
     if (drive) return [{ mode: 'bus', coords: drive.coords, distance: drive.distance, duration: drive.duration }];
   }
@@ -1254,7 +1336,8 @@ async function drawDayRoute(stops, currentStop, fit) {
     if (!st || !seg.coords || !seg.coords.length) continue;
     var opts = { color: st.color, weight: st.weight, opacity: 0.7, smoothFactor: 1.5 };
     if (st.dash) opts.dashArray = st.dash;
-    L.polyline(seg.coords, opts).addTo(routeLayer).bindTooltip(st.icon + ' ' + st.label + ': ' + formatDist(seg.distance) + ' · ' + formatDur(seg.duration), {
+    var tipLabel = seg.label || (st.icon + ' ' + st.label);
+    L.polyline(seg.coords, opts).addTo(routeLayer).bindTooltip(tipLabel + ': ' + formatDist(seg.distance) + ' · ' + formatDur(seg.duration), {
       sticky: true, direction: 'top', offset: [0, -8]
     });
     drawArrow(seg.coords, st.color, routeLayer);
