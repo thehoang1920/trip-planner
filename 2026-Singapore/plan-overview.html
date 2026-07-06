@@ -185,7 +185,7 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 .route-legend .legend-item:hover { background: #334155; }
 .route-legend .legend-item .legend-line { width: 20px; height: 3px; border-radius: 2px; flex-shrink: 0; }
 .route-legend .legend-item .legend-icon { font-size: 0.9rem; }
-.route-legend .legend-item .legend-info { font-size: 0.65rem; color: #64748b; margin-left: 2px; }
+.route-legend .legend-item .legend-info { font-size: 0.7rem; color: #94a3b8; margin-left: 2px; font-weight: 500; }
 
 .route-loading { display: inline-block; font-size: 0.7rem; color: #60a5fa; margin-left: 8px; animation: pulse 1.5s infinite; }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
@@ -1100,26 +1100,24 @@ function clearRoute() {
 function buildRouteLegend(segments) {
   const container = document.getElementById('routeLegend');
   let totalDist = 0, totalDur = 0;
-  const modeSet = {};
-  for (const seg of segments) {
-    totalDist += seg.distance || 0;
-    totalDur += seg.duration || 0;
-    if (seg.mode) modeSet[seg.mode] = (modeSet[seg.mode] || 0) + 1;
-  }
   if (!segments.length) { container.style.display = 'none'; return; }
 
   container.innerHTML = '<span class="legend-title">Tuyến tối ưu:</span>';
 
-  // Mode badges
-  const modeOrder = ['mrt','bus','walk','car'];
-  for (const mode of modeOrder) {
-    if (!modeSet[mode]) continue;
-    const st = SEG_STYLES[mode];
+  for (let i = 0; i < segments.length; i++) {
+    const seg = segments[i];
+    totalDist += seg.distance || 0;
+    totalDur += seg.duration || 0;
+    const st = SEG_STYLES[seg.mode];
     if (!st) continue;
     const item = document.createElement('span');
     item.className = 'legend-item';
     const dash = st.dash ? 'stroke-dasharray:' + st.dash : '';
-    item.innerHTML = '<span class="legend-icon">' + st.icon + '</span><span class="legend-line" style="background:' + st.color + ';' + dash + '"></span>' + st.label;
+    item.innerHTML = '<span class="legend-icon">' + st.icon + '</span><span class="legend-line" style="background:' + st.color + ';' + dash + '"></span>'
+      + st.label + ' <span class="legend-info">' + formatDist(seg.distance) + ' · ' + formatDur(seg.duration) + '</span>';
+    if (i < segments.length - 1) {
+      item.innerHTML += '<span style="color:#475569;font-size:0.6rem;margin-left:2px;">→</span>';
+    }
     container.appendChild(item);
   }
 
