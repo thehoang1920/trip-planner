@@ -1109,7 +1109,7 @@ L.marker([1.31155, 103.88085], { icon: hotelIcon }).addTo(map).bindTooltip('Hote
 // OPTIMAL ROUTE RENDERING
 // ============================================================
 const dayMarkers = {};
-const routeState = {}; // { dayNum: { stops: [], completedUpTo: 0 } }
+const routeState = {}; // { dayNum: { stops: [], currentStop: 0 } }
 let activeDay = null;
 let activeRouteToken = 0;
 let currentRouteLayer = null;
@@ -1151,16 +1151,19 @@ function buildRouteLegend(segments) {
 }
 
 function updateMarkerIcons(dayNum) {
-  const completed = routeState[dayNum] ? routeState[dayNum].completedUpTo : 0;
+  const st = routeState[dayNum];
+  if (!st) return;
+  const cur = st.currentStop;
   (dayMarkers[dayNum] || []).forEach(function(m, idx) {
     const el = m.getElement();
     if (!el) return;
-    const isDone = idx < completed;
+    const isDone = idx < cur;
+    const isCurrent = idx === cur;
     el.classList.toggle('done', isDone);
-    el.classList.toggle('current', idx === completed);
+    el.classList.toggle('current', isCurrent);
     const chk = el.querySelector('.chk');
     if (chk) {
-      if (idx === completed) chk.textContent = '●';
+      if (isCurrent) chk.textContent = '●';
       else if (isDone) chk.textContent = '✓';
       else chk.textContent = '○';
     }
@@ -1171,32 +1174,35 @@ function toggleComplete(m, dayNum) {
   var st = routeState[dayNum];
   if (!st) return;
   var target = m._stopIdx;
-  if (st.completedUpTo === target) {
-    st.completedUpTo = Math.max(0, target - 1);
+  if (st.currentStop === target) {
+    // Already at this stop — go back one
+    st.currentStop = Math.max(0, target - 1);
   } else {
-    st.completedUpTo = target;
+    // Move to this stop
+    st.currentStop = target;
   }
   clearRoute();
-  drawDayRoute(st.stops, st.completedUpTo);
+  drawDayRoute(st.stops, st.currentStop);
 }
 
-async function drawDayRoute(stops, completedUpTo) {
+async function drawDayRoute(stops, currentStop) {
   const token = ++activeRouteToken;
   const legendEl = document.getElementById('routeLegend');
 
   legendEl.innerHTML = '<span class="legend-title">Tuyến tối ưu:</span><span class="route-loading">⏳ Đang tính...</span>';
   legendEl.style.display = 'flex';
   clearRoute();
-  if (!stops || stops.length < 2) { legendEl.style.display = 'none'; return; }
+  if (!stops || stops.length < 2 || currentStop >= stops.length - 1) { legendEl.style.display = 'none'; return; }
 
   const legs = []; // [{ fromStopIdx, segments: [...] }]
 
-  for (let i = 0; i < stops.length - 1; i++) {
-    if (i < completedUpTo) { legs.push(null); continue; } // skip completed
-    const from = stops[i], to = stops[i + 1];
+  // Show only the leg FROM currentStop TO the next stop
+  var legIdx = currentStop;
+  if (legIdx < stops.length - 1) {
+    const from = stops[legIdx], to = stops[legIdx + 1];
     const segs = await getOptimalRoute(from.lat, from.lng, to.lat, to.lng);
     if (token !== activeRouteToken) return;
-    legs.push({ fromStopIdx: i, segments: segs });
+    legs.push({ fromStopIdx: legIdx, segments: segs });
   }
 
   if (token !== activeRouteToken) return;
@@ -1288,9 +1294,10 @@ document.querySelectorAll('.day-card .day-header').forEach(function(header) {
         map.addLayer(m);
       });
 
-      routeState[dayNum] = { stops: stopData, completedUpTo: 0 };
+      routeState[dayNum] = { stops: stopData, currentStop: 0 };
       dayMarkers[dayNum] = markers;
       drawDayRoute(stopData, 0);
+      updateMarkerIcons(dayNum);
 
     } else {
       if (activeDay === dayNum) {
