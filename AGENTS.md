@@ -17,7 +17,9 @@ The live GitHub Pages site must reflect local changes at all times. The user acc
   - `osm` (default): Nominatim (geocoding), OSRM (routing), Overpass (POIs). No API key needed.
   - `geoapify`: Geoapify API. Requires `GEOAPIFY_KEY` env var (or hardcoded default fallback).
 - **Trip data:** `<year>-<city>/` folders with itinerary, hotel info, README
-- **Skill reference:** `osm-planner` skill loaded via OpenCode for API patterns and Leaflet map templates
+- **Skill references:**
+  - `osm-planner` — OpenCode skill for OSM APIs (Nominatim, OSRM, Overpass) and Leaflet map templates
+  - `gmaps-route-importer` — OpenCode skill to parse Google Maps direction data (text/PDF) and inject into the planner map
 
 ## Commands
 
@@ -43,6 +45,11 @@ python osm_tools.py poi "Singapore" --type food --provider geoapify
 # ── Multi-stop trip plan ──
 python osm_tools.py plan "103.8607,1.2834" "103.8636,1.2817" "103.8303,1.2494" --mode walking
 python osm_tools.py plan "103.8607,1.2834" "103.8636,1.2817" --mode driving --provider geoapify
+
+# ── Google Maps Route Import (parse text/PDF → HTML stops) ──
+python parse_gmaps_route.py pdf "2026-Singapore/temp/mapdata.pdf"
+python parse_gmaps_route.py parse "raw_directions.txt" --geocode
+python parse_gmaps_route.py full "2026-Singapore/temp/mapdata.pdf" --origin-coords 1.31155,103.88085 --dest-coords 1.25404,103.82381
 ```
 
 ## Provider Recommendations
@@ -957,3 +964,20 @@ Each day-click generates a new token. If a previous async `getOptimalRoute` reso
 9. Add food section with cards
 10. Add `.nojekyll` at repo root
 11. Commit + push
+
+### Import Google Maps Route (when user provides direction data)
+
+When the user provides Google Maps direction text or a PDF, use the `gmaps-route-importer` skill + `parse_gmaps_route.py` to convert it into the map:
+
+1. [ ] Load the `gmaps-route-importer` skill for full instructions
+2. [ ] If PDF: `python parse_gmaps_route.py pdf path/to/file.pdf` to extract and parse
+3. [ ] If text: save to `.txt` then `python parse_gmaps_route.py parse path/to/file.txt --geocode`
+4. [ ] Review the parsed JSON and correct any mis-assigned `from`/`to` locations (parser is not perfect)
+5. [ ] Check the `line` field for MRT legs — match station codes (EW9, NE3, etc.) to the routing engine
+6. [ ] Check if all MRT stations exist in the database; add missing ones with `addStation()` + `connect()`
+7. [ ] If Sentosa Express or other special transit is involved, add VivoCity Station (SE0) if missing
+8. [ ] Generate HTML stops: `python parse_gmaps_route.py generate parsed.json --origin-coords lat,lng --dest-coords lat,lng`
+9. [ ] Insert the generated `.stop` elements into the appropriate day card in `plan-overview.html`
+10. [ ] Update `data-dist`, `data-gmaps`, `data-address` attributes as needed
+11. [ ] Refresh the page and verify the route renders correctly
+12. [ ] Commit + push
