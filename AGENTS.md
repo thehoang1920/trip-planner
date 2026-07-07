@@ -252,6 +252,28 @@ Key points:
 | `data-video` | `.wl-card`, `.food-card`, `.wl-video-btn` | YouTube URL for video preview |
 | `data-food-lat`, `data-food-lng` | `.food-card` | Food marker coordinates |
 
+### Marker Conventions
+
+Only `.stop[data-lat]` creates a numbered map marker. Follow these rules:
+
+| Rule | Example |
+|------|---------|
+| **Hotel is always marker #1** — every full day starts with a hotel `.stop` with `data-lat` | Day 2: Hotel(#1) → 126 Dim Sum(#2) → ... → Hotel(#5) |
+| **Transport stops have NO `data-lat`** — Grab rides, MRT segments are just timeline entries | `Grab đến GBTB`, `MRT đến Sentosa` — no coords |
+| **Same-location repeats have NO `data-lat`** — multiple activities at one complex | Harry Potter + Dopamine Land (both in RWS) — only Oceanarium has coords |
+| **End-of-day return to hotel HAS `data-lat`** — needed so route engine shows the last leg (dest → hotel) | `Grab về ks` at hotel coords as final marker |
+| **Food & drink places are distinct locations** with their own coordinates, not merged with hotel | 126 Dim Sum at 1.31583,103.88778 (not hotel coords) |
+
+**Marker count examples:**
+- D1 (arrival): 2 markers — Changi → Hotel
+- D2 (GBTB): 5 markers — Hotel → 126 Dim Sum → GBTB → Spectra → Hotel
+- D3 (USS): 4 markers — Hotel → 126 Dim Sum → USS → Hotel
+- D4 (Oceanarium): 3 markers — Hotel → Oceanarium → Hotel
+- D5 (Haji/Merlion): 7 markers — Hotel → Haji → Song Fa → Merlion → PORTALS → Frog Porridge → Hotel
+- D6 (departure): 4 markers — Hotel → Chin Mee Chin → Hotel(checkout) → Changi
+
+**Route flow:** Marker #1 (hotel) → destinations → last marker (hotel). Clicking the checkmark (○) on the last destination triggers `drawDayRoute` showing the leg from that dest back to hotel. Without `data-lat` on the return stop, `currentStop >= stops.length - 1` skips drawing.
+
 ### Preview Panel Structure
 
 ```html
@@ -943,6 +965,16 @@ Each day-click generates a new token. If a previous async `getOptimalRoute` reso
 
 20. **Segment `label` overrides tooltip** — If a segment has a `label` property, the tooltip shows `seg.label: distance · duration` instead of the default `🚇 MRT: distance · duration`. Used for bus routes to display route number + stop names.
 
+21. **`data-dist` format must be consistent** — All stops use `~X km from hotel · ~Y min Z` format. Vietnamese-only snippets (`~3.3 km` or `~5 phút đi bộ`) break the data-dist parsing. Always write `from hotel` and English transport names (Grab, walk).
+
+22. **Food & drink places must have their own coordinates** — A restaurant is a distinct physical location with its own lat/lng, not the hotel's. User expects a separate marker and correct routing (e.g., 126 Dim Sum is 366m from hotel, not at hotel coords).
+
+23. **End-of-day return stops need `data-lat` to show route back** — The route engine skips drawing when `currentStop >= stops.length - 1`. If the last stop (return-to-hotel) has no `data-lat`, clicking the checkmark on the second-to-last destination won't trigger a route. Fix: give the return stop hotel coords so it's a valid route endpoint.
+
+24. **Every full day starts with hotel as marker #1** — The hotel stop with `data-lat` must be the first `.stop` in every day-body (except arrival day where hotel is the last stop). Route always flows: Hotel → destinations → Hotel. Without the start marker, the route engine has no origin for the first leg.
+
+25. **Overlapping markers at same coords are acceptable** — When start-hotel and return-hotel are both at the same coordinates, the two numbered markers stack. This is fine because: (a) markers show distinct stop numbers, (b) the first is already "done" (✓) by the time the user clicks the return, and (c) both are needed by the route engine.
+
 ### Leaflet CDN
 
 ```html
@@ -957,6 +989,12 @@ Each day-click generates a new token. If a previous async `getOptimalRoute` reso
 3. Update trip info, dates, hotel, flight
 4. Create day cards (one per day)
 5. Add stops with data attributes (lat, lng, img, caption, address, dist, gmaps, video)
+   - First stop is always the hotel with `data-lat`/`data-lng` (marker #1)
+   - Food/drink stops get their own distinct coordinates
+   - Transport stops (Grab, MRT) have NO `data-lat`/`data-lng`
+   - Same-location repeats have NO `data-lat`/`data-lng`
+   - Last stop (return to hotel) gets `data-lat` with hotel coords for route engine
+   - `data-dist` uses `~X km from hotel · ~Y min Z` format (never Vietnamese-only)
 6. Label empty days with `empty-day` class
 7. Find images on Wikimedia Commons (500px width)
 8. Add wishlist section with cards + YouTube videos
